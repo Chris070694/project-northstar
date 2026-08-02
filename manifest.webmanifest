@@ -1,0 +1,10 @@
+{
+  "name": "Project Northstar",
+  "short_name": "Northstar",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070910",
+  "theme_color": "#080b12",
+  "description": "Personal Operating System für Trading, Fitness, Lernen und Ziele.",
+  "icons": []
+}
