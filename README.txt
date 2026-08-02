@@ -1,4 +1,4 @@
-NORTHSTAR MAIN v0.3.3
+CPRB MAIN v0.3.3
 
 NEU
 - voll funktionsfähige Trading Academy
