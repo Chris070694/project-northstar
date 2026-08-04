@@ -14,13 +14,13 @@ function openMobileMore(){
   document.body.classList.add('sheet-open');
 }
 function updateNavigation(id){
-  $('.nav,.mobile-nav-btn[data-page]').forEach(item=>item.classList.toggle('active',item.dataset.page===id));
+  $$('.nav,.mobile-nav-btn[data-page]').forEach(item=>item.classList.toggle('active',item.dataset.page===id));
   $('#mobileMoreButton')?.classList.toggle('active',!mobilePrimaryPages.has(id));
 }
 function showPage(id){
   const target=$('#'+id);
   if(!target?.classList.contains('page'))return;
-  $('.page').forEach(page=>page.classList.remove('active'));
+  $$('.page').forEach(page=>page.classList.remove('active'));
   target.classList.add('active');
   updateNavigation(id);
   closeMobileMore();
@@ -29,7 +29,7 @@ function showPage(id){
   history.replaceState(null,'',url);
   window.scrollTo({top:0,left:0});
 }
-$('[data-page]').forEach(button=>button.addEventListener('click',()=>showPage(button.dataset.page)));
+$$('[data-page]').forEach(button=>button.addEventListener('click',()=>showPage(button.dataset.page)));
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMobileMore()});
 async function login(){const{error}=await sb.auth.signInWithPassword({email:$('#email').value,password:$('#password').value});$('#authMsg').textContent=error?error.message:''}
 async function logout(){await sb.auth.signOut()}
