@@ -1,4 +1,4 @@
-const CACHE='northstar-reminders-v1';
+const CACHE='northstar-library-v1';
 const APP_SHELL=[
   './',
   './index.html',
@@ -16,6 +16,7 @@ const APP_SHELL=[
   './modules/fitness.js',
   './modules/notes.js',
   './modules/academy.js',
+  './modules/library.js',
   './modules/calendar.js',
   './modules/weekly.js',
   './modules/reminders.js',
