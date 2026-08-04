@@ -32,9 +32,17 @@ function reminderTime(value,fallback){
 }
 
 async function loadReminderSettings(){
+  let localPushEndpoint=null;
+  try{
+    const registration=await navigator.serviceWorker?.getRegistration();
+    const localSubscription=await registration?.pushManager.getSubscription();
+    localPushEndpoint=localSubscription?.endpoint||null;
+  }catch(error){
+    console.warn('Lokales Push-Abo konnte nicht geprüft werden.',error);
+  }
   const [settingsResult,subscriptionResult]=await Promise.all([
     sb.from('reminder_settings').select('*').eq('user_id',currentUser.id).maybeSingle(),
-    sb.from('push_subscriptions').select('id,endpoint').eq('user_id',currentUser.id).limit(1)
+    sb.from('push_subscriptions').select('id,endpoint').eq('user_id',currentUser.id)
   ]);
   const schemaError=settingsResult.error||subscriptionResult.error;
   if(schemaError){
@@ -46,7 +54,7 @@ async function loadReminderSettings(){
   }
   reminderSettingsReady=true;
   reminderSettings={...defaultReminderSettings(),...(settingsResult.data||{})};
-  pushSubscription=subscriptionResult.data?.[0]||null;
+  pushSubscription=(subscriptionResult.data||[]).find(item=>item.endpoint===localPushEndpoint)||null;
 }
 
 function notificationCapability(){
