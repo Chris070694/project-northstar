@@ -16,7 +16,8 @@
   "categories": [
     "productivity",
     "finance",
-    "health"
+    "health",
+    "books"
   ],
   "icons": [
     {
@@ -57,6 +58,11 @@
       "name": "Smart Reminders",
       "short_name": "Erinnerungen",
       "url": "./?page=reminders"
+    },
+    {
+      "name": "PDF Bibliothek",
+      "short_name": "Bibliothek",
+      "url": "./?page=library"
     }
   ]
 }
