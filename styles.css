@@ -690,3 +690,106 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
   .weekly-stats{grid-template-columns:1fr}
   .weekly-stat:last-child{grid-column:auto}
 }
+
+
+/* Habits & Smart Reminders */
+.task-repeat-toggle{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr);
+  gap:1px 9px;
+  align-items:center;
+  padding:10px 12px;
+  border:1px solid rgba(54,224,255,.16);
+  border-radius:12px;
+  background:rgba(54,224,255,.05);
+  cursor:pointer;
+}
+.task-repeat-toggle input{grid-row:1/3;width:18px;height:18px;accent-color:var(--cyan)}
+.task-repeat-toggle span{font-weight:800;color:#eefaff}
+.task-repeat-toggle small{color:var(--muted);font-size:12px}
+.task-repeat-toggle:has(input:checked){border-color:rgba(54,224,255,.48);background:rgba(54,224,255,.1)}
+.recurring-manager{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.recurring-manager-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.recurring-manager h3{margin:2px 0 0}
+.recurring-task-list{display:grid;gap:8px}
+.recurring-task-item{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:11px 12px;
+  border:1px solid rgba(54,224,255,.15);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.recurring-task-item>span{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;color:var(--cyan);background:rgba(54,224,255,.1);font-size:18px;font-weight:900}
+.recurring-task-item div{display:grid;gap:2px;min-width:0}
+.recurring-task-item b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recurring-task-item small{color:var(--muted)}
+.recurring-task-item button{border:0;background:transparent;color:#ff7d96;font:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:8px}
+.recurring-empty{padding:12px;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:12px}
+
+.notification-status-card{
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr) auto;
+  gap:16px;
+  align-items:center;
+  margin-bottom:16px;
+  border-color:rgba(54,224,255,.22);
+  background:linear-gradient(135deg,rgba(54,224,255,.08),rgba(124,92,255,.05) 58%,rgba(255,255,255,.025));
+}
+.notification-status-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:linear-gradient(145deg,rgba(54,224,255,.2),rgba(124,92,255,.18));font-size:24px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.notification-status-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:3px 0 5px}
+.notification-status-title h2{margin:0}
+.notification-status-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.notification-state{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.04);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.notification-state::before{content:"";width:7px;height:7px;border-radius:50%;background:#788294}
+.notification-state.active{color:#8df7bb;border-color:rgba(75,232,145,.35);background:rgba(75,232,145,.09)}
+.notification-state.active::before{background:#4be891;box-shadow:0 0 12px rgba(75,232,145,.85)}
+.notification-state.blocked{color:#ff9aab;border-color:rgba(255,103,128,.3);background:rgba(255,103,128,.08)}
+.notification-state.blocked::before{background:#ff6780}
+
+.reminder-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.reminder-card{display:grid;gap:18px;min-height:190px}
+.reminder-card>label,.reminder-inline-fields label{display:grid;gap:7px;color:var(--muted);font-size:12px;font-weight:800}
+.reminder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.reminder-card-head>div{display:flex;align-items:flex-start;gap:11px}
+.reminder-card-head h2{margin:0 0 4px;font-size:19px}
+.reminder-card-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.reminder-icon{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:rgba(54,224,255,.09);font-size:18px}
+.reminder-switch{position:relative;display:block!important;flex:0 0 44px;width:44px;height:26px;cursor:pointer}
+.reminder-switch input{position:absolute;opacity:0;pointer-events:none}
+.reminder-switch span{position:absolute;inset:0;border-radius:999px;background:#252b38;border:1px solid rgba(255,255,255,.08);transition:.2s}
+.reminder-switch span::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#a5adbb;transition:.2s}
+.reminder-switch input:checked+span{background:rgba(54,224,255,.22);border-color:rgba(54,224,255,.58)}
+.reminder-switch input:checked+span::after{transform:translateX(18px);background:var(--cyan);box-shadow:0 0 12px rgba(54,224,255,.65)}
+.reminder-switch input:focus-visible+span{outline:2px solid var(--cyan);outline-offset:3px}
+.reminder-inline-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fitness-reminder-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.fitness-reminder-days label{cursor:pointer}
+.fitness-reminder-days input{position:absolute;opacity:0;pointer-events:none}
+.fitness-reminder-days span{display:grid;place-items:center;height:34px;border:1px solid var(--line);border-radius:9px;color:var(--muted);font-size:11px;font-weight:900;transition:.16s}
+.fitness-reminder-days input:checked+span{color:#061016;border-color:var(--cyan);background:var(--cyan);box-shadow:0 7px 18px rgba(54,224,255,.18)}
+.fitness-reminder-days input:focus-visible+span{outline:2px solid var(--cyan);outline-offset:2px}
+.reminder-quiet-card{grid-column:1/-1;min-height:0}
+.timezone-pill{padding:6px 9px;border:1px solid rgba(124,92,255,.28);border-radius:999px;color:#cfc5ff;background:rgba(124,92,255,.08);font-size:11px;font-weight:800}
+.reminder-save-btn{display:block;min-width:240px;margin:16px 0 0 auto}
+.reminder-how-card{display:flex;gap:12px;align-items:flex-start;margin-top:14px}
+.reminder-how-card>span{font-size:20px}
+.reminder-how-card b{display:block;margin-bottom:4px}
+.reminder-how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+
+@media(max-width:800px){
+  .task-repeat-toggle{padding:10px}
+  .recurring-task-item{grid-template-columns:30px minmax(0,1fr)}
+  .recurring-task-item button{grid-column:2;justify-self:start;padding:5px 0}
+  .notification-status-card{grid-template-columns:44px minmax(0,1fr);padding:16px}
+  .notification-status-icon{width:44px;height:44px;border-radius:14px}
+  .notification-status-actions{grid-column:1/-1;justify-content:stretch}
+  .notification-status-actions .btn{flex:1}
+  .reminder-grid{grid-template-columns:1fr}
+  .reminder-quiet-card{grid-column:auto}
+  .reminder-card{min-height:0}
+  .reminder-save-btn{width:100%;min-width:0}
+}
