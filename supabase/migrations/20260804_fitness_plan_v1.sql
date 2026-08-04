@@ -65,16 +65,64 @@ alter table public.fitness_session_exercises enable row level security;
 
 drop policy if exists "Users manage their own fitness plans" on public.fitness_plans;
 create policy "Users manage their own fitness plans" on public.fitness_plans
-  for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+  for all
+  using (auth.uid()=user_id)
+  with check (auth.uid()=user_id);
 
 drop policy if exists "Users manage their own plan exercises" on public.fitness_plan_exercises;
 create policy "Users manage their own plan exercises" on public.fitness_plan_exercises
-  for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+  for all
+  using (
+    auth.uid()=user_id
+    and exists (
+      select 1 from public.fitness_plans plan
+      where plan.id=plan_id and plan.user_id=auth.uid()
+    )
+  )
+  with check (
+    auth.uid()=user_id
+    and exists (
+      select 1 from public.fitness_plans plan
+      where plan.id=plan_id and plan.user_id=auth.uid()
+    )
+  );
 
 drop policy if exists "Users manage their own fitness sessions" on public.fitness_sessions;
 create policy "Users manage their own fitness sessions" on public.fitness_sessions
-  for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+  for all
+  using (auth.uid()=user_id)
+  with check (
+    auth.uid()=user_id
+    and (
+      plan_id is null
+      or exists (
+        select 1 from public.fitness_plans plan
+        where plan.id=plan_id and plan.user_id=auth.uid()
+      )
+    )
+  );
 
 drop policy if exists "Users manage their own session exercises" on public.fitness_session_exercises;
 create policy "Users manage their own session exercises" on public.fitness_session_exercises
-  for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+  for all
+  using (
+    auth.uid()=user_id
+    and exists (
+      select 1 from public.fitness_sessions session
+      where session.id=session_id and session.user_id=auth.uid()
+    )
+  )
+  with check (
+    auth.uid()=user_id
+    and exists (
+      select 1 from public.fitness_sessions session
+      where session.id=session_id and session.user_id=auth.uid()
+    )
+    and (
+      plan_exercise_id is null
+      or exists (
+        select 1 from public.fitness_plan_exercises exercise
+        where exercise.id=plan_exercise_id and exercise.user_id=auth.uid()
+      )
+    )
+  );
