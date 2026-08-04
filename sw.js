@@ -1,4 +1,4 @@
-const CACHE='northstar-mobile-v1';
+const CACHE='northstar-mobile-v2';
 const APP_SHELL=[
   './',
   './index.html',
@@ -6,7 +6,9 @@ const APP_SHELL=[
   './app.js',
   './config.js',
   './manifest.webmanifest',
-  './icons/cprb-icon.svg',
+  './icons/cprb-og-192.png',
+  './icons/cprb-og-512.png',
+  './icons/cprb-og-180.png',
   './modules/core.js',
   './modules/trading.js',
   './modules/focus.js',
