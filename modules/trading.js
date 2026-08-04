@@ -42,7 +42,7 @@ function isMissingTradingCockpitSchema(error){
 
 async function loadTrades(){
   const [tradeResult,schemaResult,cockpitResult,settingsResult]=await Promise.all([
-    sb.from('trades').select('*').order('trade_date',{ascending:false}).order('created_at',{ascending:false}),
+    sb.from('trades').select('*').order('trade_date',{ascending:false}),
     sb.from('trades').select('id,result,followed_plan,setup_tags,mistakes,learning,before_image_path,after_image_path').limit(1),
     sb.from('trades').select('id,pre_trade_checklist,rule_score,rule_breaks,account_balance_snapshot,risk_percent,contract_value,position_size,emotion_after,execution_score').limit(1),
     sb.from('trading_settings').select('*').maybeSingle()
@@ -238,7 +238,7 @@ async function openTrade(id=null){
     $('#tTags').value=(trade.setup_tags||[]).join(', ');
     $('#tPnl').value=trade.result==='open'?'':(trade.pnl_usd??'');
     $('#tR').value=trade.result==='open'?'':(trade.r_multiple??'');
-    $('#tResult').value=trade.result||deriveTradeResult(trade.pnl_usd);
+    $('#tResult').value=trade.result==='open'?'auto':(trade.result||deriveTradeResult(trade.pnl_usd));
     $('#tEmotion').value=trade.emotion||'Ruhig';
     $('#tEmotionAfter').value=trade.emotion_after||'Ruhig';
     $('#tExecutionScore').value=trade.execution_score||7;
@@ -319,6 +319,7 @@ $('#tradeForm').onsubmit=async event=>{
     const hasPnl=$('#tPnl').value!=='';
     const pnl=hasPnl?Number($('#tPnl').value)||0:0;
     const selectedResult=$('#tResult').value;
+    if(!hasPnl&&!['auto','open'].includes(selectedResult))throw new Error('Für Win, Loss oder Break-even bitte zuerst P&L eintragen.');
     const checklist=readTradeChecklist();
     const score=tradeRuleScore(checklist);
     const tags=[...new Set($('#tTags').value.split(',').map(tag=>tag.trim()).filter(Boolean))];
@@ -470,16 +471,17 @@ function renderTradingCockpitStatus(){
 
 function renderTradingAnalytics(){
   const checklistTrades=trades.filter(hasTradeChecklist);
+  const reviewedTrades=trades.filter(trade=>(trade.result||deriveTradeResult(trade.pnl_usd))!=='open');
   const avgScore=checklistTrades.length
     ?checklistTrades.reduce((sum,trade)=>sum+(Number(trade.rule_score)||0),0)/checklistTrades.length
     :0;
-  const planRate=trades.length?trades.filter(trade=>trade.followed_plan).length/trades.length*100:0;
-  const errorCost=Math.abs(trades.filter(trade=>!trade.followed_plan&&Number(trade.r_multiple)<0).reduce((sum,trade)=>sum+(Number(trade.r_multiple)||0),0));
+  const planRate=reviewedTrades.length?reviewedTrades.filter(trade=>trade.followed_plan).length/reviewedTrades.length*100:0;
+  const errorCost=Math.abs(reviewedTrades.filter(trade=>!trade.followed_plan&&Number(trade.r_multiple)<0).reduce((sum,trade)=>sum+(Number(trade.r_multiple)||0),0));
   const breakCounts={};
   checklistTrades.forEach(trade=>(trade.rule_breaks||[]).forEach(item=>{breakCounts[item]=(breakCounts[item]||0)+1}));
   const topBreak=Object.entries(breakCounts).sort((a,b)=>b[1]-a[1])[0];
   $('#cockpitAverageScore').textContent=checklistTrades.length?`${avgScore.toFixed(0)}%`:'–';
-  $('#cockpitPlanRate').textContent=trades.length?`${planRate.toFixed(0)}%`:'–';
+  $('#cockpitPlanRate').textContent=reviewedTrades.length?`${planRate.toFixed(0)}%`:'–';
   $('#cockpitErrorCost').textContent=`${errorCost.toFixed(2)}R`;
   $('#cockpitTopBreak').textContent=topBreak?topBreak[0]:'Noch keine Daten';
   $('#cockpitTopBreakMeta').textContent=topBreak?`${topBreak[1]}x nicht erfüllt`:'Beginnt mit deinem ersten Cockpit-Trade';
