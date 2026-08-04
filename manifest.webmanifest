@@ -52,6 +52,11 @@
       "name": "Weekly Review",
       "short_name": "Review",
       "url": "./?page=weekly"
+    },
+    {
+      "name": "Smart Reminders",
+      "short_name": "Erinnerungen",
+      "url": "./?page=reminders"
     }
   ]
 }
