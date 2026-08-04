@@ -1,4 +1,4 @@
-const CACHE='northstar-mobile-v2';
+const CACHE='northstar-weekly-v1';
 const APP_SHELL=[
   './',
   './index.html',
@@ -17,6 +17,7 @@ const APP_SHELL=[
   './modules/notes.js',
   './modules/academy.js',
   './modules/calendar.js',
+  './modules/weekly.js',
   './modules/pwa.js'
 ];
 

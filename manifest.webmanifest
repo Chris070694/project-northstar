@@ -47,6 +47,11 @@
       "name": "Fitness Plan",
       "short_name": "Fitness",
       "url": "./?page=fitness"
+    },
+    {
+      "name": "Weekly Review",
+      "short_name": "Review",
+      "url": "./?page=weekly"
     }
   ]
 }
