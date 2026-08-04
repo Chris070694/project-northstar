@@ -5,6 +5,7 @@
 <div class="grid hero-grid"><div class="card focus-card"><div class="eyebrow">Dein Fokus heute</div><div id="mainFocus" class="focus-title">Definiere deinen Fokus.</div><div id="nextFocus" class="sub">Der nächste kleine Schritt zählt.</div><div class="quick-grid"><div class="quick">📈 Trading<br><b id="tradingFocus">Offen</b></div><div class="quick">💪 Fitness<br><b id="fitnessFocus">Offen</b></div><div class="quick">📚 Lernen<br><b id="learningFocus">Offen</b></div></div><div class="home-task-section"><div class="task-heading"><span>Heutige Aufgaben</span><b id="homeTaskProgress">0/0 erledigt</b></div><div id="homeTaskList" class="home-task-list"></div></div></div><div id="heroGoal" class="card vision-card"><div class="vision-content"><span class="pill">DEIN NORDSTERN</span><h2>Noch kein Long-Term-Ziel</h2><p class="sub">Füge ein Ziel mit Bild hinzu.</p></div></div></div>
 <h2 style="margin-top:24px">Trading Snapshot</h2><div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="pnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="winrate" class="value">0%</div></div><div class="card stat"><div class="label">Profit Factor</div><div id="profitFactor" class="value">0</div></div><div class="card stat"><div class="label">Trades</div><div id="tradeCount" class="value">0</div></div></div>
 <h2 style="margin-top:24px">Schnellaktionen</h2><div class="grid thirds"><div class="card dashboard-action"><strong>Trade dokumentieren</strong><span>Entry, Risiko, Setup und Ergebnis.</span><button class="btn primary" onclick="openTrade()">Trade erfassen</button></div><div class="card dashboard-action"><strong>Fokus setzen</strong><span>Definiere, was heute wirklich zählt.</span><button class="btn" onclick="showPage('focus')">Daily Focus</button></div><div class="card dashboard-action"><strong>Vision erweitern</strong><span>Verbinde dein Ziel mit dem nächsten Schritt.</span><button class="btn" onclick="openGoal()">Ziel hinzufügen</button></div></div>
+<div id="homeFitnessOverview" class="card home-fitness-overview"><div><div class="eyebrow">Fitness heute</div><h2 id="homeFitnessPlan">2er-Split einrichten</h2><p id="homeFitnessStatus" class="sub">Dein Trainingsplan ist noch offen.</p></div><button class="btn" onclick="showPage('fitness')">Fitness öffnen</button></div>
 <h2 style="margin-top:24px">Dein Weg</h2><div id="homeGoals" class="grid thirds"></div></section>
 
 <section id="trading" class="page"><div class="top"><div><h1>Trading Journal</h1><div class="sub">Dokumentieren, auswerten, verbessern.</div></div><button class="btn primary" onclick="openTrade()">+ Neuer Trade</button></div>
@@ -15,9 +16,28 @@
 <section id="focus" class="page"><div class="top"><div><h1>Daily Focus</h1><div class="sub">Was zählt heute wirklich?</div></div></div><div class="focus-workspace"><form id="focusForm" class="card"><div class="grid form-grid"><div class="full"><label>Hauptfokus</label><input id="fMain"></div><div><label>Trading</label><input id="fTrading"></div><div><label>Fitness</label><input id="fFitness"></div><div><label>Lernen</label><input id="fLearning"></div><div class="span2"><label>Nächster konkreter Schritt</label><input id="fNext"></div><div class="full"><label>Reflexion</label><textarea id="fReflection"></textarea></div><div class="full"><button class="btn primary">Fokus speichern</button></div></div></form><section class="card task-panel"><div class="task-panel-head"><div><div class="eyebrow">Tagesplan</div><h2>To-do-Liste</h2></div><div id="taskCounter" class="task-counter">0/0</div></div><form id="taskForm" class="task-entry"><input id="taskTitle" maxlength="180" required placeholder="Neue Aufgabe hinzufügen…"><select id="taskCategory" aria-label="Kategorie"><option>Allgemein</option><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Privat</option></select><button class="btn primary" aria-label="Aufgabe hinzufügen">+</button></form><div id="taskSetupNotice" class="task-setup-notice hide">Die Aufgaben-Datenbank muss noch eingerichtet werden.</div><div class="task-progress-track"><div id="taskProgressBar"></div></div><div id="dailyTaskList" class="daily-task-list"></div></section></div></section>
 
 <section id="fitness" class="page">
-  <div class="top"><div><h1>Fitness</h1><div class="sub">Übungen, Sätze, Wiederholungen und Gewicht.</div></div><button class="btn primary" onclick="openExercise()">+ Übung</button></div>
-  <div class="card">
-    <div id="exerciseList" class="module-list"></div>
+  <div class="top">
+    <div><h1>Fitness Plan</h1><div class="sub">Dein 2er-Split, Training und Fortschritt an einem Ort.</div></div>
+    <div class="actions"><button class="btn" onclick="openExercise()">+ Übung</button><button id="fitnessStartBtn" class="btn primary" onclick="startFitnessWorkout()">Training starten</button></div>
+  </div>
+  <div id="fitnessSetupNotice" class="task-setup-notice hide">Die Fitness-Datenbank muss noch eingerichtet werden.</div>
+  <div class="grid fitness-stats">
+    <div class="card stat"><div class="label">Trainings diese Woche</div><div id="fitnessWeekCount" class="value">0</div></div>
+    <div class="card stat"><div class="label">Aktiver Plan</div><div id="fitnessCurrentPlan" class="value fitness-stat-text">–</div></div>
+    <div class="card stat"><div class="label">Letztes Training</div><div id="fitnessLastWorkout" class="value fitness-stat-text">–</div></div>
+  </div>
+  <div id="fitnessEmptyState" class="card fitness-empty hide">
+    <div class="fitness-empty-icon">💪</div><h2>Deinen 2er-Split einrichten</h2>
+    <p class="sub">Training A und B werden angelegt. Vorhandene Übungen übernehmen wir automatisch in Training A.</p>
+    <button class="btn primary" onclick="createDefaultFitnessPlans()">2er-Split erstellen</button>
+  </div>
+  <section id="activeWorkout" class="card active-workout hide"></section>
+  <div id="fitnessWorkspace" class="fitness-workspace hide">
+    <section class="card fitness-plan-card">
+      <div class="fitness-plan-toolbar"><div id="fitnessPlanTabs" class="fitness-plan-tabs"></div><button class="btn" onclick="openExercise()">+ Übung</button></div>
+      <div id="fitnessPlanList" class="fitness-plan-list"></div>
+    </section>
+    <aside class="card fitness-history-card"><div class="eyebrow">Verlauf</div><h2>Letzte Trainings</h2><div id="fitnessHistory" class="fitness-history"></div></aside>
   </div>
 </section>
 
@@ -83,14 +103,15 @@
 
 <div id="exerciseModal" class="modal">
 <form id="exerciseForm" class="card">
-  <div class="top"><h2>Übung hinzufügen</h2><button type="button" class="btn" onclick="closeExercise()">✕</button></div>
+  <div class="top"><div><h2>Übung hinzufügen</h2><div class="sub">Ordne die Übung direkt Training A oder B zu.</div></div><button type="button" class="btn" onclick="closeExercise()">✕</button></div>
   <div class="grid form-grid">
-    <div><label>Übung</label><input id="exName" required placeholder="Bankdrücken"></div>
-    <div><label>Muskelgruppe</label><input id="exMuscle" placeholder="Brust"></div>
-    <div><label>Sätze</label><input id="exSets" type="number" value="3"></div>
-    <div><label>Wiederholungen</label><input id="exReps" type="number" value="10"></div>
-    <div><label>Gewicht kg</label><input id="exWeight" type="number" step=".5" value="0"></div>
-    <div class="full"><button class="btn primary">Speichern</button></div>
+    <div><label>Trainingsplan</label><select id="exPlan" required></select></div>
+    <div><label>Übung</label><input id="exName" required maxlength="100" placeholder="Bankdrücken"></div>
+    <div><label>Muskelgruppe</label><input id="exMuscle" maxlength="60" placeholder="Brust"></div>
+    <div><label>Ziel-Sätze</label><input id="exSets" type="number" min="1" max="20" value="3"></div>
+    <div><label>Ziel-Wiederholungen</label><input id="exReps" type="number" min="1" max="100" value="10"></div>
+    <div><label>Startgewicht kg</label><input id="exWeight" type="number" min="0" step=".5" value="0"></div>
+    <div class="full"><button class="btn primary">Übung speichern</button></div>
   </div>
 </form>
 </div>
