@@ -493,7 +493,7 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
     border-bottom:1px solid var(--line);background:rgba(5,7,11,.88);backdrop-filter:blur(22px)
   }
   .mobile-brand{display:flex;align-items:center;gap:10px;min-width:0}
-  .mobile-brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:13px;background:linear-gradient(145deg,rgba(112,229,255,.2),rgba(103,242,156,.12));color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(112,229,255,.2)}
+  .mobile-brand-logo{display:block;width:38px;height:38px;object-fit:cover;border-radius:13px;box-shadow:0 5px 18px rgba(0,0,0,.35),0 0 0 1px rgba(255,206,77,.28)}
   .mobile-brand b,.mobile-brand small{display:block}
   .mobile-brand b{font-size:15px;letter-spacing:.02em}
   .mobile-brand small{font-size:10px;color:var(--muted);margin-top:2px}
