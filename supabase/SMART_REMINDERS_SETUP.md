@@ -12,8 +12,8 @@ Danach funktionieren die täglich wiederholenden To-dos bereits.
 ## 2. Edge Function deployen
 
 Im Supabase Dashboard zu **Edge Functions** wechseln, eine Function mit dem Namen
-`smart-reminders` erstellen und den Inhalt von
-`supabase/functions/smart-reminders/index.ts` einsetzen.
+`smart-reminder` erstellen und den Inhalt von
+`supabase/functions/smart-reminder/index.ts` einsetzen.
 
 Die JWT-Prüfung der Function muss deaktiviert sein. Die Function prüft Aufrufe selbst:
 
@@ -23,7 +23,7 @@ Die JWT-Prüfung der Function muss deaktiviert sein. Die Function prüft Aufrufe
 Mit der Supabase CLI entspricht das:
 
 ```bash
-supabase functions deploy smart-reminders --no-verify-jwt
+supabase functions deploy smart-reminder --no-verify-jwt
 ```
 
 ## 3. Cron-Secret setzen
@@ -51,7 +51,7 @@ select vault.create_secret(
 );
 
 select cron.schedule(
-  'cprb-smart-reminders',
+  'cprb-smart-reminder',
   '* * * * *',
   $$
   select net.http_post(
@@ -59,7 +59,7 @@ select cron.schedule(
       select decrypted_secret
       from vault.decrypted_secrets
       where name = 'cprb_project_url'
-    ) || '/functions/v1/smart-reminders',
+    ) || '/functions/v1/smart-reminder',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'x-cron-secret', (
