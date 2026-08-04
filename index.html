@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CPRB OS – Project Northstar</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#080b12"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CPRB"><link rel="icon" href="icons/cprb-og-192.png" type="image/png"><link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link rel="stylesheet" href="styles.css"></head><body>
 <section id="auth" class="auth"><div class="authbox"><h1>Project <span style="color:var(--cyan)">Northstar</span></h1><p class="sub">Dein persönliches Operating System.</p><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="password" type="password"><button class="btn primary" onclick="login()">Anmelden</button><p id="authMsg" class="sub"></p></div></section>
-<div id="app" class="app hide"><header class="mobile-header"><div class="mobile-brand"><img class="mobile-brand-logo" src="icons/cprb-og-192.png" alt="CPRB OG"><div><b>CPRB OS</b><small>Project Northstar</small></div></div><button class="mobile-trade-btn" onclick="openTrade()" aria-label="Neuen Trade erfassen">+ Trade</button></header><aside class="sidebar"><div class="brand">Project <b>Northstar</b><small>Personal Operating System</small></div><button class="nav active" data-page="home">⌂ Home</button><button class="nav" data-page="trading">↗ Trading</button><button class="nav" data-page="goals">🎯 Goals & Vision</button><button class="nav" data-page="focus">◎ Daily Focus</button><button class="nav" data-page="weekly">↻ Weekly Review</button><button class="nav" data-page="reminders">🔔 Erinnerungen</button><button class="nav" data-page="fitness">💪 Fitness</button><button class="nav" data-page="notes">📝 Notizen</button><button class="nav" data-page="academy">📚 Academy</button><button class="nav" data-page="calendar">📅 Kalender</button><button class="nav" data-page="account">⚙ Konto</button></aside><main class="main"><div class="layout-shell"><div>
+<div id="app" class="app hide"><header class="mobile-header"><div class="mobile-brand"><img class="mobile-brand-logo" src="icons/cprb-og-192.png" alt="CPRB OG"><div><b>CPRB OS</b><small>Project Northstar</small></div></div><button class="mobile-trade-btn" onclick="openTrade()" aria-label="Neuen Trade erfassen">+ Trade</button></header><aside class="sidebar"><div class="brand">Project <b>Northstar</b><small>Personal Operating System</small></div><button class="nav active" data-page="home">⌂ Home</button><button class="nav" data-page="trading">↗ Trading</button><button class="nav" data-page="goals">🎯 Goals & Vision</button><button class="nav" data-page="focus">◎ Daily Focus</button><button class="nav" data-page="weekly">↻ Weekly Review</button><button class="nav" data-page="reminders">🔔 Erinnerungen</button><button class="nav" data-page="fitness">💪 Fitness</button><button class="nav" data-page="notes">📝 Notizen</button><button class="nav" data-page="library">📖 Bibliothek</button><button class="nav" data-page="academy">📚 Academy</button><button class="nav" data-page="calendar">📅 Kalender</button><button class="nav" data-page="account">⚙ Konto</button></aside><main class="main"><div class="layout-shell"><div>
 <section id="home" class="page active"><div id="pwaNotice" class="pwa-notice"><span>Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span><button id="installBtn" class="btn primary">Als App installieren</button></div><div class="top"><div><h1 id="greeting">Guten Morgen 👋</h1><div id="todayText" class="sub"></div></div><div class="actions"><button class="btn" onclick="showPage('focus')">Fokus</button><button class="btn primary" onclick="openTrade()">+ Trade</button></div></div>
 <div class="grid hero-grid"><div class="card focus-card"><div class="eyebrow">Dein Fokus heute</div><div id="mainFocus" class="focus-title">Definiere deinen Fokus.</div><div id="nextFocus" class="sub">Der nächste kleine Schritt zählt.</div><div class="quick-grid"><div class="quick">📈 Trading<br><b id="tradingFocus">Offen</b></div><div class="quick">💪 Fitness<br><b id="fitnessFocus">Offen</b></div><div class="quick">📚 Lernen<br><b id="learningFocus">Offen</b></div></div><div class="home-task-section"><div class="task-heading"><span>Heutige Aufgaben</span><b id="homeTaskProgress">0/0 erledigt</b></div><div id="homeTaskList" class="home-task-list"></div></div></div><div id="heroGoal" class="card vision-card"><div class="vision-content"><span class="pill">DEIN NORDSTERN</span><h2>Noch kein Long-Term-Ziel</h2><p class="sub">Füge ein Ziel mit Bild hinzu.</p></div></div></div>
 <h2 style="margin-top:24px">Trading Snapshot</h2><div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="pnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="winrate" class="value">0%</div></div><div class="card stat"><div class="label">Profit Factor</div><div id="profitFactor" class="value">0</div></div><div class="card stat"><div class="label">Trades</div><div id="tradeCount" class="value">0</div></div></div>
@@ -110,6 +110,34 @@
   <div id="academyGrid" class="academy-grid" style="margin-top:15px"></div>
 </section>
 
+
+<section id="library" class="page">
+  <div class="top library-page-top">
+    <div><div class="eyebrow">Dein digitales Bücherregal</div><h1>Bibliothek</h1><div class="sub">Private PDFs lesen – mit Cover, Suche und gespeichertem Fortschritt.</div></div>
+    <button id="openLibraryUploadBtn" class="btn primary" type="button" onclick="openLibraryUpload()">+ Buch hinzufügen</button>
+  </div>
+  <div id="librarySetupNotice" class="task-setup-notice hide">Die Bibliotheks-Datenbank und der private PDF-Speicher müssen noch in Supabase eingerichtet werden.</div>
+  <div class="library-stats">
+    <article class="card"><span>📚</span><div><strong id="libraryCount">0</strong><small>Bücher</small></div></article>
+    <article class="card"><span>📖</span><div><strong id="libraryReadingCount">0</strong><small>Am Lesen</small></div></article>
+    <article class="card"><span>✓</span><div><strong id="libraryFinishedCount">0</strong><small>Abgeschlossen</small></div></article>
+  </div>
+  <section id="libraryContinue" class="card library-continue hide">
+    <div id="libraryContinueCover" class="library-continue-cover"><span>📖</span></div>
+    <div><div class="eyebrow">Zuletzt gelesen</div><h2 id="libraryContinueTitle">–</h2><p id="libraryContinueMeta" class="sub">–</p></div>
+    <button id="libraryContinueBtn" class="btn primary" type="button">Weiterlesen</button>
+  </section>
+  <div class="card library-toolbar">
+    <label class="library-search"><span>⌕</span><input id="librarySearch" placeholder="Titel oder Autor suchen…" oninput="renderLibrary()"></label>
+    <select id="libraryCategoryFilter" onchange="renderLibrary()" aria-label="Kategorie filtern">
+      <option value="">Alle Kategorien</option>
+      <option>Trading</option><option>Finanzen</option><option>Mindset</option><option>Persönliche Entwicklung</option><option>Fitness</option><option>Biografie</option><option>Andere</option>
+    </select>
+  </div>
+  <div id="libraryGrid" class="library-grid"></div>
+  <section class="card library-private-note"><span>🔒</span><div><b>Deine PDFs bleiben privat</b><p>Die Dateien liegen in einem geschützten Supabase-Bucket und werden nur über zeitlich begrenzte Links geöffnet.</p></div></section>
+</section>
+
 <section id="calendar" class="page">
   <div class="top">
     <div><h1>Kalender</h1><div class="sub">Trading, Fitness, Lernen und private Termine.</div></div>
@@ -174,10 +202,11 @@
   <div class="module-card" onclick="showPage('weekly')"><div class="icon">↻</div><b>Weekly Review</b><span>Woche analysieren und planen</span></div>
   <div class="module-card" onclick="showPage('fitness')"><div class="icon">💪</div><b>Fitness</b><span>Übungen und Trainingsplan</span></div>
   <div class="module-card" onclick="showPage('notes')"><div class="icon">📝</div><b>Notizen</b><span>Gedanken und Screenshots</span></div>
+  <div class="module-card" onclick="showPage('library')"><div class="icon">📖</div><b>Bibliothek</b><span>PDFs lesen und fortsetzen</span></div>
   <div class="module-card" onclick="showPage('academy')"><div class="icon">📚</div><b>Academy</b><span>MSS, FVG, SMT und mehr</span></div>
   <div class="module-card" onclick="showPage('calendar')"><div class="icon">📅</div><b>Kalender</b><span>Termine und Routinen</span></div>
 </aside>
-</div></main><nav class="mobile-nav" aria-label="Mobile Hauptnavigation"><button class="mobile-nav-btn active" data-page="home"><span>⌂</span><small>Home</small></button><button class="mobile-nav-btn" data-page="trading"><span>↗</span><small>Trading</small></button><button class="mobile-nav-btn" data-page="focus"><span>◎</span><small>Fokus</small></button><button class="mobile-nav-btn" data-page="fitness"><span>💪</span><small>Fitness</small></button><button id="mobileMoreButton" class="mobile-nav-btn" type="button" onclick="openMobileMore()"><span>•••</span><small>Mehr</small></button></nav><div id="mobileMoreSheet" class="mobile-sheet-backdrop" onclick="closeMobileMore()"><section class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">CPRB OS</div><h2 id="mobileMoreTitle">Mehr</h2></div><button class="btn" type="button" onclick="closeMobileMore()">✕</button></div><div class="mobile-more-grid"><button data-page="reminders"><span>🔔</span><b>Erinnerungen</b><small>Push & Routinen</small></button><button data-page="weekly"><span>↻</span><b>Weekly Review</b><small>Woche abschließen</small></button><button data-page="goals"><span>🎯</span><b>Goals</b><small>Vision & Ziele</small></button><button data-page="notes"><span>📝</span><b>Notizen</b><small>Gedanken sammeln</small></button><button data-page="academy"><span>📚</span><b>Academy</b><small>Trading lernen</small></button><button data-page="calendar"><span>📅</span><b>Kalender</b><small>Termine planen</small></button><button data-page="account"><span>⚙</span><b>Konto</b><small>Einstellungen</small></button></div></section></div><div id="installGuide" class="mobile-sheet-backdrop" onclick="closeInstallGuide()"><section class="mobile-sheet install-sheet" role="dialog" aria-modal="true" aria-labelledby="installGuideTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">iPhone Installation</div><h2 id="installGuideTitle">CPRB als App nutzen</h2></div><button class="btn" type="button" onclick="closeInstallGuide()">✕</button></div><ol class="install-steps"><li><span>1</span><div><b>In Safari öffnen</b><small>Die Installation funktioniert direkt im Safari-Browser.</small></div></li><li><span>2</span><div><b>Teilen antippen</b><small>Unten auf das Teilen-Symbol drücken.</small></div></li><li><span>3</span><div><b>Zum Home-Bildschirm</b><small>Auswählen und mit „Hinzufügen“ bestätigen.</small></div></li></ol><button class="btn primary install-done-btn" type="button" onclick="closeInstallGuide()">Verstanden</button></section></div></div>
+</div></main><nav class="mobile-nav" aria-label="Mobile Hauptnavigation"><button class="mobile-nav-btn active" data-page="home"><span>⌂</span><small>Home</small></button><button class="mobile-nav-btn" data-page="trading"><span>↗</span><small>Trading</small></button><button class="mobile-nav-btn" data-page="focus"><span>◎</span><small>Fokus</small></button><button class="mobile-nav-btn" data-page="fitness"><span>💪</span><small>Fitness</small></button><button id="mobileMoreButton" class="mobile-nav-btn" type="button" onclick="openMobileMore()"><span>•••</span><small>Mehr</small></button></nav><div id="mobileMoreSheet" class="mobile-sheet-backdrop" onclick="closeMobileMore()"><section class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">CPRB OS</div><h2 id="mobileMoreTitle">Mehr</h2></div><button class="btn" type="button" onclick="closeMobileMore()">✕</button></div><div class="mobile-more-grid"><button data-page="reminders"><span>🔔</span><b>Erinnerungen</b><small>Push & Routinen</small></button><button data-page="weekly"><span>↻</span><b>Weekly Review</b><small>Woche abschließen</small></button><button data-page="goals"><span>🎯</span><b>Goals</b><small>Vision & Ziele</small></button><button data-page="library"><span>📖</span><b>Bibliothek</b><small>PDFs & Fortschritt</small></button><button data-page="notes"><span>📝</span><b>Notizen</b><small>Gedanken sammeln</small></button><button data-page="academy"><span>📚</span><b>Academy</b><small>Trading lernen</small></button><button data-page="calendar"><span>📅</span><b>Kalender</b><small>Termine planen</small></button><button data-page="account"><span>⚙</span><b>Konto</b><small>Einstellungen</small></button></div></section></div><div id="installGuide" class="mobile-sheet-backdrop" onclick="closeInstallGuide()"><section class="mobile-sheet install-sheet" role="dialog" aria-modal="true" aria-labelledby="installGuideTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">iPhone Installation</div><h2 id="installGuideTitle">CPRB als App nutzen</h2></div><button class="btn" type="button" onclick="closeInstallGuide()">✕</button></div><ol class="install-steps"><li><span>1</span><div><b>In Safari öffnen</b><small>Die Installation funktioniert direkt im Safari-Browser.</small></div></li><li><span>2</span><div><b>Teilen antippen</b><small>Unten auf das Teilen-Symbol drücken.</small></div></li><li><span>3</span><div><b>Zum Home-Bildschirm</b><small>Auswählen und mit „Hinzufügen“ bestätigen.</small></div></li></ol><button class="btn primary install-done-btn" type="button" onclick="closeInstallGuide()">Verstanden</button></section></div></div>
 
 <div id="tradeModal" class="modal">
 <form id="tradeForm" class="card trade-form-card">
@@ -247,6 +276,47 @@
 </form>
 </div>
 
+
+<div id="libraryBookModal" class="modal">
+  <form id="libraryBookForm" class="card library-upload-card">
+    <div class="top"><div><div class="eyebrow">Private PDF-Bibliothek</div><h2>Buch hinzufügen</h2><div class="sub">CPRB erstellt automatisch ein Cover und erkennt die Seitenzahl.</div></div><button type="button" class="btn" onclick="closeLibraryUpload()">✕</button></div>
+    <label class="library-upload-zone" for="bookPdf">
+      <span>📄</span><div><b id="bookFileName">PDF auswählen</b><small>Bis 50 MB · Upload kann bei Unterbrechungen fortgesetzt werden</small></div>
+      <input id="bookPdf" type="file" accept="application/pdf,.pdf" required hidden>
+    </label>
+    <div class="grid form-grid">
+      <div class="span2"><label>Titel</label><input id="bookTitle" required maxlength="180" placeholder="z. B. Trading in the Zone"></div>
+      <div><label>Autor</label><input id="bookAuthor" maxlength="160" placeholder="Mark Douglas"></div>
+      <div><label>Kategorie</label><select id="bookCategory"><option>Trading</option><option>Finanzen</option><option>Mindset</option><option>Persönliche Entwicklung</option><option>Fitness</option><option>Biografie</option><option>Andere</option></select></div>
+      <div class="full"><label>Beschreibung (optional)</label><textarea id="bookDescription" maxlength="2000" placeholder="Warum möchtest du dieses Buch lesen?"></textarea></div>
+    </div>
+    <div id="bookUploadProgress" class="library-upload-progress hide"><div><span id="bookUploadProgressBar"></span></div><small id="bookUploadProgressText">Wird vorbereitet…</small></div>
+    <button id="bookSaveBtn" class="btn primary library-upload-submit">Buch hochladen</button>
+  </form>
+</div>
+
+<div id="libraryReader" class="library-reader" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="libraryReaderTitle">
+  <header class="library-reader-header">
+    <button class="library-reader-close" type="button" onclick="closeLibraryReader()" aria-label="Reader schließen">←</button>
+    <div><b id="libraryReaderTitle">Buch</b><small id="libraryReaderAuthor"></small></div>
+    <button id="libraryOpenOriginalBtn" class="btn" type="button">Original öffnen</button>
+  </header>
+  <div class="library-reader-toolbar">
+    <button id="libraryPrevPage" class="btn" type="button" onclick="changeLibraryPage(-1)" aria-label="Vorherige Seite">←</button>
+    <label class="library-page-control"><input id="libraryPageInput" type="number" min="1" value="1" onchange="goToLibraryPage()" aria-label="Seite"><span id="libraryPageTotal">/ 1</span></label>
+    <button id="libraryNextPage" class="btn" type="button" onclick="changeLibraryPage(1)" aria-label="Nächste Seite">→</button>
+    <span class="library-reader-divider"></span>
+    <button class="btn" type="button" onclick="changeLibraryZoom(-.15)" aria-label="Verkleinern">−</button>
+    <b id="libraryZoomLabel">100%</b>
+    <button class="btn" type="button" onclick="changeLibraryZoom(.15)" aria-label="Vergrößern">+</button>
+  </div>
+  <main id="libraryReaderStage" class="library-reader-stage">
+    <div id="libraryReaderLoading" class="library-reader-loading"><span></span><b>PDF wird geladen…</b></div>
+    <canvas id="libraryReaderCanvas" class="hide"></canvas>
+  </main>
+  <footer class="library-reader-footer"><div><span id="libraryReaderProgressBar"></span></div><small id="libraryReaderProgressText">0% gelesen</small></footer>
+</div>
+
 <div id="academyModal" class="modal">
 <form id="academyForm" class="card">
   <div class="top"><div><h2>Lernnotiz erstellen</h2><div class="sub">Erklärung, Regeln und dein TradingView-Beispiel.</div></div><button type="button" class="btn" onclick="closeAcademyNote()">✕</button></div>
@@ -286,4 +356,4 @@
   </div>
 </form>
 </div>
-<script src="config.js"></script><script src="modules/core.js"></script><script src="modules/focus.js"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js"></script><script src="modules/reminders.js"></script><script src="modules/pwa.js"></script><script src="app.js"></script></body></html>
+<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="modules/core.js"></script><script src="modules/focus.js"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js"></script><script src="modules/reminders.js"></script><script src="modules/pwa.js"></script><script src="app.js"></script></body></html>
