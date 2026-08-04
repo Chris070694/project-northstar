@@ -8,9 +8,12 @@
 <div id="homeFitnessOverview" class="card home-fitness-overview"><div><div class="eyebrow">Fitness heute</div><h2 id="homeFitnessPlan">2er-Split einrichten</h2><p id="homeFitnessStatus" class="sub">Dein Trainingsplan ist noch offen.</p></div><button class="btn" onclick="showPage('fitness')">Fitness öffnen</button></div>
 <h2 style="margin-top:24px">Dein Weg</h2><div id="homeGoals" class="grid thirds"></div></section>
 
-<section id="trading" class="page"><div class="top"><div><h1>Trading Journal</h1><div class="sub">Dokumentieren, auswerten, verbessern.</div></div><button class="btn primary" onclick="openTrade()">+ Neuer Trade</button></div>
-<div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="tpnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="twinrate" class="value">0%</div></div><div class="card stat"><div class="label">Ø R</div><div id="tavgR" class="value">0R</div></div><div class="card stat"><div class="label">Trades</div><div id="tcount" class="value">0</div></div></div>
-<div class="card" style="margin-top:16px"><div class="table-wrap"><table><thead><tr><th>Datum</th><th>Markt</th><th>Richtung</th><th>Session</th><th>Setup</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody id="tradeRows"></tbody></table></div></div></section>
+<section id="trading" class="page">
+  <div class="top"><div><h1>Trading Journal</h1><div class="sub">Dokumentieren, ehrlich auswerten, besser werden.</div></div><button class="btn primary" onclick="openTrade()">+ Neuer Trade</button></div>
+  <div id="tradingSetupNotice" class="task-setup-notice hide">Trading Journal v2 muss noch in Supabase eingerichtet werden.</div>
+  <div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="tpnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="twinrate" class="value">0%</div></div><div class="card stat"><div class="label">Ø R</div><div id="tavgR" class="value">0R</div></div><div class="card stat"><div class="label">Trades</div><div id="tcount" class="value">0</div></div></div>
+  <div class="card trading-table-card"><div class="table-wrap"><table><thead><tr><th>Datum</th><th>Markt</th><th>Richtung</th><th>Session</th><th>Setup</th><th>Ergebnis</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody id="tradeRows"></tbody></table></div></div>
+</section>
 
 <section id="goals" class="page"><div class="top"><div><h1>Goals & Vision</h1><div class="sub">Ziel, Warum und nächster Schritt.</div></div><button class="btn primary" onclick="openGoal()">+ Neues Ziel</button></div><h2>Long-Term</h2><div id="longGoals" class="grid thirds"></div><h2 style="margin-top:24px">Short-Term</h2><div id="shortGoals" class="grid thirds"></div></section>
 <section id="focus" class="page"><div class="top"><div><h1>Daily Focus</h1><div class="sub">Was zählt heute wirklich?</div></div></div><div class="focus-workspace"><form id="focusForm" class="card"><div class="grid form-grid"><div class="full"><label>Hauptfokus</label><input id="fMain"></div><div><label>Trading</label><input id="fTrading"></div><div><label>Fitness</label><input id="fFitness"></div><div><label>Lernen</label><input id="fLearning"></div><div class="span2"><label>Nächster konkreter Schritt</label><input id="fNext"></div><div class="full"><label>Reflexion</label><textarea id="fReflection"></textarea></div><div class="full"><button class="btn primary">Fokus speichern</button></div></div></form><section class="card task-panel"><div class="task-panel-head"><div><div class="eyebrow">Tagesplan</div><h2>To-do-Liste</h2></div><div id="taskCounter" class="task-counter">0/0</div></div><form id="taskForm" class="task-entry"><input id="taskTitle" maxlength="180" required placeholder="Neue Aufgabe hinzufügen…"><select id="taskCategory" aria-label="Kategorie"><option>Allgemein</option><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Privat</option></select><button class="btn primary" aria-label="Aufgabe hinzufügen">+</button></form><div id="taskSetupNotice" class="task-setup-notice hide">Die Aufgaben-Datenbank muss noch eingerichtet werden.</div><div class="task-progress-track"><div id="taskProgressBar"></div></div><div id="dailyTaskList" class="daily-task-list"></div></section></div></section>
@@ -91,12 +94,43 @@
 </aside>
 </div></main></div>
 
-<div id="tradeModal" class="modal"><form id="tradeForm" class="card"><div class="top"><div><h2>Trade erfassen</h2><div class="sub">Je ehrlicher der Eintrag, desto wertvoller die Auswertung.</div></div><button type="button" class="btn" onclick="closeTrade()">✕</button></div><div class="grid form-grid">
-<div><label>Datum</label><input id="tDate" type="date" required></div><div><label>Markt</label><input id="tMarket" required placeholder="EURUSD"></div><div><label>Richtung</label><select id="tDirection"><option>Long</option><option>Short</option></select></div>
-<div><label>Session</label><select id="tSession"><option>London</option><option>New York</option><option>Asia</option><option>Andere</option></select></div><div><label>Setup</label><input id="tSetup" placeholder="MSS + FVG"></div><div><label>Risiko USD</label><input id="tRisk" type="number" step=".01"></div>
-<div><label>P&L USD</label><input id="tPnl" type="number" step=".01" required></div><div><label>R-Multiple</label><input id="tR" type="number" step=".01"></div><div><label>Emotion</label><select id="tEmotion"><option>Ruhig</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
-<div><label>Entry</label><input id="tEntry" type="number" step="any"></div><div><label>Stop Loss</label><input id="tStop" type="number" step="any"></div><div><label>Take Profit</label><input id="tTp" type="number" step="any"></div>
-<div class="full"><label>Notizen / Learning</label><textarea id="tNotes"></textarea></div><div class="full"><button class="btn primary">Trade speichern</button></div></div></form></div>
+<div id="tradeModal" class="modal">
+<form id="tradeForm" class="card trade-form-card">
+  <div class="top"><div><h2 id="tradeModalTitle">Trade erfassen</h2><div class="sub">Plan, Ausführung und Review – ehrlich statt perfekt.</div></div><button type="button" class="btn" onclick="closeTrade()">✕</button></div>
+  <div class="grid form-grid">
+    <div><label>Datum</label><input id="tDate" type="date" required></div>
+    <div><label>Markt</label><input id="tMarket" required maxlength="20" placeholder="XAUUSD"></div>
+    <div><label>Richtung</label><select id="tDirection"><option>Long</option><option>Short</option></select></div>
+    <div><label>Session</label><select id="tSession"><option>London</option><option>New York</option><option>Asia</option><option>Andere</option></select></div>
+    <div><label>Setup</label><input id="tSetup" maxlength="100" placeholder="SMT + MSS + FVG"></div>
+    <div><label>Setup-Tags</label><input id="tTags" maxlength="200" placeholder="SMT, MSS, FVG"></div>
+    <div><label>Risiko USD</label><input id="tRisk" type="number" min="0" step=".01"></div>
+    <div><label>P&L USD</label><input id="tPnl" type="number" step=".01" required></div>
+    <div><label>R-Multiple</label><input id="tR" type="number" step=".01"></div>
+    <div><label>Ergebnis</label><select id="tResult"><option value="auto">Automatisch aus P&L</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Break-even</option><option value="open">Offen</option></select></div>
+    <div><label>Emotion</label><select id="tEmotion"><option>Ruhig</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
+    <div class="trade-rule-field"><label>Regelcheck</label><label class="trade-rule-toggle"><input id="tFollowedPlan" type="checkbox"><span></span>Nach meinem Plan gehandelt</label></div>
+    <div><label>Entry</label><input id="tEntry" type="number" step="any"></div>
+    <div><label>Stop Loss</label><input id="tStop" type="number" step="any"></div>
+    <div><label>Take Profit</label><input id="tTp" type="number" step="any"></div>
+    <div class="full trade-image-grid">
+      <div><label>Chart vorher</label><div class="trade-image-picker" onclick="document.getElementById('tBeforeImage').click()"><img id="tBeforePreview" class="hide" alt="Chart vor dem Trade"><span id="tBeforeLabel">Vorher-Screenshot auswählen</span><input id="tBeforeImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
+      <div><label>Chart nachher</label><div class="trade-image-picker" onclick="document.getElementById('tAfterImage').click()"><img id="tAfterPreview" class="hide" alt="Chart nach dem Trade"><span id="tAfterLabel">Nachher-Screenshot auswählen</span><input id="tAfterImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
+    </div>
+    <div class="full"><label>Trade-Notizen</label><textarea id="tNotes" placeholder="Was war der Plan?"></textarea></div>
+    <div class="full"><label>Fehler</label><textarea id="tMistakes" placeholder="Was habe ich falsch oder unklar gemacht?"></textarea></div>
+    <div class="full"><label>Learning</label><textarea id="tLearning" placeholder="Was mache ich beim nächsten Mal konkret besser?"></textarea></div>
+    <div class="full"><button id="tradeSubmitLabel" class="btn primary">Trade speichern</button></div>
+  </div>
+</form>
+</div>
+
+<div id="tradeDetailModal" class="modal">
+  <div class="card trade-detail-card">
+    <div class="top"><div><div class="eyebrow">Trade Review</div><h2 id="tradeDetailTitle">Trade</h2></div><button class="btn" onclick="closeTradeDetail()">✕</button></div>
+    <div id="tradeDetailContent"></div>
+  </div>
+</div>
 
 <div id="goalModal" class="modal"><form id="goalForm" class="card"><div class="top"><h2>Neues Ziel</h2><button type="button" class="btn" onclick="closeGoal()">✕</button></div><div class="grid form-grid"><div><label>Titel</label><input id="gTitle" required></div><div><label>Typ</label><select id="gType"><option value="short">Short-Term</option><option value="long">Long-Term</option></select></div><div><label>Kategorie</label><input id="gCategory"></div><div><label>Zieldatum</label><input id="gDate" type="date"></div><div class="full"><label>Warum?</label><textarea id="gWhy"></textarea></div><div class="full"><label>Nächster Schritt</label><input id="gNext"></div><div><label>Aktuell</label><input id="gCurrent" type="number" value="0"></div><div><label>Zielwert</label><input id="gTarget" type="number" value="100"></div><div class="full"><label>Bild</label><input id="gImage" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="full"><button class="btn primary">Ziel speichern</button></div></div></form></div>
 
