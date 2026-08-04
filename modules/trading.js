@@ -167,9 +167,12 @@ function updateTradeCockpit(){
   const balance=Number($('#tAccountBalance')?.value)||0;
   const riskPercent=Number($('#tRiskPercent')?.value)||0;
   const contractValue=Number($('#tContractValue')?.value)||0;
-  const entry=Number($('#tEntry')?.value);
-  const stop=Number($('#tStop')?.value);
-  const target=Number($('#tTp')?.value);
+  const entryRaw=$('#tEntry')?.value??'';
+  const stopRaw=$('#tStop')?.value??'';
+  const targetRaw=$('#tTp')?.value??'';
+  const entry=entryRaw!==''?Number(entryRaw):Number.NaN;
+  const stop=stopRaw!==''?Number(stopRaw):Number.NaN;
+  const target=targetRaw!==''?Number(targetRaw):Number.NaN;
   const riskAmount=balance>0&&riskPercent>0?balance*riskPercent/100:0;
   const distance=Number.isFinite(entry)&&Number.isFinite(stop)?Math.abs(entry-stop):0;
   const positionSize=distance>0&&contractValue>0?riskAmount/(distance*contractValue):0;
