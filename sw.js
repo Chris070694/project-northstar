@@ -1,4 +1,4 @@
-const CACHE='northstar-library-v1';
+const CACHE='northstar-cockpit-v1';
 const APP_SHELL=[
   './',
   './index.html',

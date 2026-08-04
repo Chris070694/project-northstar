@@ -9,8 +9,39 @@
 <button type="button" class="card home-weekly-card" data-page="weekly"><span class="home-weekly-icon">↻</span><span><small>WEEKLY REVIEW</small><b>Deine Woche auf einen Blick</b><em id="homeWeeklyPrompt">System Score wird berechnet…</em></span><strong>Öffnen →</strong></button><h2 style="margin-top:24px">Dein Weg</h2><div id="homeGoals" class="grid thirds"></div></section>
 
 <section id="trading" class="page">
-  <div class="top"><div><h1>Trading Journal</h1><div class="sub">Dokumentieren, ehrlich auswerten, besser werden.</div></div><button class="btn primary" onclick="openTrade()">+ Neuer Trade</button></div>
+  <div class="top"><div><div class="eyebrow">CPRB Trading Cockpit</div><h1>Trading Journal</h1><div class="sub">Plan prüfen, Risiko berechnen und Ausführung ehrlich auswerten.</div></div><button id="openTradeBtn" class="btn primary" onclick="openTrade()">+ Trade planen</button></div>
   <div id="tradingSetupNotice" class="task-setup-notice hide">Trading Journal v2 muss noch in Supabase eingerichtet werden.</div>
+  <div id="tradingCockpitSetupNotice" class="task-setup-notice hide">Das Trading Cockpit muss noch mit der neuen Supabase-Migration aktiviert werden.</div>
+
+  <section class="trading-cockpit-grid">
+    <article id="cockpitDayStatus" class="card cockpit-day-status">
+      <div id="cockpitDayIcon" class="cockpit-status-icon">✓</div>
+      <div class="cockpit-status-copy"><div class="eyebrow">HEUTIGER SYSTEM-CHECK</div><h2 id="cockpitDayTitle">Bereit für deinen Plan</h2><p id="cockpitDayCopy" class="sub">Checkliste vollständig machen und nur ein A-Setup ausführen.</p></div>
+      <div class="cockpit-day-metrics"><div><small>Trades heute</small><b id="cockpitTodayTrades">0/2</b></div><div><small>Heute in R</small><b id="cockpitTodayR">0.00R</b></div></div>
+      <button class="btn primary" type="button" onclick="openTrade()">Trade-Check starten</button>
+    </article>
+
+    <form id="tradingSettingsForm" class="card cockpit-settings">
+      <div><div class="eyebrow">FESTE RISIKO-REGELN</div><h2>Cockpit einstellen</h2><p class="sub">Diese Werte werden bei jedem neuen Trade automatisch eingesetzt.</p></div>
+      <div class="cockpit-settings-grid">
+        <label>Kontostand USD<input id="tradeAccountBalance" type="number" min="0" step=".01" required></label>
+        <label>Risiko pro Trade %<input id="tradeDefaultRisk" type="number" min=".01" max="5" step=".01" required></label>
+        <label>Kontraktwert je 1.0 Bewegung<input id="tradeDefaultContract" type="number" min=".000001" step="any" required></label>
+        <label>Tagesverlust-Limit in R<input id="tradeDailyLossLimit" type="number" min=".25" max="20" step=".25" required></label>
+        <label>Maximale Trades pro Tag<input id="tradeMaxTrades" type="number" min="1" max="20" step="1" required></label>
+      </div>
+      <small class="cockpit-contract-hint">Bei XAUUSD entspricht 1 Standard-Lot häufig ungefähr 100 USD je 1.0 Preisbewegung. Bitte die Spezifikation deines Brokers prüfen.</small>
+      <button id="saveTradingSettingsBtn" class="btn" type="submit">Cockpit speichern</button>
+    </form>
+  </section>
+
+  <div class="cockpit-analytics">
+    <article class="card"><span>◎</span><div><small>Ø Regel-Score</small><strong id="cockpitAverageScore">–</strong></div></article>
+    <article class="card"><span>✓</span><div><small>Nach Plan</small><strong id="cockpitPlanRate">–</strong></div></article>
+    <article class="card"><span>−R</span><div><small>Fehlerkosten</small><strong id="cockpitErrorCost">0.00R</strong></div></article>
+    <article class="card cockpit-break-stat"><span>!</span><div><small>Häufigster Regelbruch</small><strong id="cockpitTopBreak">Noch keine Daten</strong><em id="cockpitTopBreakMeta">Beginnt mit deinem ersten Cockpit-Trade</em></div></article>
+  </div>
+
   <div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="tpnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="twinrate" class="value">0%</div></div><div class="card stat"><div class="label">Ø R</div><div id="tavgR" class="value">0R</div></div><div class="card stat"><div class="label">Trades</div><div id="tcount" class="value">0</div></div></div>
   <div class="card trading-table-card"><div class="table-wrap"><table><thead><tr><th>Datum</th><th>Markt</th><th>Richtung</th><th>Session</th><th>Setup</th><th>Ergebnis</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody id="tradeRows"></tbody></table></div></div>
 </section>
@@ -210,32 +241,72 @@
 
 <div id="tradeModal" class="modal">
 <form id="tradeForm" class="card trade-form-card">
-  <div class="top"><div><h2 id="tradeModalTitle">Trade erfassen</h2><div class="sub">Plan, Ausführung und Review – ehrlich statt perfekt.</div></div><button type="button" class="btn" onclick="closeTrade()">✕</button></div>
-  <div class="grid form-grid">
+  <div class="top"><div><div class="eyebrow">CPRB PRE-TRADE SYSTEM</div><h2 id="tradeModalTitle">Trade planen</h2><div class="sub">Erst freigeben, dann ausführen, danach ehrlich reviewen.</div></div><button type="button" class="btn" onclick="closeTrade()">✕</button></div>
+
+  <div class="grid form-grid trade-basic-fields">
     <div><label>Datum</label><input id="tDate" type="date" required></div>
     <div><label>Markt</label><input id="tMarket" required maxlength="20" placeholder="XAUUSD"></div>
     <div><label>Richtung</label><select id="tDirection"><option>Long</option><option>Short</option></select></div>
     <div><label>Session</label><select id="tSession"><option>London</option><option>New York</option><option>Asia</option><option>Andere</option></select></div>
     <div><label>Setup</label><input id="tSetup" maxlength="100" placeholder="SMT + MSS + FVG"></div>
     <div><label>Setup-Tags</label><input id="tTags" maxlength="200" placeholder="SMT, MSS, FVG"></div>
-    <div><label>Risiko USD</label><input id="tRisk" type="number" min="0" step=".01"></div>
-    <div><label>P&L USD</label><input id="tPnl" type="number" step=".01" required></div>
-    <div><label>R-Multiple</label><input id="tR" type="number" step=".01"></div>
-    <div><label>Ergebnis</label><select id="tResult"><option value="auto">Automatisch aus P&L</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Break-even</option><option value="open">Offen</option></select></div>
-    <div><label>Emotion</label><select id="tEmotion"><option>Ruhig</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
-    <div class="trade-rule-field"><label>Regelcheck</label><label class="trade-rule-toggle"><input id="tFollowedPlan" type="checkbox"><span></span>Nach meinem Plan gehandelt</label></div>
-    <div><label>Entry</label><input id="tEntry" type="number" step="any"></div>
-    <div><label>Stop Loss</label><input id="tStop" type="number" step="any"></div>
-    <div><label>Take Profit</label><input id="tTp" type="number" step="any"></div>
-    <div class="full trade-image-grid">
-      <div><label>Chart vorher</label><div class="trade-image-picker" onclick="document.getElementById('tBeforeImage').click()"><img id="tBeforePreview" class="hide" alt="Chart vor dem Trade"><span id="tBeforeLabel">Vorher-Screenshot auswählen</span><input id="tBeforeImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
-      <div><label>Chart nachher</label><div class="trade-image-picker" onclick="document.getElementById('tAfterImage').click()"><img id="tAfterPreview" class="hide" alt="Chart nach dem Trade"><span id="tAfterLabel">Nachher-Screenshot auswählen</span><input id="tAfterImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
-    </div>
-    <div class="full"><label>Trade-Notizen</label><textarea id="tNotes" placeholder="Was war der Plan?"></textarea></div>
-    <div class="full"><label>Fehler</label><textarea id="tMistakes" placeholder="Was habe ich falsch oder unklar gemacht?"></textarea></div>
-    <div class="full"><label>Learning</label><textarea id="tLearning" placeholder="Was mache ich beim nächsten Mal konkret besser?"></textarea></div>
-    <div class="full"><button id="tradeSubmitLabel" class="btn primary">Trade speichern</button></div>
   </div>
+
+  <section class="trade-planner">
+    <div class="trade-planner-head"><div><div class="eyebrow">RISIKO-RECHNER</div><h3>Position vor dem Klick planen</h3></div><div id="tradeGate" class="trade-gate blocked"><span></span><div><b id="tradeGateTitle">Trade noch nicht freigegeben</b><small id="tradeGateCopy">Checkliste und Risikodaten vervollständigen.</small></div></div></div>
+    <div class="trade-risk-fields">
+      <label>Kontostand USD<input id="tAccountBalance" type="number" min="0" step=".01" required></label>
+      <label>Risiko %<input id="tRiskPercent" type="number" min=".01" max="5" step=".01" required></label>
+      <label>Kontraktwert<input id="tContractValue" type="number" min=".000001" step="any" required></label>
+      <label>Entry<input id="tEntry" type="number" step="any" required></label>
+      <label>Stop Loss<input id="tStop" type="number" step="any" required></label>
+      <label>Take Profit<input id="tTp" type="number" step="any"></label>
+      <label>Risiko USD<input id="tRisk" type="number" readonly></label>
+      <label>Positionsgröße<input id="tPositionSize" type="number" readonly></label>
+    </div>
+    <div class="trade-risk-output">
+      <div><small>Risikobetrag</small><b id="tradeRiskAmount">$0.00</b></div>
+      <div><small>Stop-Distanz</small><b id="tradeStopDistance">–</b></div>
+      <div><small>Einheiten / Lots</small><b id="tradePositionSize">–</b></div>
+      <div><small>Geplantes CRV</small><b id="tradePlannedR">–</b></div>
+    </div>
+  </section>
+
+  <section class="trade-checklist-section">
+    <div class="trade-checklist-head"><div><div class="eyebrow">60-SEKUNDEN-CHECK</div><h3>A-Setup bestätigen</h3></div><strong id="tRuleScore">0%</strong></div>
+    <div class="trade-checklist-progress"><span id="tradeChecklistProgress"></span></div>
+    <div class="trade-checklist-grid">
+      <label><input class="trade-precheck" data-trade-check="scenario" type="checkbox"><span>1</span><div><b>Szenario definiert</b><small>Long oder Short wurde vor der Session geplant.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="liquidity" type="checkbox"><span>2</span><div><b>Ziel-Liquidität klar</b><small>Das logische Ziel der Bewegung ist markiert.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="sweep" type="checkbox"><span>3</span><div><b>Sweep / SMT</b><small>Liquiditätsereignis oder sinnvolle Divergenz bestätigt.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="structure" type="checkbox"><span>4</span><div><b>MSS + Displacement</b><small>Der Strukturwechsel ist klar und nicht nur vermutet.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="entry_zone" type="checkbox"><span>5</span><div><b>Geplante Entry-Zone</b><small>Kein Hinterherspringen mitten in der Bewegung.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="news" type="checkbox"><span>6</span><div><b>News geprüft</b><small>Zeitfenster und wichtige Nachrichten passen.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="invalidation" type="checkbox"><span>7</span><div><b>Stop ist logisch</b><small>Die Invalidierung macht die Idee objektiv falsch.</small></div></label>
+      <label><input class="trade-precheck" data-trade-check="emotion" type="checkbox"><span>8</span><div><b>Emotional neutral</b><small>Ein voller Verlust kann ruhig akzeptiert werden.</small></div></label>
+    </div>
+  </section>
+
+  <section class="trade-review-form">
+    <div><div class="eyebrow">NACH DEM TRADE</div><h3>Ergebnis und Ausführung</h3><p class="sub">Für einen offenen Trade-Plan können P&L und Review zunächst leer bleiben.</p></div>
+    <div class="grid form-grid">
+      <div><label>P&L USD</label><input id="tPnl" type="number" step=".01" placeholder="Leer = Trade noch offen"></div>
+      <div><label>R-Multiple</label><input id="tR" type="number" step=".01"></div>
+      <div><label>Ergebnis</label><select id="tResult"><option value="auto">Automatisch / offen</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Break-even</option><option value="open">Offen</option></select></div>
+      <div><label>Emotion vorher</label><select id="tEmotion"><option>Ruhig</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
+      <div><label>Emotion danach</label><select id="tEmotionAfter"><option>Ruhig</option><option>Erleichtert</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
+      <div class="trade-rule-field"><label>Regelcheck danach</label><label class="trade-rule-toggle"><input id="tFollowedPlan" type="checkbox"><span></span>Plan wirklich eingehalten</label></div>
+      <div class="full trade-execution-score"><div><label>Qualität der Ausführung</label><small>Bewerte deinen Prozess, nicht nur das Ergebnis.</small></div><input id="tExecutionScore" type="range" min="1" max="10" value="7"><strong id="tExecutionScoreValue">7/10</strong></div>
+      <div class="full trade-image-grid">
+        <div><label>Chart vorher</label><div class="trade-image-picker" onclick="document.getElementById('tBeforeImage').click()"><img id="tBeforePreview" class="hide" alt="Chart vor dem Trade"><span id="tBeforeLabel">Vorher-Screenshot auswählen</span><input id="tBeforeImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
+        <div><label>Chart nachher</label><div class="trade-image-picker" onclick="document.getElementById('tAfterImage').click()"><img id="tAfterPreview" class="hide" alt="Chart nach dem Trade"><span id="tAfterLabel">Nachher-Screenshot auswählen</span><input id="tAfterImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
+      </div>
+      <div class="full"><label>Trade-Notizen</label><textarea id="tNotes" placeholder="Was war der Plan?"></textarea></div>
+      <div class="full"><label>Fehler</label><textarea id="tMistakes" placeholder="Was habe ich falsch oder unklar gemacht?"></textarea></div>
+      <div class="full"><label>Learning</label><textarea id="tLearning" placeholder="Was mache ich beim nächsten Mal konkret besser?"></textarea></div>
+      <div class="full trade-submit-row"><small id="tradeSubmitHint">CPRB prüft gerade deinen Plan.</small><button id="tradeSubmitLabel" class="btn primary">Trade-Plan speichern</button></div>
+    </div>
+  </section>
 </form>
 </div>
 
