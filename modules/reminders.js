@@ -117,7 +117,7 @@ function urlBase64ToUint8Array(base64String){
 }
 
 async function getPushPublicKey(){
-  const {data,error}=await sb.functions.invoke('smart-reminders',{body:{action:'public-key'}});
+  const {data,error}=await sb.functions.invoke('smart-reminder',{body:{action:'public-key'}});
   if(error)throw new Error('Der Push-Server ist noch nicht aktiviert.');
   if(!data?.publicKey)throw new Error('Der Push-Server hat keinen öffentlichen Schlüssel geliefert.');
   return data.publicKey;
