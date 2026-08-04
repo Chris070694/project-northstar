@@ -1,4 +1,4 @@
-const CACHE='northstar-weekly-v1';
+const CACHE='northstar-reminders-v1';
 const APP_SHELL=[
   './',
   './index.html',
@@ -18,6 +18,7 @@ const APP_SHELL=[
   './modules/academy.js',
   './modules/calendar.js',
   './modules/weekly.js',
+  './modules/reminders.js',
   './modules/pwa.js'
 ];
 
@@ -55,4 +56,30 @@ self.addEventListener('fetch',event=>{
 
 self.addEventListener('message',event=>{
   if(event.data==='SKIP_WAITING')self.skipWaiting();
+});
+
+
+self.addEventListener('push',event=>{
+  let data={};
+  try{data=event.data?.json()||{}}catch(error){console.warn('Invalid push payload',error)}
+  event.waitUntil(self.registration.showNotification(data.title||'CPRB Erinnerung',{
+    body:data.body||'Dein CPRB OS erinnert dich.',
+    icon:'./icons/cprb-og-192.png',
+    badge:'./icons/cprb-og-192.png',
+    tag:data.tag||'cprb-reminder',
+    data:{url:data.url||'./'}
+  }));
+});
+
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const target=new URL(event.notification.data?.url||'./',self.registration.scope).href;
+  event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async windows=>{
+    const appWindow=windows.find(client=>client.url.startsWith(self.registration.scope));
+    if(appWindow){
+      if('navigate' in appWindow)await appWindow.navigate(target);
+      return appWindow.focus();
+    }
+    return self.clients.openWindow(target);
+  }));
 });
