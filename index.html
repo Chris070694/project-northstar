@@ -228,7 +228,46 @@
   </form>
   <section class="card reminder-how-card"><span>🔒</span><div><b>Privat und freiwillig</b><p>Benachrichtigungen werden nur nach deiner ausdrücklichen Freigabe aktiviert. Jede Erinnerung kann einzeln ausgeschaltet werden.</p></div></section>
 </section>
-<section id="account" class="page"><div class="card"><h1>Konto</h1><p id="who"></p><button class="btn" onclick="logout()">Abmelden</button></div></section></div>
+<section id="account" class="page">
+  <div class="top account-page-top"><div><div class="eyebrow">Deine Daten gehören dir</div><h1>Konto & Backup</h1><div class="sub">Sichere CPRB unabhängig von Supabase auf deinem eigenen Gerät.</div></div><button class="btn" onclick="logout()">Abmelden</button></div>
+  <section class="account-grid">
+    <article class="card account-profile-card">
+      <span class="account-avatar">CP</span>
+      <div><small>Angemeldet als</small><b id="who"></b><em>Persönliches CPRB-Konto</em></div>
+    </article>
+    <article id="backupStatusCard" class="card backup-status-card due">
+      <span id="backupStatusIcon">!</span>
+      <div><small>LETZTE SICHERUNG</small><b id="backupStatusTitle">Noch kein Backup</b><em id="backupStatusCopy">Erstelle jetzt deine erste Sicherung.</em></div>
+    </article>
+  </section>
+
+  <section class="backup-layout">
+    <article class="card backup-card backup-create-card">
+      <div class="backup-card-head"><span>↓</span><div><div class="eyebrow">Backup erstellen</div><h2>Deine CPRB-Sicherung</h2><p class="sub">Mit Passwort verschlüsselt und nur von CPRB wieder lesbar.</p></div></div>
+      <label>Backup-Passwort<input id="backupPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Mindestens 6 Zeichen"></label>
+      <small class="backup-password-hint">Nicht dein Login-Passwort. Gut aufbewahren – ohne dieses Passwort kann das Backup nicht geöffnet werden.</small>
+      <div class="backup-choice-grid">
+        <button id="backupDataBtn" class="backup-choice" type="button" onclick="createCprbBackup(false)"><span>⚡</span><b>Daten-Backup</b><small>Trades, Ziele, Training, Aufgaben und Einstellungen. Schnell und klein.</small></button>
+        <button id="backupCompleteBtn" class="backup-choice recommended" type="button" onclick="createCprbBackup(true)"><span>🔒</span><b>Komplettes Backup</b><small>Zusätzlich PDFs, Cover und Bilder. Am besten am Windows-Laptop.</small><em>EMPFOHLEN</em></button>
+      </div>
+      <div id="backupProgress" class="backup-progress hide"><div><span id="backupProgressBar"></span></div><small id="backupProgressText">Backup wird vorbereitet…</small></div>
+    </article>
+
+    <article class="card backup-card backup-restore-card">
+      <div class="backup-card-head"><span>↥</span><div><div class="eyebrow">Wiederherstellen</div><h2>Backup einlesen</h2><p class="sub">Bestehende Einträge bleiben erhalten, gleiche Einträge werden aktualisiert.</p></div></div>
+      <label class="backup-file-zone" for="backupFile"><span>📦</span><div><b id="backupFileName">CPRB-Backup auswählen</b><small>.cprbbackup</small></div><input id="backupFile" type="file" accept=".cprbbackup,application/octet-stream" hidden></label>
+      <label>Backup-Passwort<input id="restorePassword" type="password" minlength="6" autocomplete="current-password" placeholder="Passwort der Sicherung"></label>
+      <button id="restoreBackupBtn" class="btn primary backup-action-btn" type="button" onclick="restoreCprbBackup()">Backup wiederherstellen</button>
+      <div id="restoreProgress" class="backup-progress hide"><div><span id="restoreProgressBar"></span></div><small id="restoreProgressText">Backup wird geprüft…</small></div>
+      <small class="backup-safe-note">✓ Sichere Zusammenführung: CPRB löscht beim Wiederherstellen keine neueren Einträge.</small>
+    </article>
+  </section>
+
+  <section class="card export-card">
+    <div><div class="eyebrow">Lesbarer Export</div><h2>Einzelne Bereiche exportieren</h2><p class="sub">CSV-Dateien lassen sich direkt in Excel oder Google Tabellen öffnen.</p></div>
+    <div class="export-actions"><select id="exportModule" aria-label="Bereich auswählen"><option value="trading">Trading</option><option value="fitness">Fitness</option><option value="focus">To-dos & Fokus</option><option value="goals">Ziele</option></select><button id="exportCsvBtn" class="btn" type="button" onclick="exportCprbCsv()">CSV herunterladen</button></div>
+  </section>
+</section></div>
 <aside class="right-rail">
   <div class="module-card" onclick="showPage('weekly')"><div class="icon">↻</div><b>Weekly Review</b><span>Woche analysieren und planen</span></div>
   <div class="module-card" onclick="showPage('fitness')"><div class="icon">💪</div><b>Fitness</b><span>Übungen und Trainingsplan</span></div>
@@ -427,4 +466,4 @@
   </div>
 </form>
 </div>
-<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="modules/core.js"></script><script src="modules/focus.js"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js"></script><script src="modules/reminders.js"></script><script src="modules/pwa.js"></script><script src="app.js"></script></body></html>
+<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js"></script><script src="modules/focus.js"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js"></script><script src="modules/reminders.js"></script><script src="modules/backup.js"></script><script src="modules/pwa.js"></script><script src="app.js"></script></body></html>
