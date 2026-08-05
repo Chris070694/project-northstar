@@ -1,4 +1,4 @@
-const CACHE='northstar-backup-v1';
+const CACHE='northstar-backup-v2';
 const APP_SHELL=[
   './',
   './index.html',
@@ -44,6 +44,17 @@ self.addEventListener('fetch',event=>{
       caches.open(CACHE).then(cache=>cache.put('./index.html',copy));
       return response;
     }).catch(()=>caches.match('./index.html')));
+    return;
+  }
+
+  if(request.destination==='script'||request.destination==='style'){
+    event.respondWith(fetch(request).then(response=>{
+      if(response.ok){
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(request,copy));
+      }
+      return response;
+    }).catch(()=>caches.match(request)));
     return;
   }
 
