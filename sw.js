@@ -1,8 +1,8 @@
-const CACHE='northstar-fitness-v2';
+const CACHE='northstar-fitness-mobile-v1';
 const APP_SHELL=[
   './',
   './index.html',
-  './styles.css',
+  './styles.css?v=2',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',

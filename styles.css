@@ -388,10 +388,11 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .workout-set-list{display:grid;gap:7px}
 .workout-set-row{display:grid;grid-template-columns:26px 62px minmax(115px,.55fr) minmax(130px,.6fr) minmax(220px,1fr);gap:10px;align-items:center;padding:10px 11px;border:1px solid rgba(135,156,185,.1);border-radius:12px;background:rgba(4,8,15,.45)}
 .workout-set-row.done{background:rgba(84,239,177,.045)}
-.workout-set-row>label{margin:0;text-transform:none;letter-spacing:0}
+.workout-set-row>label{min-width:0;margin:0;text-transform:none;letter-spacing:0}
 .workout-set-row>label>span{display:block;margin-bottom:3px;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.06em}
-.workout-set-row>label>div{display:flex;align-items:center;gap:6px}
-.workout-set-row input[type=number]{padding:7px 8px;min-width:0}
+.workout-set-row>label>div{display:flex;align-items:center;gap:6px;min-width:0}
+.workout-set-row input[type=number]{flex:1 1 0;width:0;min-width:0;padding:7px 8px}
+.workout-set-row>label small{flex:0 0 auto}
 .workout-set-row small{color:var(--muted)}
 .previous-set{line-height:1.45}
 .fitness-progress-modal{max-width:860px!important}
@@ -416,9 +417,14 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
   .fitness-stats{grid-template-columns:1fr}
   .home-fitness-overview,.active-workout-head{align-items:flex-start;flex-direction:column}
   .fitness-plan-toolbar{align-items:stretch;flex-direction:column}
-  .workout-set-row{grid-template-columns:26px 1fr 1fr}
-  .workout-set-row>b{grid-column:2/4}
-  .previous-set{grid-column:2/4}
+  .active-workout{padding:14px}
+  .workout-exercise{padding:10px}
+  .workout-set-row{grid-template-columns:26px minmax(0,1fr) minmax(0,1fr);gap:8px;padding:9px 8px}
+  .workout-set-row>.fit-check{grid-column:1;grid-row:1}
+  .workout-set-row>b{grid-column:2/4;grid-row:1}
+  .workout-set-row>label:nth-of-type(1){grid-column:2;grid-row:2}
+  .workout-set-row>label:nth-of-type(2){grid-column:3;grid-row:2}
+  .previous-set{grid-column:2/4;grid-row:3}
   .fitness-progress-entry{grid-template-columns:1fr}
 }
 
