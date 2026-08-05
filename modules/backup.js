@@ -245,7 +245,7 @@ async function createCprbBackup(includeFiles=true){
       created_at:new Date().toISOString(),
       owner_id:currentUser.id,
       backup_type:includeFiles?'complete':'data',
-      app:'CPRB OS – Project Northstar',
+      app:'CPRB OS',
       row_count:collected.rowCount,
       unavailable_tables:collected.unavailable,
       files:files.included,
