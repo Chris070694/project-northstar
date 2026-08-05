@@ -1,11 +1,11 @@
-const CACHE='northstar-tasks-v1';
+const CACHE='northstar-brand-v1';
 const APP_SHELL=[
   './',
   './index.html',
   './styles.css',
   './app.js',
   './config.js',
-  './manifest.webmanifest',
+  './manifest.webmanifest?v=2',
   './icons/cprb-og-192.png',
   './icons/cprb-og-512.png',
   './icons/cprb-og-180.png',

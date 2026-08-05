@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "CPRB OS – Project Northstar",
-  "short_name": "CPRB",
+  "name": "CPRB OS",
+  "short_name": "CPRB OS",
   "description": "Dein persönliches Operating System für Trading, Fitness, Fokus und Ziele.",
   "start_url": "./",
   "scope": "./",
