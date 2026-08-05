@@ -286,8 +286,8 @@ async function restoreBackupFiles(zip,files,onProgress){
     onProgress(index,files.length,file.path);
     const entry=zip.file(file.zip_path);
     if(!entry)throw new Error(`Datei fehlt im Backup: ${file.path}`);
-    const blob=await entry.async('blob');
-    const {error}=await sb.storage.from(file.bucket).upload(file.path,blob,{
+    const bytes=await entry.async('uint8array');
+    const {error}=await sb.storage.from(file.bucket).upload(file.path,bytes,{
       contentType:backupFileMimeType(file.path,file.type),
       cacheControl:'3600',
       upsert:true
