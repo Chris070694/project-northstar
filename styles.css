@@ -1479,3 +1479,67 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
   .cockpit-break-stat{grid-column:auto}
   .trade-risk-fields,.trade-risk-output,.trade-cockpit-detail{grid-template-columns:1fr}
 }
+
+/* Account & encrypted backup center */
+.account-page-top{margin-bottom:16px}
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.account-profile-card,.backup-status-card{display:flex;align-items:center;gap:14px;min-height:105px}
+.account-avatar,.backup-status-card>span{
+  display:grid;place-items:center;flex:0 0 54px;width:54px;height:54px;border-radius:17px;
+  color:#061017;background:linear-gradient(135deg,var(--cyan),var(--green));font-size:15px;font-weight:950;
+  box-shadow:0 10px 30px rgba(54,224,255,.13)
+}
+.account-profile-card>div,.backup-status-card>div{display:grid;gap:4px;min-width:0}
+.account-profile-card small,.backup-status-card small{color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.08em}
+.account-profile-card b,.backup-status-card b{overflow:hidden;text-overflow:ellipsis;font-size:17px}
+.account-profile-card em,.backup-status-card em{color:var(--muted);font-size:10px;font-style:normal}
+.backup-status-card{border-color:rgba(84,239,177,.2);background:linear-gradient(135deg,rgba(84,239,177,.055),rgba(54,224,255,.025))}
+.backup-status-card.due{border-color:rgba(255,185,84,.25);background:linear-gradient(135deg,rgba(255,185,84,.07),rgba(255,112,136,.025))}
+.backup-status-card.due>span{color:#151006;background:linear-gradient(135deg,#ffd66b,#ff9b5e);box-shadow:0 10px 30px rgba(255,185,84,.13)}
+.backup-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+.backup-card{display:grid;align-content:start;gap:14px}
+.backup-card-head{display:flex;align-items:flex-start;gap:12px}
+.backup-card-head>span{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(54,224,255,.2);border-radius:13px;color:var(--cyan);background:rgba(54,224,255,.055);font-size:19px;font-weight:900}
+.backup-card-head h2,.export-card h2{margin:3px 0 4px}
+.backup-card-head p,.export-card p{margin:0}
+.backup-card label{margin:0}
+.backup-password-hint{margin-top:-8px;color:var(--muted);font-size:9px;line-height:1.45}
+.backup-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.backup-choice{position:relative;display:grid;grid-template-columns:34px 1fr;gap:3px 9px;align-items:center;min-height:104px;padding:12px;border:1px solid var(--line);border-radius:15px;color:var(--text);background:#090e17;text-align:left;cursor:pointer;transition:.18s}
+.backup-choice:hover{transform:translateY(-1px);border-color:rgba(54,224,255,.3);background:rgba(54,224,255,.035)}
+.backup-choice:disabled{opacity:.5;transform:none;cursor:wait}
+.backup-choice>span{grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.045)}
+.backup-choice b{font-size:11px}
+.backup-choice small{grid-column:2;color:var(--muted);font-size:9px;line-height:1.4}
+.backup-choice.recommended{border-color:rgba(84,239,177,.24);background:linear-gradient(135deg,rgba(84,239,177,.05),rgba(54,224,255,.025))}
+.backup-choice em{position:absolute;right:8px;top:7px;padding:3px 6px;border-radius:999px;color:var(--green);background:rgba(84,239,177,.08);font-size:7px;font-style:normal;font-weight:950;letter-spacing:.06em}
+.backup-progress{display:grid;gap:7px;padding:10px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.02)}
+.backup-progress>div{height:6px;overflow:hidden;border-radius:99px;background:#070b12}
+.backup-progress>div>span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--cyan),var(--green));transition:width .2s}
+.backup-progress small{color:var(--muted);font-size:9px}
+.backup-file-zone{display:flex!important;align-items:center;gap:11px;min-height:77px;padding:12px;border:1px dashed rgba(54,224,255,.3);border-radius:15px;background:rgba(54,224,255,.025);cursor:pointer}
+.backup-file-zone>span{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:rgba(54,224,255,.07);font-size:18px}
+.backup-file-zone>div{display:grid;gap:4px;min-width:0}
+.backup-file-zone b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.backup-file-zone small{color:var(--muted);font-size:9px}
+.backup-action-btn{width:100%}
+.backup-safe-note{color:var(--green);font-size:9px;line-height:1.4}
+.export-card{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:14px}
+.export-actions{display:flex;gap:9px;min-width:340px}
+.export-actions select{margin:0;min-width:175px}
+.export-actions .btn{white-space:nowrap}
+
+@media(max-width:1050px){
+  .backup-layout{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+  .account-page-top{align-items:flex-start}
+  .account-grid{grid-template-columns:1fr;gap:10px}
+  .account-profile-card,.backup-status-card{min-height:92px;padding:14px}
+  .backup-card{padding:15px}
+  .backup-choice-grid{grid-template-columns:1fr}
+  .backup-choice{min-height:91px}
+  .export-card{display:grid;padding:15px}
+  .export-actions{display:grid;grid-template-columns:1fr;min-width:0;width:100%}
+  .export-actions select,.export-actions .btn{width:100%}
+}

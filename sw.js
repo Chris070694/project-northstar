@@ -1,4 +1,4 @@
-const CACHE='northstar-cockpit-v1';
+const CACHE='northstar-backup-v1';
 const APP_SHELL=[
   './',
   './index.html',
@@ -20,6 +20,7 @@ const APP_SHELL=[
   './modules/calendar.js',
   './modules/weekly.js',
   './modules/reminders.js',
+  './modules/backup.js',
   './modules/pwa.js'
 ];
 
