@@ -349,7 +349,7 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .fitness-plan-tab{border:1px solid var(--line);border-radius:12px;padding:10px 16px;background:rgba(255,255,255,.025);color:var(--muted);font-weight:850;cursor:pointer}
 .fitness-plan-tab.active{color:#031014;border-color:transparent;background:linear-gradient(100deg,var(--cyan),var(--green))}
 .fitness-plan-list{display:grid;gap:8px}
-.fitness-plan-exercise{display:grid;grid-template-columns:38px minmax(160px,1.2fr) minmax(105px,.7fr) minmax(120px,.75fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.022);transition:.2s ease}
+.fitness-plan-exercise{display:grid;grid-template-columns:38px minmax(160px,1.1fr) minmax(105px,.55fr) minmax(210px,1fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.022);transition:.2s ease}
 .fitness-plan-exercise:hover{border-color:rgba(112,229,255,.28);transform:translateY(-1px)}
 .fitness-order{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:rgba(112,229,255,.08);color:var(--cyan);font-weight:950}
 .fitness-exercise-copy b,.fitness-exercise-copy span{display:block}
@@ -357,6 +357,7 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .fitness-target small,.fitness-target b{display:block}
 .fitness-target small{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.06em}
 .fitness-target b{margin-top:3px}
+.fitness-last-sets b{font-size:11px;line-height:1.45}
 .fitness-row-actions{display:flex;gap:5px}
 .mini-btn{width:30px;height:30px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.03);color:var(--text);cursor:pointer}
 .mini-btn:hover:not(:disabled){border-color:var(--line-strong);background:rgba(112,229,255,.07)}
@@ -375,19 +376,31 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .fitness-progress{height:8px;border-radius:999px;background:#070b13;overflow:hidden;margin:17px 0}
 .fitness-progress div{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .3s ease}
 .workout-exercise-list{display:grid;gap:9px}
-.workout-exercise{display:grid;grid-template-columns:28px minmax(0,1fr) 150px;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.028)}
-.workout-exercise.done{opacity:.6}
-.workout-exercise.done .workout-exercise-copy b{text-decoration:line-through}
+.workout-exercise{padding:14px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.028)}
+.workout-exercise.done{border-color:rgba(84,239,177,.24);background:rgba(84,239,177,.035)}
+.workout-exercise-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:11px}
 .fit-check{appearance:none;width:24px;height:24px;padding:0;margin:0;border:1px solid var(--line-strong);border-radius:8px;cursor:pointer;display:grid;place-items:center}
 .fit-check:checked{background:linear-gradient(135deg,var(--cyan),var(--green));border-color:transparent}
 .fit-check:checked:after{content:"✓";color:#031014;font-weight:950;font-size:14px}
 .workout-exercise-copy b,.workout-exercise-copy span{display:block}
 .workout-exercise-copy span{color:var(--muted);font-size:11px;margin-top:3px}
-.workout-weight{margin:0;text-transform:none;letter-spacing:0}
-.workout-weight>span{display:block;margin-bottom:4px;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.06em}
-.workout-weight>div{display:flex;align-items:center;gap:6px}
-.workout-weight input{padding:8px 9px}
-.workout-weight small{color:var(--muted)}
+.history-btn{width:auto;min-width:30px;padding:0 9px;color:var(--cyan)}
+.workout-set-list{display:grid;gap:7px}
+.workout-set-row{display:grid;grid-template-columns:26px 62px minmax(115px,.55fr) minmax(130px,.6fr) minmax(220px,1fr);gap:10px;align-items:center;padding:10px 11px;border:1px solid rgba(135,156,185,.1);border-radius:12px;background:rgba(4,8,15,.45)}
+.workout-set-row.done{background:rgba(84,239,177,.045)}
+.workout-set-row>label{margin:0;text-transform:none;letter-spacing:0}
+.workout-set-row>label>span{display:block;margin-bottom:3px;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.06em}
+.workout-set-row>label>div{display:flex;align-items:center;gap:6px}
+.workout-set-row input[type=number]{padding:7px 8px;min-width:0}
+.workout-set-row small{color:var(--muted)}
+.previous-set{line-height:1.45}
+.fitness-progress-modal{max-width:860px!important}
+.fitness-progress-content{display:grid;gap:8px;margin-top:14px;max-height:65vh;overflow:auto}
+.fitness-progress-entry{display:grid;grid-template-columns:145px minmax(0,1fr);gap:13px;padding:13px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.02)}
+.fitness-progress-entry b,.fitness-progress-entry small{display:block}
+.fitness-progress-entry small{color:var(--muted);margin-top:4px}
+.fitness-progress-entry p{margin:0;line-height:1.6;color:var(--text)}
+.progress-gain{display:inline-flex;margin-left:5px;padding:2px 6px;border-radius:999px;background:rgba(84,239,177,.11);color:var(--green);font-weight:900}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 
 @media(max-width:1200px){
@@ -403,8 +416,10 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
   .fitness-stats{grid-template-columns:1fr}
   .home-fitness-overview,.active-workout-head{align-items:flex-start;flex-direction:column}
   .fitness-plan-toolbar{align-items:stretch;flex-direction:column}
-  .workout-exercise{grid-template-columns:26px minmax(0,1fr)}
-  .workout-weight{grid-column:2}
+  .workout-set-row{grid-template-columns:26px 1fr 1fr}
+  .workout-set-row>b{grid-column:2/4}
+  .previous-set{grid-column:2/4}
+  .fitness-progress-entry{grid-template-columns:1fr}
 }
 
 

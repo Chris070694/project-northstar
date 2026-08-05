@@ -15,6 +15,7 @@ const CPRB_BACKUP_TABLES=[
   {name:'fitness_plan_exercises'},
   {name:'fitness_sessions'},
   {name:'fitness_session_exercises'},
+  {name:'fitness_set_logs'},
   {name:'notes'},
   {name:'academy_notes'},
   {name:'calendar_events'},
@@ -25,13 +26,13 @@ const CPRB_BACKUP_TABLES=[
 const CPRB_RESTORE_ORDER=[
   'trades','trading_settings','daily_focus','vision_goals','recurring_tasks','daily_tasks',
   'recurring_task_skips','weekly_reviews','fitness_exercises','fitness_plans',
-  'fitness_plan_exercises','fitness_sessions','fitness_session_exercises','notes',
+  'fitness_plan_exercises','fitness_sessions','fitness_session_exercises','fitness_set_logs','notes',
   'academy_notes','calendar_events','reminder_settings','library_books'
 ];
 
 const CPRB_EXPORT_MODULES={
   trading:['trades','trading_settings'],
-  fitness:['fitness_plans','fitness_plan_exercises','fitness_sessions','fitness_session_exercises'],
+  fitness:['fitness_plans','fitness_plan_exercises','fitness_sessions','fitness_session_exercises','fitness_set_logs'],
   focus:['daily_focus','daily_tasks','recurring_tasks','recurring_task_skips','weekly_reviews'],
   goals:['vision_goals']
 };
