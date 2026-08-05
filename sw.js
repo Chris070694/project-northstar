@@ -1,4 +1,4 @@
-const CACHE='northstar-backup-v2';
+const CACHE='northstar-backup-v3';
 const APP_SHELL=[
   './',
   './index.html',
@@ -20,8 +20,8 @@ const APP_SHELL=[
   './modules/calendar.js',
   './modules/weekly.js',
   './modules/reminders.js',
-  './modules/backup.js',
-  './modules/pwa.js'
+  './modules/backup.js?v=3',
+  './modules/pwa.js?v=3'
 ];
 
 self.addEventListener('install',event=>{

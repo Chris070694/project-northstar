@@ -41,5 +41,13 @@ window.addEventListener('appinstalled',()=>{
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeInstallGuide()});
 
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error));
+  let refreshingForUpdate=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(refreshingForUpdate)return;
+    refreshingForUpdate=true;
+    location.reload();
+  });
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=3',{updateViaCache:'none'})
+    .then(registration=>registration.update())
+    .catch(console.error));
 }
