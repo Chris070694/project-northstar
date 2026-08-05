@@ -1,4 +1,4 @@
-const CACHE='northstar-brand-v1';
+const CACHE='northstar-fitness-v2';
 const APP_SHELL=[
   './',
   './index.html',
@@ -13,14 +13,14 @@ const APP_SHELL=[
   './modules/trading.js',
   './modules/focus.js?v=2',
   './modules/goals.js',
-  './modules/fitness.js',
+  './modules/fitness.js?v=2',
   './modules/notes.js',
   './modules/academy.js',
   './modules/library.js',
   './modules/calendar.js',
   './modules/weekly.js?v=2',
   './modules/reminders.js',
-  './modules/backup.js?v=4',
+  './modules/backup.js?v=5',
   './modules/pwa.js?v=3'
 ];
 

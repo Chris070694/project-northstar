@@ -100,6 +100,7 @@
     <div class="actions"><button class="btn" onclick="openExercise()">+ Übung</button><button id="fitnessStartBtn" class="btn primary" onclick="startFitnessWorkout()">Training starten</button></div>
   </div>
   <div id="fitnessSetupNotice" class="task-setup-notice hide">Die Fitness-Datenbank muss noch eingerichtet werden.</div>
+  <div id="fitnessSetSetupNotice" class="task-setup-notice hide">Fitness v2 wartet noch auf die Satzprotokoll-Migration in Supabase.</div>
   <div class="grid fitness-stats">
     <div class="card stat"><div class="label">Trainings diese Woche</div><div id="fitnessWeekCount" class="value">0</div></div>
     <div class="card stat"><div class="label">Aktiver Plan</div><div id="fitnessCurrentPlan" class="value fitness-stat-text">–</div></div>
@@ -374,6 +375,13 @@
 </form>
 </div>
 
+<div id="fitnessProgressModal" class="modal">
+  <div class="card fitness-progress-modal">
+    <div class="top"><div><div class="eyebrow">Satzgenauer Verlauf</div><h2 id="fitnessProgressTitle">Übung</h2></div><button type="button" class="btn" onclick="closeFitnessProgress()">✕</button></div>
+    <div id="fitnessProgressContent" class="fitness-progress-content"></div>
+  </div>
+</div>
+
 <div id="noteModal" class="modal">
 <form id="noteForm" class="card">
   <div class="top"><h2>Notiz erstellen</h2><button type="button" class="btn" onclick="closeNote()">✕</button></div>
@@ -466,4 +474,4 @@
   </div>
 </form>
 </div>
-<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js?v=2"></script><script src="modules/focus.js?v=2"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js?v=2"></script><script src="modules/reminders.js"></script><script src="modules/backup.js?v=4"></script><script src="modules/pwa.js?v=3"></script><script src="app.js"></script></body></html>
+<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js?v=2"></script><script src="modules/focus.js?v=2"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js?v=2"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js"></script><script src="modules/weekly.js?v=2"></script><script src="modules/reminders.js"></script><script src="modules/backup.js?v=5"></script><script src="modules/pwa.js?v=3"></script><script src="app.js"></script></body></html>
