@@ -1,5 +1,6 @@
 let dailyTasks=[];
 let dailyTasksReady=true;
+let taskPriorityReady=true;
 let recurringTasks=[];
 let recurringTasksReady=true;
 
@@ -22,16 +23,21 @@ function isMissingRecurringTasksSchema(error){
     (message.includes('source_recurring_task_id')&&/does not exist|schema cache|not find/i.test(message));
 }
 
+function isMissingTaskPrioritySchema(error){
+  const message=`${error?.code||''} ${error?.message||''} ${error?.details||''}`.toLowerCase();
+  return message.includes('42703')||message.includes('pgrst204')||
+    (message.includes('is_priority')&&/does not exist|schema cache|not find/i.test(message));
+}
+
 async function loadFocus(){
   const d=focusDateKey();
-  const [focusResult,taskResult,recurringResult,skipResult]=await Promise.all([
-    sb.from('daily_focus').select('*').eq('focus_date',d).maybeSingle(),
+  const [taskResult,priorityResult,recurringResult,skipResult]=await Promise.all([
     sb.from('daily_tasks').select('*').eq('task_date',d).order('position',{ascending:true}).order('created_at',{ascending:true}),
+    sb.from('daily_tasks').select('is_priority').limit(1),
     sb.from('recurring_tasks').select('*').eq('is_active',true).order('position',{ascending:true}).order('created_at',{ascending:true}),
     sb.from('recurring_task_skips').select('recurring_task_id').eq('skip_date',d)
   ]);
-  if(focusResult.error)throw focusResult.error;
-  focus=focusResult.data||null;
+  focus=null;
 
   if(taskResult.error){
     if(!isMissingDailyTasksTable(taskResult.error)&&!isMissingRecurringTasksSchema(taskResult.error))throw taskResult.error;
@@ -39,10 +45,17 @@ async function loadFocus(){
     recurringTasksReady=false;
     dailyTasks=[];
     recurringTasks=[];
+    taskPriorityReady=false;
     return;
   }
   dailyTasksReady=true;
   dailyTasks=taskResult.data||[];
+  if(priorityResult.error){
+    if(!isMissingTaskPrioritySchema(priorityResult.error)&&!isMissingDailyTasksTable(priorityResult.error))throw priorityResult.error;
+    taskPriorityReady=false;
+  }else{
+    taskPriorityReady=true;
+  }
 
   if(recurringResult.error){
     if(!isMissingRecurringTasksSchema(recurringResult.error))throw recurringResult.error;
@@ -85,26 +98,6 @@ async function loadFocus(){
     dailyTasks=refreshed.data||[];
   }
 }
-
-$('#focusForm').onsubmit=async e=>{
-  e.preventDefault();
-  const d=focusDateKey();
-  const {error}=await sb.from('daily_focus').upsert({
-    user_id:currentUser.id,
-    focus_date:d,
-    main_focus:$('#fMain').value.trim(),
-    trading_focus:$('#fTrading').value.trim(),
-    fitness_focus:$('#fFitness').value.trim(),
-    learning_focus:$('#fLearning').value.trim(),
-    next_action:$('#fNext').value.trim(),
-    reflection:$('#fReflection').value.trim(),
-    updated_at:new Date().toISOString()
-  },{onConflict:'user_id,focus_date'});
-  if(error)return alert(error.message);
-  await loadFocus();
-  renderFocus();
-  showPage('home');
-};
 
 $('#taskForm').onsubmit=async e=>{
   e.preventDefault();
@@ -165,6 +158,32 @@ async function toggleDailyTask(id,isCompleted){
   renderDailyTasks();
 }
 
+async function toggleTaskPriority(id){
+  if(!taskPriorityReady)return alert('Bitte zuerst die To-do-Prioritäts-Migration in Supabase ausführen.');
+  const task=dailyTasks.find(item=>item.id===id);
+  if(!task)return;
+  const nextValue=!task.is_priority;
+  if(nextValue){
+    const {error:clearError}=await sb.from('daily_tasks').update({
+      is_priority:false,
+      updated_at:new Date().toISOString()
+    }).eq('task_date',focusDateKey()).eq('is_priority',true);
+    if(clearError)return alert(clearError.message);
+  }
+  const {error}=await sb.from('daily_tasks').update({
+    is_priority:nextValue,
+    updated_at:new Date().toISOString()
+  }).eq('id',id);
+  if(error){
+    if(isMissingTaskPrioritySchema(error))taskPriorityReady=false;
+    alert(error.message);
+    await loadFocus();
+  }else{
+    dailyTasks.forEach(item=>{item.is_priority=item.id===id?nextValue:false});
+  }
+  renderFocus();
+}
+
 async function deleteDailyTask(id){
   const task=dailyTasks.find(item=>item.id===id);
   if(task?.source_recurring_task_id){
@@ -222,6 +241,7 @@ function renderDailyTasks(){
   $('#homeTaskProgress').textContent=`${completed}/${total} erledigt`;
   $('#taskProgressBar').style.width=`${percent}%`;
   $('#taskSetupNotice').classList.toggle('hide',dailyTasksReady);
+  $('#taskPrioritySetupNotice')?.classList.toggle('hide',taskPriorityReady||!dailyTasksReady);
 
   if(!dailyTasksReady){
     list.innerHTML='<div class="empty">Nach der Supabase-Einrichtung erscheinen hier deine Aufgaben.</div>';
@@ -238,35 +258,35 @@ function renderDailyTasks(){
   }
 
   list.innerHTML=dailyTasks.map(task=>`
-    <div class="daily-task ${task.is_completed?'done':''}">
+    <div class="daily-task ${task.is_completed?'done':''} ${task.is_priority?'priority':''}">
       <input class="task-check" type="checkbox" ${task.is_completed?'checked':''} onchange="toggleDailyTask('${task.id}',this.checked)" aria-label="Aufgabe erledigt">
+      <button class="task-priority ${task.is_priority?'active':''}" type="button" onclick="toggleTaskPriority('${task.id}')" ${taskPriorityReady?'':'disabled'} aria-label="${task.is_priority?'Top-Priorität entfernen':'Als Top-Priorität markieren'}" title="${task.is_priority?'Top-Priorität entfernen':'Als Top-Priorität markieren'}">${task.is_priority?'★':'☆'}</button>
       <div class="task-copy"><b>${escapeHtml(task.title)}</b><span>${escapeHtml(task.category||'Allgemein')}${task.source_recurring_task_id?' · ↻ Täglich':''}</span></div>
       <button class="task-delete" onclick="deleteDailyTask('${task.id}')" aria-label="${task.source_recurring_task_id?'Nur heute entfernen':'Aufgabe löschen'}" title="${task.source_recurring_task_id?'Nur heute entfernen – die Serie bleibt aktiv':'Aufgabe löschen'}">✕</button>
     </div>
   `).join('');
 
   const openTasks=dailyTasks.filter(task=>!task.is_completed);
-  const homeTasks=(openTasks.length?openTasks:dailyTasks).slice(0,4);
+  const homeTasks=(openTasks.length?openTasks:dailyTasks).slice(0,5);
   homeList.innerHTML=homeTasks.map(task=>`
-    <button class="home-task ${task.is_completed?'done':''}" onclick="showPage('focus')">
-      <span>${task.is_completed?'✓':'○'}</span>
-      <b>${escapeHtml(task.title)}</b>
-    </button>
+    <div class="home-task ${task.is_completed?'done':''} ${task.is_priority?'priority':''}">
+      <input class="task-check" type="checkbox" ${task.is_completed?'checked':''} onchange="toggleDailyTask('${task.id}',this.checked)" aria-label="Aufgabe erledigt">
+      <button class="task-priority ${task.is_priority?'active':''}" type="button" onclick="toggleTaskPriority('${task.id}')" ${taskPriorityReady?'':'disabled'} aria-label="${task.is_priority?'Top-Priorität entfernen':'Als Top-Priorität markieren'}" title="${task.is_priority?'Top-Priorität entfernen':'Als Top-Priorität markieren'}">${task.is_priority?'★':'☆'}</button>
+      <div class="home-task-copy"><b>${escapeHtml(task.title)}</b><small>${escapeHtml(task.category||'Allgemein')}${task.source_recurring_task_id?' · ↻ Täglich':''}</small></div>
+    </div>
   `).join('');
   renderRecurringTasks();
 }
 
 function renderFocus(){
-  $('#mainFocus').textContent=focus?.main_focus||'Definiere deinen Fokus.';
-  $('#nextFocus').textContent=focus?.next_action||'Der nächste kleine Schritt zählt.';
-  $('#tradingFocus').textContent=focus?.trading_focus||'Offen';
-  $('#fitnessFocus').textContent=focus?.fitness_focus||'Offen';
-  $('#learningFocus').textContent=focus?.learning_focus||'Offen';
-  $('#fMain').value=focus?.main_focus||'';
-  $('#fTrading').value=focus?.trading_focus||'';
-  $('#fFitness').value=focus?.fitness_focus||'';
-  $('#fLearning').value=focus?.learning_focus||'';
-  $('#fNext').value=focus?.next_action||'';
-  $('#fReflection').value=focus?.reflection||'';
+  const priorityTask=dailyTasks.find(task=>task.is_priority&&!task.is_completed)||dailyTasks.find(task=>task.is_priority);
+  const openCount=dailyTasks.filter(task=>!task.is_completed).length;
+  if(priorityTask){
+    $('#mainFocus').textContent=priorityTask.title;
+    $('#nextFocus').textContent=priorityTask.is_completed?'Top-Priorität erledigt ✓':`★ Top-Priorität · ${priorityTask.category||'Allgemein'}`;
+  }else{
+    $('#mainFocus').textContent=dailyTasks.length?'Wähle deine Top-Priorität.':'Plane deinen Tag mit einer Aufgabe.';
+    $('#nextFocus').textContent=taskPriorityReady?`${openCount} offene Aufgabe${openCount===1?'':'n'} · Tippe auf ☆`:'Prioritätsfunktion noch einrichten';
+  }
   renderDailyTasks();
 }
