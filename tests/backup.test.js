@@ -37,9 +37,27 @@ globalThis.testPromise=(async()=>{
   if(backupFileMimeType('user/books/book.pdf','application/octet-stream')!=='application/pdf')throw new Error('PDF MIME type correction failed');
   if(backupFileMimeType('user/covers/book.webp','application/octet-stream')!=='image/webp')throw new Error('Image MIME type correction failed');
 
+  let uploaded=null;
+  sb={storage:{from:bucket=>({upload:async(path,body,options)=>{
+    uploaded={bucket,path,body,options};
+    return {error:null};
+  }})}};
+  const zip={file:()=>({async:async format=>{
+    if(format!=='uint8array')throw new Error('Restore must use raw bytes');
+    return new Uint8Array([37,80,68,70]);
+  }})};
+  await restoreBackupFiles(zip,[{
+    bucket:'northstar-library',
+    path:'user/books/book.pdf',
+    zip_path:'files/book.pdf',
+    type:'application/octet-stream'
+  }],()=>{});
+  if(!(uploaded.body instanceof Uint8Array))throw new Error('Restore upload did not use raw bytes');
+  if(uploaded.options.contentType!=='application/pdf')throw new Error('Restore upload used the wrong PDF MIME type');
+
   const csv=rowsToCsv([{title:'A;B',note:'Zitat "ok"'}]);
   if(!csv.includes('"A;B"')||!csv.includes('"Zitat ""ok"""'))throw new Error('CSV escaping failed');
 })();`;
 
 vm.runInNewContext(`${source}\n${test}`,context,{filename:'backup.js'});
-context.testPromise.then(()=>console.log('backup crypto, MIME correction, password rejection, file mapping and CSV: OK'));
+context.testPromise.then(()=>console.log('backup crypto, raw-byte restore, MIME correction, password rejection, file mapping and CSV: OK'));
