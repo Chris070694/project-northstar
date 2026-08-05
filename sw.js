@@ -1,4 +1,4 @@
-const CACHE='northstar-backup-v4';
+const CACHE='northstar-tasks-v1';
 const APP_SHELL=[
   './',
   './index.html',
@@ -9,16 +9,16 @@ const APP_SHELL=[
   './icons/cprb-og-192.png',
   './icons/cprb-og-512.png',
   './icons/cprb-og-180.png',
-  './modules/core.js',
+  './modules/core.js?v=2',
   './modules/trading.js',
-  './modules/focus.js',
+  './modules/focus.js?v=2',
   './modules/goals.js',
   './modules/fitness.js',
   './modules/notes.js',
   './modules/academy.js',
   './modules/library.js',
   './modules/calendar.js',
-  './modules/weekly.js',
+  './modules/weekly.js?v=2',
   './modules/reminders.js',
   './modules/backup.js?v=4',
   './modules/pwa.js?v=3'

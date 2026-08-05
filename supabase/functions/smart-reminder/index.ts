@@ -74,7 +74,7 @@ function dueReminders(settings:any,now:Date){
   if(isQuiet(clock.time,shortTime(settings.quiet_start),shortTime(settings.quiet_end)))return []
   const due=[]
   if(settings.daily_focus_enabled&&clock.time===shortTime(settings.daily_focus_time)){
-    due.push({type:'daily_focus',title:'Daily Focus setzen ◎',body:'Was zählt heute wirklich? Starte deinen Tag mit einem klaren Fokus.',url:'./?page=focus'})
+    due.push({type:'daily_focus',title:'Tagesplanung öffnen ✓',body:'Plane deine Aufgaben und wähle deine Top-Priorität für heute.',url:'./?page=tasks'})
   }
   if(settings.trading_enabled&&clock.time===shortTime(settings.trading_time)){
     due.push({type:'trading',title:'Trading-Plan prüfen 📈',body:'Setup, Risiko und Regeln zuerst – dann erst den Trade.',url:'./?page=trading'})

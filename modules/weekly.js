@@ -1,6 +1,5 @@
 let weeklyReview=null;
 let weeklyTasks=[];
-let weeklyFocusEntries=[];
 let weeklyOffset=0;
 let weeklyReady=true;
 
@@ -33,10 +32,9 @@ function isMissingWeeklyReviewTable(error){
 
 async function loadWeeklyReview(){
   const bounds=weeklyBounds();
-  const [reviewResult,taskResult,focusResult]=await Promise.all([
+  const [reviewResult,taskResult]=await Promise.all([
     sb.from('weekly_reviews').select('*').eq('user_id',currentUser.id).eq('week_start',bounds.start).maybeSingle(),
-    sb.from('daily_tasks').select('*').eq('user_id',currentUser.id).gte('task_date',bounds.start).lte('task_date',bounds.end).order('task_date',{ascending:true}),
-    sb.from('daily_focus').select('*').eq('user_id',currentUser.id).gte('focus_date',bounds.start).lte('focus_date',bounds.end).order('focus_date',{ascending:true})
+    sb.from('daily_tasks').select('*').eq('user_id',currentUser.id).gte('task_date',bounds.start).lte('task_date',bounds.end).order('task_date',{ascending:true})
   ]);
 
   if(reviewResult.error){
@@ -54,9 +52,6 @@ async function loadWeeklyReview(){
   }else{
     weeklyTasks=taskResult.data||[];
   }
-
-  if(focusResult.error)throw focusResult.error;
-  weeklyFocusEntries=focusResult.data||[];
 }
 
 function weeklyMetrics(){
@@ -74,18 +69,18 @@ function weeklyMetrics(){
   const planRate=weekTrades.length?followed/weekTrades.length*100:0;
   const completedTasks=weeklyTasks.filter(task=>task.is_completed).length;
   const taskRate=weeklyTasks.length?completedTasks/weeklyTasks.length*100:0;
-  const focusDays=new Set(weeklyFocusEntries.map(entry=>entry.focus_date)).size;
+  const activeDays=new Set(weeklyTasks.map(task=>task.task_date)).size;
   const goalProgress=goals.length?goals.reduce((sum,goal)=>{
     const target=Number(goal.target_value)||1;
     return sum+Math.max(0,Math.min(100,(Number(goal.current_value)||0)/target*100));
   },0)/goals.length:0;
-  const scoreParts=[Math.min(100,weekSessions.length/2*100),Math.min(100,focusDays/5*100)];
+  const scoreParts=[Math.min(100,weekSessions.length/2*100),Math.min(100,activeDays/5*100)];
   if(weekTrades.length)scoreParts.push(planRate);
   if(weeklyTasks.length)scoreParts.push(taskRate);
   const score=Math.round(scoreParts.reduce((sum,value)=>sum+value,0)/scoreParts.length);
   return {
     bounds,weekTrades,weekSessions,wins,pnl,winrate,planRate,
-    completedTasks,taskRate,focusDays,goalProgress,score
+    completedTasks,taskRate,activeDays,goalProgress,score
   };
 }
 
@@ -112,7 +107,7 @@ function weeklyInsightMarkup(metrics){
   }
 
   if(!weeklyTasks.length){
-    insights.push({icon:'○',tone:'neutral',title:'Woche konkreter planen',copy:'Daily-Focus-Aufgaben machen deinen Fortschritt messbar.'});
+    insights.push({icon:'○',tone:'neutral',title:'Woche konkreter planen',copy:'Deine To-dos machen den Fortschritt der Woche messbar.'});
   }else if(metrics.taskRate>=80){
     insights.push({icon:'✓',tone:'positive',title:'Fokus sitzt',copy:`${metrics.completedTasks} von ${weeklyTasks.length} Aufgaben erledigt.`});
   }else{
@@ -149,8 +144,8 @@ function renderWeeklyReview(){
   $('#weeklyFitnessMeta').textContent=metrics.weekSessions.length>=2?'Wochenziel erreicht':'Ziel: 2 Einheiten';
   $('#weeklyTasksDone').textContent=`${metrics.completedTasks}/${weeklyTasks.length}`;
   $('#weeklyTaskMeta').textContent=weeklyTasks.length?`${metrics.taskRate.toFixed(0)}% erledigt`:'Noch keine Aufgaben';
-  $('#weeklyFocusDays').textContent=String(metrics.focusDays);
-  $('#weeklyFocusMeta').textContent=metrics.focusDays===1?'1 geplanter Tag':`${metrics.focusDays} geplante Tage`;
+  $('#weeklyFocusDays').textContent=String(metrics.activeDays);
+  $('#weeklyFocusMeta').textContent=metrics.activeDays===1?'1 Tag mit Aufgaben':`${metrics.activeDays} Tage mit Aufgaben`;
   $('#weeklyGoalProgress').textContent=goals.length?`${metrics.goalProgress.toFixed(0)}%`:'–';
   $('#weeklyGoalMeta').textContent=goals.length?`${goals.length} aktive Ziele`:'Noch keine Ziele';
   $('#weeklyInsights').innerHTML=weeklyInsightMarkup(metrics);
@@ -216,4 +211,3 @@ $('#weeklyForm')?.addEventListener('submit',async event=>{
   submit.textContent='Gespeichert ✓';
   setTimeout(()=>{submit.textContent='Weekly Review speichern';submit.disabled=false},1400);
 });
-

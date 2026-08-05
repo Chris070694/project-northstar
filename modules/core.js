@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)||0);
 let sb,currentUser=null,trades=[],focus=null,goals=[];
-const mobilePrimaryPages=new Set(['home','trading','focus','fitness']);
+const mobilePrimaryPages=new Set(['home','trading','tasks','fitness']);
 function closeMobileMore(){
   $('#mobileMoreSheet')?.classList.remove('show');
   $('#mobileMoreButton')?.setAttribute('aria-expanded','false');
@@ -18,6 +18,7 @@ function updateNavigation(id){
   $('#mobileMoreButton')?.classList.toggle('active',!mobilePrimaryPages.has(id));
 }
 function showPage(id){
+  if(id==='focus')id='tasks';
   const target=$('#'+id);
   if(!target?.classList.contains('page'))return;
   $$('.page').forEach(page=>page.classList.remove('active'));

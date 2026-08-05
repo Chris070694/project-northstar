@@ -40,9 +40,9 @@
       "url": "./?page=trading"
     },
     {
-      "name": "Daily Focus",
-      "short_name": "Fokus",
-      "url": "./?page=focus"
+      "name": "To-do-Liste",
+      "short_name": "To-dos",
+      "url": "./?page=tasks"
     },
     {
       "name": "Fitness Plan",
