@@ -34,11 +34,12 @@ globalThis.testPromise=(async()=>{
   });
   if(refs.length!==3)throw new Error('Storage references were not collected');
   if(refs[0].bucket!=='northstar-media'||refs[1].bucket!=='northstar-library')throw new Error('Storage bucket mapping failed');
+  if(backupFileMimeType('user/books/book.pdf','application/octet-stream')!=='application/pdf')throw new Error('PDF MIME type correction failed');
+  if(backupFileMimeType('user/covers/book.webp','application/octet-stream')!=='image/webp')throw new Error('Image MIME type correction failed');
 
   const csv=rowsToCsv([{title:'A;B',note:'Zitat "ok"'}]);
   if(!csv.includes('"A;B"')||!csv.includes('"Zitat ""ok"""'))throw new Error('CSV escaping failed');
 })();`;
 
 vm.runInNewContext(`${source}\n${test}`,context,{filename:'backup.js'});
-context.testPromise.then(()=>console.log('backup crypto, password rejection, file mapping and CSV: OK'));
-
+context.testPromise.then(()=>console.log('backup crypto, MIME correction, password rejection, file mapping and CSV: OK'));

@@ -134,6 +134,18 @@ function backupZipPath(file,index){
   return `files/${file.bucket}/${safePath||`file-${index}`}`;
 }
 
+function backupFileMimeType(path,reportedType=''){
+  const extension=String(path||'').split('?')[0].split('.').pop().toLowerCase();
+  const byExtension={
+    pdf:'application/pdf',
+    webp:'image/webp',
+    jpg:'image/jpeg',
+    jpeg:'image/jpeg',
+    png:'image/png'
+  };
+  return byExtension[extension]||reportedType||'application/octet-stream';
+}
+
 async function addFilesToBackup(zip,fileRefs,onProgress){
   const included=[];
   const failed=[];
@@ -149,7 +161,7 @@ async function addFilesToBackup(zip,fileRefs,onProgress){
       const blob=await response.blob();
       const zipPath=backupZipPath(file,index);
       zip.file(zipPath,blob,{binary:true,compression:'STORE'});
-      included.push({bucket:file.bucket,path:file.path,zip_path:zipPath,size:blob.size,type:blob.type||''});
+      included.push({bucket:file.bucket,path:file.path,zip_path:zipPath,size:blob.size,type:backupFileMimeType(file.path,blob.type)});
       totalBytes+=blob.size;
     }catch(error){
       console.warn(`Backup-Datei übersprungen: ${file.bucket}/${file.path}`,error);
@@ -276,7 +288,7 @@ async function restoreBackupFiles(zip,files,onProgress){
     if(!entry)throw new Error(`Datei fehlt im Backup: ${file.path}`);
     const blob=await entry.async('blob');
     const {error}=await sb.storage.from(file.bucket).upload(file.path,blob,{
-      contentType:file.type||undefined,
+      contentType:backupFileMimeType(file.path,file.type),
       cacheControl:'3600',
       upsert:true
     });
@@ -407,4 +419,3 @@ $('#backupFile')?.addEventListener('change',event=>{
   const file=event.target.files?.[0];
   $('#backupFileName').textContent=file?`${file.name} · ${formatBackupBytes(file.size)}`:'CPRB-Backup auswählen';
 });
-
