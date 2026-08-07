@@ -27,6 +27,11 @@ final class PhoneWatchBridge: NSObject, ObservableObject {
 
     func sendCredentials() {
         guard let session, !accessToken.isEmpty else { return }
+        guard session.activationState == .activated else {
+            lastTransferMessage = "Watch-Verbindung wird aktiviert…"
+            session.activate()
+            return
+        }
         let payload = [
             "supabaseURL": CPRBConfig.supabaseURL,
             "supabaseKey": CPRBConfig.supabasePublishableKey,
@@ -75,6 +80,16 @@ extension PhoneWatchBridge: WCSessionDelegate {
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
         Task { @MainActor [weak self] in
             self?.refreshState()
+        }
+    }
+
+    nonisolated func sessionWatchStateDidChange(_ session: WCSession) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.refreshState()
+            if session.isPaired, session.isWatchAppInstalled, !self.accessToken.isEmpty {
+                self.sendCredentials()
+            }
         }
     }
 }

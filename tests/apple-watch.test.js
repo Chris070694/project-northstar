@@ -15,11 +15,15 @@ assert.match(project,/PRODUCT_BUNDLE_IDENTIFIER = com\.chris070694\.CPRBOS;/);
 assert.match(project,/PRODUCT_BUNDLE_IDENTIFIER = com\.chris070694\.CPRBOS\.watchkitapp;/);
 assert.match(project,/INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com\.chris070694\.CPRBOS;/);
 assert.match(project,/INFOPLIST_KEY_CFBundleDisplayName = "CPRB OS";/);
+assert.match(project,/WATCHOS_DEPLOYMENT_TARGET = 10\.0;/);
+assert.match(project,/IPHONEOS_DEPLOYMENT_TARGET = 17\.0;/);
+assert.match(project,/Embed Watch Content/);
 
 assert.match(phoneStore,/grant_type=password/);
 assert.match(phoneStore,/password = ""/);
 assert.match(bridge,/updateApplicationContext/);
 assert.match(bridge,/"accessToken": accessToken/);
+assert.match(bridge,/sessionWatchStateDidChange/);
 
 assert.match(watchStore,/fitness_sessions\?select=id,plan_name_snapshot&status=eq\.active/);
 assert.match(watchStore,/fitness_set_logs\?select=/);
