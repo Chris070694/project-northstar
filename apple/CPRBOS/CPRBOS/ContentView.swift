@@ -163,7 +163,3 @@ struct ContentView: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 22))
     }
 }
-
-#Preview {
-    ContentView()
-}

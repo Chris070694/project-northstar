@@ -202,8 +202,3 @@ private struct SetDetailView: View {
         }
     }
 }
-
-#Preview {
-    ContentView()
-        .environmentObject(WatchWorkoutStore())
-}

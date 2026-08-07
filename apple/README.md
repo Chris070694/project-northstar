@@ -20,6 +20,11 @@ Die native Begleit-App verbindet das bestehende CPRB-Fitnessmodul mit der Apple 
 3. Zuerst die iPhone-App auf einem gekoppelten iPhone starten und anmelden.
 4. Danach die Watch-App starten und das aktive Training aktualisieren.
 
+Unterstützt werden iOS 17 oder neuer und watchOS 10 oder neuer. Für
+`WatchConnectivity` sind weder App Groups noch zusätzliche Entitlements nötig;
+entscheidend sind dasselbe Signing-Team, die Companion-Bundle-ID und die im
+iPhone-Target eingebettete Watch-App.
+
 Der Supabase Publishable Key ist bewusst ein öffentlicher Client-Schlüssel. RLS schützt weiterhin alle Fitnessdaten pro Benutzer.
 
 ## Nächste Ausbaustufe
