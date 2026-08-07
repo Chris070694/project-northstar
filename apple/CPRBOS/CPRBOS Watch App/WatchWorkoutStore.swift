@@ -14,14 +14,23 @@ final class WatchWorkoutStore: NSObject, ObservableObject {
     private var supabaseURL = ""
     private var supabaseKey = ""
     private var accessToken = ""
+    private var refreshToken = ""
+    private var accessTokenExpiresAt = Date.distantPast
+    private var sessionRefreshTask: Task<WatchAuthResponse, Error>?
     private let watchSession: WCSession? = WCSession.isSupported() ? .default : nil
 
     override init() {
         super.init()
+        if let storedCredentials = try? WatchCredentialStore.read() {
+            apply(credentials: storedCredentials, shouldLoadWorkout: false)
+        }
         watchSession?.delegate = self
         watchSession?.activate()
         if let context = watchSession?.receivedApplicationContext, !context.isEmpty {
             apply(context: context)
+        } else if hasCredentials {
+            message = "Gespeicherte Anmeldung geladen – Training wird aktualisiert…"
+            Task { await loadWorkout() }
         }
     }
 
@@ -135,15 +144,74 @@ final class WatchWorkoutStore: NSObject, ObservableObject {
     }
 
     private func apply(context: [String: Any]) {
+        if context["signedOut"] as? Bool == true {
+            clearCredentials(message: "Auf dem iPhone abgemeldet. Öffne CPRB OS dort erneut.")
+            return
+        }
         guard let url = context["supabaseURL"] as? String,
               let key = context["supabaseKey"] as? String,
-              let token = context["accessToken"] as? String else { return }
-        supabaseURL = url
-        supabaseKey = key
-        accessToken = token
+              let token = context["accessToken"] as? String,
+              let newRefreshToken = context["refreshToken"] as? String,
+              let expiresAt = context["accessTokenExpiresAt"] as? Double else { return }
+        let contextExpiration = Date(timeIntervalSince1970: expiresAt)
+        if hasCredentials, accessTokenExpiresAt >= contextExpiration {
+            Task { await loadWorkout() }
+            return
+        }
+        guard contextExpiration > Date() else {
+            message = "Watch-Anmeldung ist zu alt. Melde dich in CPRB OS auf dem iPhone erneut an."
+            return
+        }
+        let credentials = WatchStoredCredentials(
+            supabaseURL: url,
+            supabaseKey: key,
+            accessToken: token,
+            refreshToken: newRefreshToken,
+            accessTokenExpiresAt: contextExpiration
+        )
+        apply(credentials: credentials, shouldLoadWorkout: true)
+    }
+
+    private func apply(credentials: WatchStoredCredentials, shouldLoadWorkout: Bool) {
+        supabaseURL = credentials.supabaseURL
+        supabaseKey = credentials.supabaseKey
+        accessToken = credentials.accessToken
+        refreshToken = credentials.refreshToken
+        accessTokenExpiresAt = credentials.accessTokenExpiresAt
+        try? WatchCredentialStore.save(credentials)
         isConnected = true
         message = "Verbunden – Training wird geladen…"
-        Task { await loadWorkout() }
+        if shouldLoadWorkout {
+            Task { await loadWorkout() }
+        }
+    }
+
+    private func persistCredentials() throws {
+        try WatchCredentialStore.save(
+            WatchStoredCredentials(
+                supabaseURL: supabaseURL,
+                supabaseKey: supabaseKey,
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                accessTokenExpiresAt: accessTokenExpiresAt
+            )
+        )
+    }
+
+    private func clearCredentials(message: String) {
+        supabaseURL = ""
+        supabaseKey = ""
+        accessToken = ""
+        refreshToken = ""
+        accessTokenExpiresAt = .distantPast
+        sessionRefreshTask?.cancel()
+        sessionRefreshTask = nil
+        session = nil
+        exercises = []
+        sets = []
+        isConnected = false
+        try? WatchCredentialStore.delete()
+        self.message = message
     }
 
     private func get<T: Decodable>(_ path: String) async throws -> T {
@@ -173,7 +241,13 @@ final class WatchWorkoutStore: NSObject, ObservableObject {
         try await patch(table: "fitness_session_exercises", id: exerciseID, values: values)
     }
 
-    private func request(path: String, method: String, body: Data?) async throws -> Data {
+    private func request(
+        path: String,
+        method: String,
+        body: Data?,
+        mayRetryAfterRefresh: Bool = true
+    ) async throws -> Data {
+        try await refreshAccessTokenIfNeeded()
         guard hasCredentials else { throw WatchCPRBError.missingConnection }
         guard let url = URL(string: "\(supabaseURL)/rest/v1/\(path)") else {
             throw WatchCPRBError.invalidURL
@@ -190,6 +264,15 @@ final class WatchWorkoutStore: NSObject, ObservableObject {
         guard let http = response as? HTTPURLResponse else {
             throw WatchCPRBError.invalidResponse
         }
+        if http.statusCode == 401, mayRetryAfterRefresh {
+            try await refreshAccessToken()
+            return try await self.request(
+                path: path,
+                method: method,
+                body: body,
+                mayRetryAfterRefresh: false
+            )
+        }
         guard (200...299).contains(http.statusCode) else {
             let payload = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
             let serverMessage = payload?["message"] as? String
@@ -198,6 +281,71 @@ final class WatchWorkoutStore: NSObject, ObservableObject {
             throw WatchCPRBError.server(serverMessage)
         }
         return data
+    }
+
+    private func refreshAccessTokenIfNeeded() async throws {
+        guard accessTokenExpiresAt.timeIntervalSinceNow <= 300 else { return }
+        try await refreshAccessToken()
+    }
+
+    private func refreshAccessToken() async throws {
+        guard !refreshToken.isEmpty else { throw WatchCPRBError.missingConnection }
+        let previousRefreshToken = refreshToken
+        let auth: WatchAuthResponse
+        if let sessionRefreshTask {
+            auth = try await sessionRefreshTask.value
+        } else {
+            let refreshTask = Task { @MainActor in
+                try await requestRefreshedAuth(using: previousRefreshToken)
+            }
+            sessionRefreshTask = refreshTask
+            do {
+                auth = try await refreshTask.value
+                sessionRefreshTask = nil
+            } catch {
+                sessionRefreshTask = nil
+                throw error
+            }
+        }
+
+        accessToken = auth.accessToken
+        refreshToken = auth.refreshToken ?? previousRefreshToken
+        if let expiresAt = auth.expiresAt {
+            accessTokenExpiresAt = Date(timeIntervalSince1970: expiresAt)
+        } else {
+            accessTokenExpiresAt = Date().addingTimeInterval(auth.expiresIn ?? 3600)
+        }
+        try persistCredentials()
+        isConnected = true
+    }
+
+    private func requestRefreshedAuth(using refreshToken: String) async throws -> WatchAuthResponse {
+        guard let url = URL(
+            string: "\(supabaseURL)/auth/v1/token?grant_type=refresh_token"
+        ) else {
+            throw WatchCPRBError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(supabaseKey, forHTTPHeaderField: "apikey")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: ["refresh_token": refreshToken]
+        )
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw WatchCPRBError.invalidResponse
+        }
+        if http.statusCode == 400 || http.statusCode == 401 {
+            clearCredentials(message: "Anmeldung abgelaufen. Öffne CPRB OS auf dem iPhone.")
+            throw WatchCPRBError.missingConnection
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw WatchCPRBError.server("Anmeldung konnte nicht erneuert werden (\(http.statusCode)).")
+        }
+
+        return try JSONDecoder().decode(WatchAuthResponse.self, from: data)
     }
 }
 

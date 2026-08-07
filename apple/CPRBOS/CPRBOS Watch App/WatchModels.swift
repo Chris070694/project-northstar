@@ -1,5 +1,19 @@
 import Foundation
 
+struct WatchAuthResponse: Decodable {
+    let accessToken: String
+    let refreshToken: String?
+    let expiresIn: Double?
+    let expiresAt: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
+        case expiresAt = "expires_at"
+    }
+}
+
 struct WatchFitnessSession: Decodable, Identifiable {
     let id: String
     let planName: String

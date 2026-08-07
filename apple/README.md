@@ -7,6 +7,10 @@ Die native Begleit-App verbindet das bestehende CPRB-Fitnessmodul mit der Apple 
 - Anmeldung auf dem iPhone mit dem bestehenden CPRB-Konto
 - Passwort bleibt nur während der Anmeldung im Speicher und wird danach verworfen
 - temporärer Supabase-Zugang wird über `WatchConnectivity` an die gekoppelte Watch übertragen
+- Refresh-Token wird verschlüsselt in den Schlüsselbünden von iPhone und Watch gespeichert
+- iPhone und Watch verwenden getrennte Supabase-Sitzungen, damit Token-Rotation sicher bleibt
+- Anmeldung und Watch-Zugang werden vor Ablauf automatisch erneuert
+- Abmeldung auf dem iPhone wird an die Watch weitergegeben
 - aktive Training-A- oder Training-B-Sitzung laden
 - Sätze, Gewicht und Wiederholungen auf der Watch ändern
 - einzelne Sätze auf der Watch abschließen oder wieder öffnen

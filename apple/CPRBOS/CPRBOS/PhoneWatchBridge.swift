@@ -11,6 +11,9 @@ final class PhoneWatchBridge: NSObject, ObservableObject {
     @Published private(set) var lastTransferMessage = "Noch nicht an die Watch gesendet"
 
     private var accessToken = ""
+    private var refreshToken = ""
+    private var accessTokenExpiresAt = Date.distantPast
+    private var shouldSendSignOut = false
     private let session: WCSession? = WCSession.isSupported() ? .default : nil
 
     private override init() {
@@ -20,9 +23,20 @@ final class PhoneWatchBridge: NSObject, ObservableObject {
         refreshState()
     }
 
-    func updateCredentials(accessToken: String) {
+    func updateCredentials(accessToken: String, refreshToken: String, expiresAt: Date) {
         self.accessToken = accessToken
+        self.refreshToken = refreshToken
+        accessTokenExpiresAt = expiresAt
+        shouldSendSignOut = false
         sendCredentials()
+    }
+
+    func clearCredentials() {
+        accessToken = ""
+        refreshToken = ""
+        accessTokenExpiresAt = .distantPast
+        shouldSendSignOut = true
+        sendSignOut()
     }
 
     func sendCredentials() {
@@ -32,10 +46,13 @@ final class PhoneWatchBridge: NSObject, ObservableObject {
             session.activate()
             return
         }
-        let payload = [
+        let payload: [String: Any] = [
             "supabaseURL": CPRBConfig.supabaseURL,
             "supabaseKey": CPRBConfig.supabasePublishableKey,
             "accessToken": accessToken,
+            "refreshToken": refreshToken,
+            "accessTokenExpiresAt": accessTokenExpiresAt.timeIntervalSince1970,
+            "signedOut": false,
             "sentAt": ISO8601DateFormatter().string(from: Date())
         ]
 
@@ -48,6 +65,24 @@ final class PhoneWatchBridge: NSObject, ObservableObject {
             lastTransferMessage = "Übertragung fehlgeschlagen: \(error.localizedDescription)"
         }
         refreshState()
+    }
+
+    private func sendSignOut() {
+        guard let session else { return }
+        guard session.activationState == .activated else {
+            session.activate()
+            return
+        }
+        do {
+            let payload: [String: Any] = [
+                "signedOut": true,
+                "sentAt": ISO8601DateFormatter().string(from: Date())
+            ]
+            try session.updateApplicationContext(payload)
+            lastTransferMessage = "Abmeldung wurde an die Watch gesendet"
+        } catch {
+            lastTransferMessage = "Abmeldung konnte nicht übertragen werden: \(error.localizedDescription)"
+        }
     }
 
     private func refreshState() {
@@ -65,8 +100,12 @@ extension PhoneWatchBridge: WCSessionDelegate {
         Task { @MainActor [weak self] in
             guard let self else { return }
             self.refreshState()
-            if error == nil, !self.accessToken.isEmpty {
-                self.sendCredentials()
+            if error == nil {
+                if self.shouldSendSignOut {
+                    self.sendSignOut()
+                } else if !self.accessToken.isEmpty {
+                    self.sendCredentials()
+                }
             }
         }
     }
@@ -87,8 +126,12 @@ extension PhoneWatchBridge: WCSessionDelegate {
         Task { @MainActor [weak self] in
             guard let self else { return }
             self.refreshState()
-            if session.isPaired, session.isWatchAppInstalled, !self.accessToken.isEmpty {
-                self.sendCredentials()
+            if session.isPaired, session.isWatchAppInstalled {
+                if self.shouldSendSignOut {
+                    self.sendSignOut()
+                } else if !self.accessToken.isEmpty {
+                    self.sendCredentials()
+                }
             }
         }
     }
