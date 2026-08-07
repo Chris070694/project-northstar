@@ -29,6 +29,9 @@ struct ContentView: View {
             .preferredColorScheme(.dark)
             .navigationTitle("CPRB OS")
         }
+        .task {
+            await store.restoreSession()
+        }
     }
 
     private var header: some View {
@@ -81,14 +84,18 @@ struct ContentView: View {
             } label: {
                 HStack {
                     if store.isBusy { ProgressView() }
-                    Text(store.isBusy ? "Verbinden…" : "Mit CPRB anmelden")
+                    Text(
+                        store.isRestoringSession
+                            ? "Anmeldung wird geprüft…"
+                            : (store.isBusy ? "Verbinden…" : "Mit CPRB anmelden")
+                    )
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
             }
             .buttonStyle(.borderedProminent)
             .tint(.cyan)
-            .disabled(store.isBusy)
+            .disabled(store.isBusy || store.isRestoringSession)
 
             Text(store.message)
                 .font(.footnote)
@@ -155,6 +162,11 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
             Button("Erneut an Watch senden") {
                 store.sendToWatchAgain()
+            }
+            .buttonStyle(.bordered)
+
+            Button("Abmelden", role: .destructive) {
+                store.logout()
             }
             .buttonStyle(.bordered)
         }

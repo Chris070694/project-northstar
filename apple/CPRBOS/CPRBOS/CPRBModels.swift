@@ -9,10 +9,14 @@ enum CPRBConfig {
 struct AuthResponse: Decodable {
     let accessToken: String
     let refreshToken: String?
+    let expiresIn: Double?
+    let expiresAt: Double?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
+        case expiresAt = "expires_at"
     }
 }
 
@@ -33,6 +37,7 @@ struct FitnessSession: Decodable, Identifiable {
 enum CPRBError: LocalizedError {
     case invalidURL
     case invalidResponse
+    case sessionExpired
     case server(String)
 
     var errorDescription: String? {
@@ -41,6 +46,8 @@ enum CPRBError: LocalizedError {
             return "Die CPRB-Verbindung ist ungültig."
         case .invalidResponse:
             return "CPRB hat keine gültige Antwort erhalten."
+        case .sessionExpired:
+            return "Deine CPRB-Anmeldung ist abgelaufen. Bitte melde dich erneut an."
         case .server(let message):
             return message
         }
