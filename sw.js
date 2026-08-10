@@ -1,8 +1,8 @@
-const CACHE='cprb-calendar-v2-v1';
+const CACHE='cprb-pencil-notes-v1';
 const APP_SHELL=[
   './',
   './index.html',
-  './styles.css?v=3',
+  './styles.css?v=4',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',
@@ -14,13 +14,13 @@ const APP_SHELL=[
   './modules/focus.js?v=2',
   './modules/goals.js',
   './modules/fitness.js?v=2',
-  './modules/notes.js',
+  './modules/notes.js?v=2',
   './modules/academy.js',
   './modules/library.js',
   './modules/calendar.js?v=2',
   './modules/weekly.js?v=2',
   './modules/reminders.js',
-  './modules/backup.js?v=5',
+  './modules/backup.js?v=6',
   './modules/pwa.js?v=3'
 ];
 

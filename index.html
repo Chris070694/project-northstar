@@ -1,4 +1,4 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CPRB OS</title><link rel="manifest" href="manifest.webmanifest?v=2"><meta name="theme-color" content="#080b12"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CPRB OS"><link rel="icon" href="icons/cprb-og-192.png" type="image/png"><link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link rel="stylesheet" href="styles.css?v=3"></head><body>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CPRB OS</title><link rel="manifest" href="manifest.webmanifest?v=2"><meta name="theme-color" content="#080b12"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CPRB OS"><link rel="icon" href="icons/cprb-og-192.png" type="image/png"><link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link rel="stylesheet" href="styles.css?v=4"></head><body>
 <section id="auth" class="auth"><div class="authbox"><h1><span style="color:var(--cyan)">CPRB</span> OS</h1><p class="sub">Dein persönliches Operating System.</p><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="password" type="password"><button class="btn primary" onclick="login()">Anmelden</button><p id="authMsg" class="sub"></p></div></section>
 <div id="app" class="app hide"><header class="mobile-header"><div class="mobile-brand"><img class="mobile-brand-logo" src="icons/cprb-og-192.png" alt="CPRB OG"><div><b>CPRB OS</b><small>Personal Operating System</small></div></div><button class="mobile-trade-btn" onclick="openTrade()" aria-label="Neuen Trade erfassen">+ Trade</button></header><aside class="sidebar"><div class="brand">CPRB <b>OS</b><small>Personal Operating System</small></div><button class="nav active" data-page="home">⌂ Home</button><button class="nav" data-page="trading">↗ Trading</button><button class="nav" data-page="goals">🎯 Goals & Vision</button><button class="nav" data-page="tasks">✓ To-dos</button><button class="nav" data-page="weekly">↻ Weekly Review</button><button class="nav" data-page="reminders">🔔 Erinnerungen</button><button class="nav" data-page="fitness">💪 Fitness</button><button class="nav" data-page="notes">📝 Notizen</button><button class="nav" data-page="library">📖 Bibliothek</button><button class="nav" data-page="academy">📚 Academy</button><button class="nav" data-page="calendar">📅 Kalender</button><button class="nav" data-page="account">⚙ Konto</button></aside><main class="main"><div class="layout-shell"><div>
 <section id="home" class="page active"><div id="pwaNotice" class="pwa-notice"><span>Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span><button id="installBtn" class="btn primary">Als App installieren</button></div><div class="top"><div><h1 id="greeting">Guten Morgen 👋</h1><div id="todayText" class="sub"></div></div><div class="actions"><button class="btn" onclick="showPage('tasks')">To-dos</button><button class="btn primary" onclick="openTrade()">+ Trade</button></div></div>
@@ -122,7 +122,8 @@
 </section>
 
 <section id="notes" class="page">
-  <div class="top"><div><h1>Notizen</h1><div class="sub">Trading, Fitness und allgemeine Gedanken an einem Ort.</div></div><button class="btn primary" onclick="openNote()">+ Notiz</button></div>
+  <div class="top"><div><div class="eyebrow">Text & Handschrift</div><h1>Notizen</h1><div class="sub">Gedanken tippen oder direkt mit dem Apple Pencil festhalten.</div></div><div class="actions"><button class="btn" onclick="openNote()">+ Textnotiz</button><button id="openPencilNoteBtn" class="btn primary" onclick="openPencilNote()">✎ Pencil-Notiz</button></div></div>
+  <div id="pencilNotesSetupNotice" class="task-setup-notice hide">Apple-Pencil-Notizen müssen noch mit der Pencil-v1-Migration in Supabase aktiviert werden.</div>
   <div id="notesList" class="grid thirds"></div>
 </section>
 
@@ -395,6 +396,28 @@
 </form>
 </div>
 
+<div id="pencilNoteModal" class="modal pencil-modal">
+  <section class="card pencil-editor-card" role="dialog" aria-modal="true" aria-labelledby="pencilEditorHeading">
+    <header class="pencil-editor-header">
+      <div><div class="eyebrow">Apple Pencil</div><h2 id="pencilEditorHeading">Neue Pencil-Notiz</h2></div>
+      <div class="actions"><button id="savePencilNoteBtn" class="btn primary" type="button" onclick="savePencilNote()">Pencil-Notiz speichern</button><button class="btn" type="button" onclick="closePencilNote()">✕</button></div>
+    </header>
+    <div class="pencil-editor-meta">
+      <label>Titel<input id="pencilTitle" maxlength="180" placeholder="Meine handschriftliche Notiz"></label>
+      <label>Kategorie<select id="pencilCategory"><option>Allgemein</option><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Privat</option></select></label>
+      <label>Papier<select id="pencilPaper"><option value="lined">Liniert</option><option value="grid">Kariert</option><option value="dotted">Gepunktet</option><option value="blank">Blanko</option></select></label>
+    </div>
+    <div class="pencil-toolbar" aria-label="Pencil-Werkzeuge">
+      <div class="pencil-tool-group"><button class="pencil-tool active" data-tool="pen" type="button" onclick="setPencilTool('pen')">✎ Stift</button><button class="pencil-tool" data-tool="eraser" type="button" onclick="setPencilTool('eraser')">▱ Radierer</button></div>
+      <div class="pencil-colors" aria-label="Stiftfarbe"><button class="pencil-color active" data-color="#162033" style="--pencil-color:#162033" type="button" onclick="setPencilColor('#162033')" aria-label="Schwarz"></button><button class="pencil-color" data-color="#1769d2" style="--pencil-color:#1769d2" type="button" onclick="setPencilColor('#1769d2')" aria-label="Blau"></button><button class="pencil-color" data-color="#d9364f" style="--pencil-color:#d9364f" type="button" onclick="setPencilColor('#d9364f')" aria-label="Rot"></button><button class="pencil-color" data-color="#16865b" style="--pencil-color:#16865b" type="button" onclick="setPencilColor('#16865b')" aria-label="Grün"></button></div>
+      <label class="pencil-size-control"><span>Stärke <b id="pencilSizeLabel">5 px</b></span><input id="pencilSize" type="range" min="2" max="14" value="5"></label>
+      <div class="pencil-history"><button id="pencilUndoBtn" class="btn" type="button" onclick="undoPencilStroke()" aria-label="Rückgängig">↶</button><button id="pencilRedoBtn" class="btn" type="button" onclick="redoPencilStroke()" aria-label="Wiederholen">↷</button><button class="btn danger" type="button" onclick="clearPencilSheet()">Leeren</button></div>
+    </div>
+    <div class="pencil-hint"><span> Pencil</span><small>Druckstärke wird automatisch erkannt. Mit dem Finger kannst du über das Blatt scrollen.</small></div>
+    <main class="pencil-stage"><canvas id="pencilCanvas" width="1200" height="1697" aria-label="Handschriftliche Zeichenfläche"></canvas></main>
+  </section>
+</div>
+
 
 <div id="libraryBookModal" class="modal">
   <form id="libraryBookForm" class="card library-upload-card">
@@ -481,4 +504,4 @@
   </div>
 </form>
 </div>
-<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js?v=2"></script><script src="modules/focus.js?v=2"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js?v=2"></script><script src="modules/notes.js"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js?v=2"></script><script src="modules/weekly.js?v=2"></script><script src="modules/reminders.js"></script><script src="modules/backup.js?v=5"></script><script src="modules/pwa.js?v=3"></script><script src="app.js"></script></body></html>
+<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js?v=2"></script><script src="modules/focus.js?v=2"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js?v=2"></script><script src="modules/notes.js?v=2"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js?v=2"></script><script src="modules/weekly.js?v=2"></script><script src="modules/reminders.js"></script><script src="modules/backup.js?v=6"></script><script src="modules/pwa.js?v=3"></script><script src="app.js"></script></body></html>
