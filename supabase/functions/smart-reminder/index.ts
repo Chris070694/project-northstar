@@ -88,6 +88,27 @@ function dueReminders(settings:any,now:Date){
   return due.map(item=>({...item,deliveryKey:clock.date}))
 }
 
+function calendarEventOccursOnDate(event:any,date:string){
+  if(event.event_date===date)return true
+  return event.recurrence==='yearly'&&date>=event.event_date&&String(event.event_date).slice(5)===date.slice(5)
+}
+
+function dueCalendarReminders(events:any[],settings:any,now:Date){
+  const clock=localClock(now,settings.timezone||'Europe/Vienna')
+  if(isQuiet(clock.time,shortTime(settings.quiet_start),shortTime(settings.quiet_end)))return []
+  return (events||[]).filter(event=>
+    event.reminder_enabled&&
+    clock.time===shortTime(event.reminder_time||'08:00')&&
+    calendarEventOccursOnDate(event,clock.date)
+  ).map(event=>({
+    type:`calendar:${event.id}`,
+    title:event.category==='Geburtstag'?`Geburtstag: ${event.title} 🎂`:`Kalender: ${event.title} 📅`,
+    body:`Heute: ${event.title}${event.start_time?` um ${shortTime(event.start_time)} Uhr`:''}.`,
+    url:`./?page=calendar&date=${clock.date}`,
+    deliveryKey:clock.date
+  }))
+}
+
 async function dispatchReminders(){
   const cronSecret=Deno.env.get('CRON_SECRET')
   if(!cronSecret)throw new Error('CRON_SECRET is not configured')
@@ -97,13 +118,35 @@ async function dispatchReminders(){
     config.public_key,
     config.private_key
   )
-  const {data:settings,error:settingsError}=await admin.from('reminder_settings').select('*')
-  if(settingsError)throw settingsError
+  const [settingsResult,calendarResult]=await Promise.all([
+    admin.from('reminder_settings').select('*'),
+    admin.from('calendar_events')
+      .select('id,user_id,title,event_date,start_time,category,recurrence,reminder_enabled,reminder_time')
+      .eq('reminder_enabled',true)
+  ])
+  if(settingsResult.error)throw settingsResult.error
+  if(calendarResult.error)throw calendarResult.error
   const now=new Date()
-  const dueUsers=(settings||[]).map(row=>({row,due:dueReminders(row,now)})).filter(item=>item.due.length)
+  const settingsByUser=new Map<string,any>((settingsResult.data||[]).map(row=>[row.user_id,row] as [string,any]))
+  const calendarByUser=new Map<string,any[]>()
+  for(const event of calendarResult.data||[]){
+    const list=calendarByUser.get(event.user_id)||[]
+    list.push(event)
+    calendarByUser.set(event.user_id,list)
+  }
+  const userIds=[...new Set([...settingsByUser.keys(),...calendarByUser.keys()])]
+  const dueUsers=userIds.map(userId=>{
+    const row=settingsByUser.get(userId)||{
+      user_id:userId,
+      timezone:'Europe/Vienna',
+      quiet_start:'22:00',
+      quiet_end:'07:00'
+    }
+    return {row,due:[...dueReminders(row,now),...dueCalendarReminders(calendarByUser.get(userId)||[],row,now)]}
+  }).filter(item=>item.due.length)
   if(!dueUsers.length)return {sent:0,due:0}
-  const userIds=dueUsers.map(item=>item.row.user_id)
-  const {data:subscriptions,error:subscriptionError}=await admin.from('push_subscriptions').select('*').in('user_id',userIds)
+  const dueUserIds=dueUsers.map(item=>item.row.user_id)
+  const {data:subscriptions,error:subscriptionError}=await admin.from('push_subscriptions').select('*').in('user_id',dueUserIds)
   if(subscriptionError)throw subscriptionError
   const byUser=new Map<string,any[]>()
   for(const subscription of subscriptions||[]){

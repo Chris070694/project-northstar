@@ -1,27 +1,83 @@
 
 let calendarEvents=[];
 let calendarCursor=new Date();
-let selectedCalendarDate=new Date().toISOString().slice(0,10);
+let selectedCalendarDate=isoDate(new Date());
+let calendarV2Ready=true;
+
+function isMissingCalendarV2Schema(error){
+  const message=`${error?.code||''} ${error?.message||''} ${error?.details||''}`.toLowerCase();
+  return /recurrence|reminder_enabled|reminder_time/.test(message)&&/does not exist|schema cache|not find|pgrst204|42703/.test(message);
+}
+
+function calendarQuery(columns='*'){
+  return sb.from('calendar_events').select(columns).order('event_date',{ascending:true}).order('start_time',{ascending:true});
+}
 
 async function loadCalendar(){
-  const {data,error}=await sb.from('calendar_events').select('*').order('event_date',{ascending:true}).order('start_time',{ascending:true});
+  const columns='id,user_id,created_at,title,event_date,start_time,end_time,category,description,completed,recurrence,reminder_enabled,reminder_time';
+  let {data,error}=await calendarQuery(columns);
+  if(error&&isMissingCalendarV2Schema(error)){
+    calendarV2Ready=false;
+    ({data,error}=await calendarQuery());
+  }else calendarV2Ready=true;
   if(error)throw error;
-  calendarEvents=data||[];
+  calendarEvents=(data||[]).map(event=>({
+    recurrence:'none',
+    reminder_enabled:false,
+    reminder_time:'08:00',
+    ...event
+  }));
+  const requestedDate=new URLSearchParams(location.search).get('date');
+  if(/^\d{4}-\d{2}-\d{2}$/.test(requestedDate||'')){
+    selectedCalendarDate=requestedDate;
+    const requestedMonth=new Date(`${requestedDate}T12:00:00`);
+    if(!Number.isNaN(requestedMonth.getTime()))calendarCursor=new Date(requestedMonth.getFullYear(),requestedMonth.getMonth(),1);
+  }
 }
 
 function openCalendarEvent(date){
-  $('#cDate').value=date||selectedCalendarDate||new Date().toISOString().slice(0,10);
+  $('#calendarForm').reset();
+  $('#cDate').value=date||selectedCalendarDate||isoDate(new Date());
+  $('#cRecurrence').value='none';
+  $('#cReminderEnabled').checked=false;
+  $('#cReminderTime').value='08:00';
+  renderCalendarFormOptions();
   $('#calendarModal').classList.add('open');
 }
 function closeCalendarEvent(){ $('#calendarModal').classList.remove('open'); }
 
+function renderCalendarFormOptions(){
+  const enabled=calendarV2Ready&&$('#cReminderEnabled').checked;
+  $('#cRecurrence').disabled=!calendarV2Ready;
+  $('#cReminderEnabled').disabled=!calendarV2Ready;
+  $('#cReminderTime').disabled=!enabled;
+  $('#cReminderTime').required=enabled;
+  $('#calendarReminderFields').classList.toggle('inactive',!enabled);
+}
+
+function applyCalendarCategoryDefaults(){
+  if($('#cCategory').value!=='Geburtstag'||!calendarV2Ready)return;
+  $('#cRecurrence').value='yearly';
+  $('#cReminderEnabled').checked=true;
+  renderCalendarFormOptions();
+}
+
+$('#cReminderEnabled').addEventListener('change',renderCalendarFormOptions);
+$('#cCategory').addEventListener('change',applyCalendarCategoryDefaults);
+
 $('#calendarForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  const {error}=await sb.from('calendar_events').insert({
+  const payload={
     user_id:currentUser.id,title:$('#cTitle').value,event_date:$('#cDate').value,
     start_time:$('#cStart').value||null,end_time:$('#cEnd').value||null,
     category:$('#cCategory').value,description:$('#cDescription').value
-  });
+  };
+  if(calendarV2Ready){
+    payload.recurrence=$('#cRecurrence').value;
+    payload.reminder_enabled=$('#cReminderEnabled').checked;
+    payload.reminder_time=$('#cReminderEnabled').checked?($('#cReminderTime').value||'08:00'):null;
+  }
+  const {error}=await sb.from('calendar_events').insert(payload);
   if(error)return alert(error.message);
   e.target.reset();closeCalendarEvent();await loadAll();showPage('calendar');
 });
@@ -31,7 +87,8 @@ async function toggleCalendarEvent(id,value){
   await loadAll();
 }
 async function deleteCalendarEvent(id){
-  if(!confirm('Termin löschen?'))return;
+  const event=calendarEvents.find(item=>item.id===id);
+  if(!confirm(event?.recurrence==='yearly'?'Jährlichen Termin wirklich löschen?':'Termin löschen?'))return;
   await sb.from('calendar_events').delete().eq('id',id);
   await loadAll();
 }
@@ -41,12 +98,28 @@ function shiftCalendar(n){
 }
 function selectCalendarDate(date){
   selectedCalendarDate=date;
+  const url=new URL(location.href);
+  url.searchParams.set('page','calendar');
+  url.searchParams.set('date',date);
+  history.replaceState(null,'',url);
   renderCalendarSelectedDay();
 }
-function categoryClass(cat){return 'cat-'+(cat||'Privat').toLowerCase().replace('ä','a').replace(' ','-')}
+function categoryClass(cat){
+  return 'cat-'+(cat||'Privat').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');
+}
+
+function calendarEventOccursOn(event,date){
+  if(event.event_date===date)return true;
+  return event.recurrence==='yearly'&&date>=event.event_date&&event.event_date.slice(5)===date.slice(5);
+}
+
+function calendarEventsForDate(date){
+  return calendarEvents.filter(event=>calendarEventOccursOn(event,date)).sort((a,b)=>String(a.start_time||'').localeCompare(String(b.start_time||'')));
+}
 
 function renderCalendar(){
   const y=calendarCursor.getFullYear(),m=calendarCursor.getMonth();
+  $('#calendarV2SetupNotice').classList.toggle('hide',calendarV2Ready);
   $('#calendarTitle').textContent=new Intl.DateTimeFormat('de-DE',{month:'long',year:'numeric'}).format(calendarCursor);
   let html=['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>`<div class="cal-head">${x}</div>`).join('');
   const first=new Date(y,m,1),offset=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
@@ -68,22 +141,23 @@ function renderCalendar(){
   renderCalendarSelectedDay();
 }
 function calendarDay(date,num,outside){
-  const events=calendarEvents.filter(e=>e.event_date===date);
-  const today=date===new Date().toISOString().slice(0,10);
+  const events=calendarEventsForDate(date);
+  const today=date===isoDate(new Date());
   return `<div class="cal-day ${outside?'outside':''} ${today?'today':''}" onclick="selectCalendarDate('${date}')">
     <div class="cal-num">${num}</div>
-    <div class="cal-events">${events.slice(0,3).map(e=>`<div class="cal-event ${categoryClass(e.category)}">${escapeHtml(e.title)}</div>`).join('')}${events.length>3?`<div class="sub">+${events.length-3}</div>`:''}</div>
+    <div class="cal-events">${events.slice(0,3).map(e=>`<div class="cal-event ${categoryClass(e.category)}">${e.recurrence==='yearly'?'↻ ':''}${escapeHtml(e.title)}</div>`).join('')}${events.length>3?`<div class="sub">+${events.length-3}</div>`:''}</div>
   </div>`;
 }
 function renderCalendarSelectedDay(){
   const date=new Date(selectedCalendarDate+'T12:00:00');
   $('#selectedDateTitle').textContent=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'long'}).format(date);
-  const events=calendarEvents.filter(e=>e.event_date===selectedCalendarDate);
-  $('#selectedDateEvents').innerHTML=events.map(e=>`<div class="event-item ${e.completed?'done':''}">
+  const events=calendarEventsForDate(selectedCalendarDate);
+  $('#selectedDateEvents').innerHTML=events.map(e=>`<div class="event-item ${e.completed&&e.recurrence!=='yearly'?'done':''}">
     <div class="calendar-title-row"><b>${escapeHtml(e.title)}</b><span class="pill">${escapeHtml(e.category)}</span></div>
     <div class="sub">${e.start_time?e.start_time.slice(0,5):'Ganztägig'}${e.end_time?' – '+e.end_time.slice(0,5):''}</div>
+    <div class="event-meta">${e.recurrence==='yearly'?'<span>↻ Jährlich</span>':''}${e.reminder_enabled?`<span>🔔 ${String(e.reminder_time||'08:00').slice(0,5)} Uhr</span>`:''}</div>
     ${e.description?`<p>${escapeHtml(e.description)}</p>`:''}
-    <div class="actions"><button class="btn" onclick="toggleCalendarEvent('${e.id}',${e.completed})">${e.completed?'Wieder öffnen':'Erledigt'}</button><button class="btn danger" onclick="deleteCalendarEvent('${e.id}')">Löschen</button></div>
+    <div class="actions">${e.recurrence==='yearly'?'':`<button class="btn" onclick="toggleCalendarEvent('${e.id}',${e.completed})">${e.completed?'Wieder öffnen':'Erledigt'}</button>`}<button class="btn danger" onclick="deleteCalendarEvent('${e.id}')">Löschen</button></div>
   </div>`).join('')||'<div class="empty">Keine Termine an diesem Tag.</div>';
 }
 function isoDate(d){

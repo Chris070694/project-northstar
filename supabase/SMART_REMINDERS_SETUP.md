@@ -9,11 +9,16 @@ Im Supabase Dashboard den **SQL Editor** öffnen und den vollständigen Inhalt v
 
 Danach funktionieren die täglich wiederholenden To-dos bereits.
 
+Für jährliche Kalendertermine und deren Push-Erinnerungen zusätzlich den vollständigen Inhalt von
+`supabase/migrations/20260810_calendar_v2.sql` im SQL Editor ausführen.
+
 ## 2. Edge Function deployen
 
 Im Supabase Dashboard zu **Edge Functions** wechseln, eine Function mit dem Namen
 `smart-reminder` erstellen und den Inhalt von
 `supabase/functions/smart-reminder/index.ts` einsetzen.
+
+Wenn die Function bereits existiert, muss sie nach dem Kalender-v2-Update einmal mit dem neuen Inhalt erneut bereitgestellt werden.
 
 Die JWT-Prüfung der Function muss deaktiviert sein. Die Function prüft Aufrufe selbst:
 
@@ -81,6 +86,8 @@ select cron.schedule(
 3. Uhrzeiten und Wochentage einstellen und speichern.
 4. **Push aktivieren** antippen und die Systemabfrage erlauben.
 5. Mit **Test senden** prüfen.
+
+Kalender-Erinnerungen werden direkt beim Erstellen eines Termins eingeschaltet. Bei der Kategorie **Geburtstag** stellt CPRB automatisch **Jedes Jahr** und eine Push-Erinnerung um **08:00 Uhr** ein; beides bleibt frei änderbar.
 
 VAPID-Schlüssel werden beim ersten Aktivieren automatisch erzeugt und ausschließlich in der RLS-geschützten Tabelle `push_server_config` gespeichert.
 

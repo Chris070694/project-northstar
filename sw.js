@@ -1,8 +1,8 @@
-const CACHE='northstar-fitness-mobile-v1';
+const CACHE='cprb-calendar-v2-v1';
 const APP_SHELL=[
   './',
   './index.html',
-  './styles.css?v=2',
+  './styles.css?v=3',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',
@@ -17,7 +17,7 @@ const APP_SHELL=[
   './modules/notes.js',
   './modules/academy.js',
   './modules/library.js',
-  './modules/calendar.js',
+  './modules/calendar.js?v=2',
   './modules/weekly.js?v=2',
   './modules/reminders.js',
   './modules/backup.js?v=5',
