@@ -254,8 +254,16 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .cat-lernen{background:rgba(173,147,255,.13);color:#d0c4ff}
 .cat-privat{background:rgba(255,121,215,.11);color:#ff9ee4}
 .cat-arbeit{background:rgba(255,211,107,.11);color:var(--yellow)}
+.cat-geburtstag{background:rgba(255,121,215,.16);color:#ffb5ea}
 .event-list{display:grid;gap:9px}.event-item{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
 .event-item.done{opacity:.54;text-decoration:line-through}.calendar-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.event-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.event-meta span{padding:5px 8px;border-radius:999px;background:rgba(112,229,255,.07);border:1px solid rgba(112,229,255,.14);color:var(--cyan);font-size:10px;font-weight:800}
+.calendar-reminder-fields{display:grid;grid-template-columns:minmax(0,1fr) 115px;gap:10px;align-items:end;padding:10px;border:1px solid rgba(112,229,255,.17);border-radius:13px;background:rgba(112,229,255,.035)}
+.calendar-reminder-fields.inactive{opacity:.62}
+.calendar-reminder-toggle{display:flex;align-items:center;gap:9px;min-height:42px;margin:0;color:var(--text);font-weight:800}
+.calendar-reminder-toggle input{width:18px;height:18px;margin:0}
+.calendar-form-hint{padding:9px 11px;border-radius:11px;background:rgba(173,147,255,.06);border:1px solid rgba(173,147,255,.13);color:var(--muted);font-size:10px}
 .icon-btn{width:40px;height:40px;padding:0;display:grid;place-items:center}
 .pwa-notice{display:none;padding:11px 13px;margin-bottom:15px;border-radius:13px;background:rgba(112,229,255,.07);border:1px solid rgba(112,229,255,.18)}
 .pwa-notice.show{display:flex;justify-content:space-between;align-items:center;gap:10px}
