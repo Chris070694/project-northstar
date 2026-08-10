@@ -142,7 +142,8 @@ function backupFileMimeType(path,reportedType=''){
     webp:'image/webp',
     jpg:'image/jpeg',
     jpeg:'image/jpeg',
-    png:'image/png'
+    png:'image/png',
+    json:'application/json'
   };
   return byExtension[extension]||reportedType||'application/octet-stream';
 }
