@@ -88,6 +88,37 @@ function dueReminders(settings:any,now:Date){
   return due.map(item=>({...item,deliveryKey:clock.date}))
 }
 
+function dueHydrationReminder(settings:any,hydration:any,now:Date){
+  if(settings.hydration_enabled===false)return []
+  const clock=localClock(now,settings.timezone||'Europe/Vienna')
+  if(isQuiet(clock.time,shortTime(settings.quiet_start),shortTime(settings.quiet_end)))return []
+  const checkpoints:Record<string,number>={
+    '10:00':0.20,
+    '12:00':0.35,
+    '14:00':0.50,
+    '16:00':0.65,
+    '18:00':0.80,
+    '20:00':0.95
+  }
+  const expected=checkpoints[clock.time]
+  if(!expected)return []
+  const goal=Math.max(500,Number(hydration?.goal)||2500)
+  const amount=Math.max(0,Number(hydration?.amount)||0)
+  if(amount>=goal)return []
+  const ratio=amount/goal
+  if(ratio>=Math.max(0,expected-0.10))return []
+  const remaining=Math.max(0,goal-amount)
+  const amountLabel=(amount/1000).toFixed(2).replace('.',',')
+  const remainingLabel=(remaining/1000).toFixed(2).replace('.',',')
+  return [{
+    type:'hydration',
+    title:'Zeit für Wasser 💧',
+    body:`Du bist heute bei ${amountLabel} L. Noch ${remainingLabel} L bis zu deinem Tagesziel.`,
+    url:'./?page=home',
+    deliveryKey:`${clock.date}-${clock.time}`
+  }]
+}
+
 function calendarEventOccursOnDate(event:any,date:string){
   if(event.event_date===date)return true
   return event.recurrence==='yearly'&&date>=event.event_date&&String(event.event_date).slice(5)===date.slice(5)
@@ -118,14 +149,19 @@ async function dispatchReminders(){
     config.public_key,
     config.private_key
   )
-  const [settingsResult,calendarResult]=await Promise.all([
+  const hydrationCutoff=new Date(Date.now()-36*60*60*1000).toISOString().slice(0,10)
+  const [settingsResult,calendarResult,hydrationSettingsResult,hydrationDaysResult]=await Promise.all([
     admin.from('reminder_settings').select('*'),
     admin.from('calendar_events')
       .select('id,user_id,title,event_date,start_time,category,recurrence,reminder_enabled,reminder_time')
-      .eq('reminder_enabled',true)
+      .eq('reminder_enabled',true),
+    admin.from('hydration_settings').select('user_id,daily_goal_ml'),
+    admin.from('hydration_days').select('user_id,day,amount_ml').gte('day',hydrationCutoff)
   ])
   if(settingsResult.error)throw settingsResult.error
   if(calendarResult.error)throw calendarResult.error
+  if(hydrationSettingsResult.error)throw hydrationSettingsResult.error
+  if(hydrationDaysResult.error)throw hydrationDaysResult.error
   const now=new Date()
   const settingsByUser=new Map<string,any>((settingsResult.data||[]).map(row=>[row.user_id,row] as [string,any]))
   const calendarByUser=new Map<string,any[]>()
@@ -134,15 +170,34 @@ async function dispatchReminders(){
     list.push(event)
     calendarByUser.set(event.user_id,list)
   }
-  const userIds=[...new Set([...settingsByUser.keys(),...calendarByUser.keys()])]
+  const hydrationGoalByUser=new Map<string,number>((hydrationSettingsResult.data||[]).map(row=>[row.user_id,Number(row.daily_goal_ml)||2500]))
+  const hydrationByUserDate=new Map<string,number>()
+  for(const day of hydrationDaysResult.data||[]){
+    hydrationByUserDate.set(`${day.user_id}:${day.day}`,Number(day.amount_ml)||0)
+  }
+  const hydrationUserIds=[...new Set([
+    ...(hydrationSettingsResult.data||[]).map(row=>row.user_id),
+    ...(hydrationDaysResult.data||[]).map(row=>row.user_id)
+  ])]
+  const userIds=[...new Set([...settingsByUser.keys(),...calendarByUser.keys(),...hydrationUserIds])]
   const dueUsers=userIds.map(userId=>{
     const row=settingsByUser.get(userId)||{
       user_id:userId,
       timezone:'Europe/Vienna',
+      hydration_enabled:true,
       quiet_start:'22:00',
       quiet_end:'07:00'
     }
-    return {row,due:[...dueReminders(row,now),...dueCalendarReminders(calendarByUser.get(userId)||[],row,now)]}
+    const clock=localClock(now,row.timezone||'Europe/Vienna')
+    const hydration={
+      goal:hydrationGoalByUser.get(userId)||2500,
+      amount:hydrationByUserDate.get(`${userId}:${clock.date}`)||0
+    }
+    return {row,due:[
+      ...dueReminders(row,now),
+      ...dueCalendarReminders(calendarByUser.get(userId)||[],row,now),
+      ...dueHydrationReminder(row,hydration,now)
+    ]}
   }).filter(item=>item.due.length)
   if(!dueUsers.length)return {sent:0,due:0}
   const dueUserIds=dueUsers.map(item=>item.row.user_id)
