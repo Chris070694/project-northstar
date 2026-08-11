@@ -92,30 +92,45 @@ function dueHydrationReminder(settings:any,hydration:any,now:Date){
   if(settings.hydration_enabled===false)return []
   const clock=localClock(now,settings.timezone||'Europe/Vienna')
   if(isQuiet(clock.time,shortTime(settings.quiet_start),shortTime(settings.quiet_end)))return []
-  const checkpoints:Record<string,number>={
-    '10:00':0.20,
-    '12:00':0.35,
-    '14:00':0.50,
-    '16:00':0.65,
-    '18:00':0.80,
-    '20:00':0.95
+
+  const checkpoints=[
+    {time:'10:00',expected:0.20},
+    {time:'12:00',expected:0.35},
+    {time:'14:00',expected:0.50},
+    {time:'16:00',expected:0.65},
+    {time:'18:00',expected:0.80},
+    {time:'20:00',expected:0.95}
+  ]
+
+  const toMinutes=(value:string)=>{
+    const [hours,minutes]=value.split(':').map(Number)
+    return hours*60+minutes
   }
-  const expected=checkpoints[clock.time]
-  if(!expected)return []
+
+  const nowMinutes=toMinutes(clock.time)
+  const checkpoint=checkpoints.find(item=>{
+    const checkpointMinutes=toMinutes(item.time)
+    return nowMinutes>=checkpointMinutes&&nowMinutes<=checkpointMinutes+5
+  })
+
+  if(!checkpoint)return []
+
   const goal=Math.max(500,Number(hydration?.goal)||2500)
   const amount=Math.max(0,Number(hydration?.amount)||0)
   if(amount>=goal)return []
   const ratio=amount/goal
-  if(ratio>=Math.max(0,expected-0.10))return []
+  if(ratio>=Math.max(0,checkpoint.expected-0.10))return []
+
   const remaining=Math.max(0,goal-amount)
   const amountLabel=(amount/1000).toFixed(2).replace('.',',')
   const remainingLabel=(remaining/1000).toFixed(2).replace('.',',')
+
   return [{
     type:'hydration',
     title:'Zeit für Wasser 💧',
     body:`Du bist heute bei ${amountLabel} L. Noch ${remainingLabel} L bis zu deinem Tagesziel.`,
     url:'./?page=home',
-    deliveryKey:`${clock.date}-${clock.time}`
+    deliveryKey:`${clock.date}-${checkpoint.time}`
   }]
 }
 
