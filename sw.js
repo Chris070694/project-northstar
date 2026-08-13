@@ -1,8 +1,8 @@
-const CACHE='cprb-pencil-notes-v1';
+const CACHE='cprb-persistent-tasks-v1';
 const APP_SHELL=[
   './',
   './index.html',
-  './styles.css?v=4',
+  './styles.css?v=5',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',
@@ -11,7 +11,7 @@ const APP_SHELL=[
   './icons/cprb-og-180.png',
   './modules/core.js?v=2',
   './modules/trading.js',
-  './modules/focus.js?v=2',
+  './modules/focus.js?v=3',
   './modules/goals.js',
   './modules/fitness.js?v=2',
   './modules/notes.js?v=2',

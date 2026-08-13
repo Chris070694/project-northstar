@@ -32,7 +32,9 @@ vm.runInContext(`
   recurringTasks=[];
   dailyTasks=[
     {id:'one',title:'Journal schreiben',category:'Trading',is_completed:false,is_priority:false},
-    {id:'two',title:'Training',category:'Fitness',is_completed:false,is_priority:true}
+    {id:'two',title:'Training',category:'Fitness',is_completed:false,is_priority:true},
+    {id:'three',title:'Auto waschen',category:'Privat',is_completed:false,is_priority:false,keep_until_done:true},
+    {id:'four',title:'Altglas wegbringen',category:'Privat',is_completed:true,is_priority:false,keep_until_done:true}
   ];
   renderFocus();
 `,context);
@@ -42,9 +44,21 @@ assert.match(element('#nextFocus').textContent,/Top-Priorität/);
 assert.match(element('#homeTaskList').innerHTML,/toggleDailyTask\('one',this\.checked\)/);
 assert.match(element('#homeTaskList').innerHTML,/toggleTaskPriority\('two'\)/);
 assert.match(element('#dailyTaskList').innerHTML,/class="daily-task[^\"]*priority/);
+assert.match(element('#dailyTaskList').innerHTML,/class="daily-task[^\"]*persistent/);
+assert.match(element('#dailyTaskList').innerHTML,/Auto waschen[\s\S]*Bleibt offen/);
+assert.match(element('#dailyTaskList').innerHTML,/Erledigt \(1\)/);
+assert.doesNotMatch(element('#homeTaskList').innerHTML,/Altglas wegbringen/);
 
 const migration=fs.readFileSync(path.join(root,'supabase/migrations/20260805_todo_priority.sql'),'utf8');
 assert.match(migration,/add column if not exists is_priority boolean not null default false/i);
 assert.match(migration,/unique index[\s\S]*where is_priority/i);
 
-console.log('dashboard task completion and one-priority setup: OK');
+const persistentMigration=fs.readFileSync(path.join(root,'supabase/migrations/20260813_persistent_tasks.sql'),'utf8');
+assert.match(persistentMigration,/add column if not exists keep_until_done boolean not null default false/i);
+assert.match(persistentMigration,/where keep_until_done and not is_completed/i);
+
+const focusSource=fs.readFileSync(path.join(root,'modules/focus.js'),'utf8');
+assert.match(focusSource,/eq\('keep_until_done',true\).*eq\('is_completed',false\).*lt\('task_date',d\)/s);
+assert.match(focusSource,/task_date:d,[\s\S]*is_priority:false/);
+
+console.log('dashboard task completion, carry-until-done and one-priority setup: OK');
