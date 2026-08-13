@@ -346,6 +346,8 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .daily-task{display:grid;grid-template-columns:24px 30px minmax(0,1fr) 30px;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);transition:.2s ease}
 .daily-task:hover{border-color:rgba(112,229,255,.28);transform:translateY(-1px)}
 .daily-task.priority{border-color:rgba(255,211,107,.35);background:rgba(255,211,107,.055)}
+.daily-task.persistent{border-color:rgba(173,147,255,.3);background:linear-gradient(100deg,rgba(173,147,255,.06),rgba(112,229,255,.025))}
+.daily-task.persistent.priority{border-color:rgba(255,211,107,.4);background:linear-gradient(100deg,rgba(255,211,107,.06),rgba(173,147,255,.05))}
 .daily-task.done{opacity:.58}
 .daily-task.done .task-copy b{text-decoration:line-through}
 .task-check{appearance:none;width:21px;height:21px;margin:0;padding:0;border:1px solid var(--line-strong);border-radius:7px;cursor:pointer;display:grid;place-items:center}
@@ -360,6 +362,13 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .task-copy span{display:block;color:var(--muted);font-size:10px;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
 .task-delete{border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;height:30px}
 .task-delete:hover{color:var(--red);background:rgba(255,120,142,.08)}
+.task-all-done{color:var(--green);border-color:rgba(84,239,177,.2);background:rgba(84,239,177,.045)}
+.task-completed-group{margin-top:11px;border-top:1px solid var(--line);padding-top:10px}
+.task-completed-group summary{padding:8px 4px;color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.07em;cursor:pointer;list-style:none}
+.task-completed-group summary::-webkit-details-marker{display:none}
+.task-completed-group summary::before{content:"▸";display:inline-block;margin-right:7px;color:var(--cyan);transition:transform .16s}
+.task-completed-group[open] summary::before{transform:rotate(90deg)}
+.task-completed-group>div{display:grid;gap:8px;margin-top:5px}
 .home-task-section{margin-top:20px;padding-top:17px;border-top:1px solid var(--line)}
 .task-heading{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .task-heading b{color:var(--cyan)}
@@ -771,8 +780,8 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 
 
 /* Habits & Smart Reminders */
-.task-repeat-toggle{
-  grid-column:1/-1;
+.task-mode-options{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.task-repeat-toggle,.task-carry-toggle{
   display:grid;
   grid-template-columns:22px minmax(0,1fr);
   gap:1px 9px;
@@ -783,10 +792,14 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
   background:rgba(54,224,255,.05);
   cursor:pointer;
 }
-.task-repeat-toggle input{grid-row:1/3;width:18px;height:18px;accent-color:var(--cyan)}
-.task-repeat-toggle span{font-weight:800;color:#eefaff}
-.task-repeat-toggle small{color:var(--muted);font-size:12px}
+.task-carry-toggle{border-color:rgba(173,147,255,.18);background:rgba(173,147,255,.05)}
+.task-repeat-toggle input,.task-carry-toggle input{grid-row:1/3;width:18px;height:18px;accent-color:var(--cyan)}
+.task-carry-toggle input{accent-color:var(--purple)}
+.task-repeat-toggle span,.task-carry-toggle span{font-weight:800;color:#eefaff}
+.task-repeat-toggle small,.task-carry-toggle small{color:var(--muted);font-size:12px}
 .task-repeat-toggle:has(input:checked){border-color:rgba(54,224,255,.48);background:rgba(54,224,255,.1)}
+.task-carry-toggle:has(input:checked){border-color:rgba(173,147,255,.5);background:rgba(173,147,255,.11)}
+.task-repeat-toggle:has(input:disabled),.task-carry-toggle:has(input:disabled){opacity:.48;cursor:not-allowed}
 .recurring-manager{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
 .recurring-manager-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .recurring-manager h3{margin:2px 0 0}
@@ -807,6 +820,8 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .recurring-task-item small{color:var(--muted)}
 .recurring-task-item button{border:0;background:transparent;color:#ff7d96;font:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:8px}
 .recurring-empty{padding:12px;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:12px}
+
+@media(max-width:640px){.task-mode-options{grid-template-columns:1fr}}
 
 .notification-status-card{
   display:grid;
@@ -859,7 +874,7 @@ tbody tr:hover td{background:rgba(255,255,255,.018)}
 .reminder-how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 
 @media(max-width:800px){
-  .task-repeat-toggle{padding:10px}
+  .task-repeat-toggle,.task-carry-toggle{padding:10px}
   .recurring-task-item{grid-template-columns:30px minmax(0,1fr)}
   .recurring-task-item button{grid-column:2;justify-self:start;padding:5px 0}
   .notification-status-card{grid-template-columns:44px minmax(0,1fr);padding:16px}
