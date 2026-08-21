@@ -36,6 +36,7 @@ async function loadAll() {
     renderReminderSettings();
     renderHydration();
     renderBackupCenter();
+    renderToday();
     const h = new Date().getHours();
     $('#greeting').textContent =
       (h < 11 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend') + ' 👋';

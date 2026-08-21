@@ -7,22 +7,41 @@ let sb,
   trades = [],
   focus = null,
   goals = [];
-const mobilePrimaryPages = new Set(['home', 'trading', 'tasks', 'fitness']);
-function closeMobileMore() {
-  $('#mobileMoreSheet')?.classList.remove('show');
-  $('#mobileMoreButton')?.setAttribute('aria-expanded', 'false');
+const mobilePrimaryPages = new Set(['today', 'trading', 'fitness']);
+const mobileWissenPages = new Set(['library', 'notes', 'academy']);
+const MOBILE_SHEETS = {
+  wissen: { sheet: '#mobileWissenSheet', button: '#mobileWissenButton' },
+  ich: { sheet: '#mobileMoreSheet', button: '#mobileMoreButton' },
+};
+function closeMobileSheet() {
+  Object.values(MOBILE_SHEETS).forEach(entry => {
+    $(entry.sheet)?.classList.remove('show');
+    $(entry.button)?.setAttribute('aria-expanded', 'false');
+  });
   document.body.classList.remove('sheet-open');
 }
-function openMobileMore() {
-  $('#mobileMoreSheet')?.classList.add('show');
-  $('#mobileMoreButton')?.setAttribute('aria-expanded', 'true');
+function openMobileSheet(name) {
+  const entry = MOBILE_SHEETS[name];
+  if (!entry) return;
+  closeMobileSheet();
+  $(entry.sheet)?.classList.add('show');
+  $(entry.button)?.setAttribute('aria-expanded', 'true');
   document.body.classList.add('sheet-open');
+}
+/* Alte Namen bleiben gültig, damit vorhandene Aufrufe weiter funktionieren. */
+function openMobileMore() {
+  openMobileSheet('ich');
+}
+function closeMobileMore() {
+  closeMobileSheet();
 }
 function updateNavigation(id) {
   $$('.nav,.mobile-nav-btn[data-page]').forEach(item =>
     item.classList.toggle('active', item.dataset.page === id),
   );
-  $('#mobileMoreButton')?.classList.toggle('active', !mobilePrimaryPages.has(id));
+  const inWissen = mobileWissenPages.has(id);
+  $('#mobileWissenButton')?.classList.toggle('active', inWissen);
+  $('#mobileMoreButton')?.classList.toggle('active', !mobilePrimaryPages.has(id) && !inWissen);
 }
 function showPage(id) {
   if (id === 'focus') id = 'tasks';
@@ -31,9 +50,10 @@ function showPage(id) {
   $$('.page').forEach(page => page.classList.remove('active'));
   target.classList.add('active');
   updateNavigation(id);
-  closeMobileMore();
+  closeMobileSheet();
+  if (id === 'today') renderToday();
   const url = new URL(location.href);
-  id === 'home' ? url.searchParams.delete('page') : url.searchParams.set('page', id);
+  id === 'today' ? url.searchParams.delete('page') : url.searchParams.set('page', id);
   history.replaceState(null, '', url);
   window.scrollTo({ top: 0, left: 0 });
 }
@@ -41,7 +61,7 @@ $$('[data-page]').forEach(button =>
   button.addEventListener('click', () => showPage(button.dataset.page)),
 );
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeMobileMore();
+  if (event.key === 'Escape') closeMobileSheet();
 });
 async function login() {
   const { error } = await sb.auth.signInWithPassword({

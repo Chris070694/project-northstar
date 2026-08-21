@@ -5192,3 +5192,326 @@ tbody tr:hover td {
     width: 100%;
   }
 }
+
+/* ============ Heute — adaptiver Startscreen ============ */
+.today-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.today-head h1 {
+  font-size: 28px;
+}
+.today-section-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 22px 0 10px;
+}
+.today-anchor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  border-color: var(--line-strong);
+}
+.today-anchor-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  text-wrap: pretty;
+}
+.today-anchor.done .today-anchor-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.today-anchor-flag {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.today-anchor-empty .today-anchor-title {
+  color: var(--muted);
+  font-weight: 700;
+}
+.today-now {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.today-now-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--cyan);
+}
+.today-now.accent-green .today-now-eyebrow {
+  color: var(--green);
+}
+.today-now.accent-violet .today-now-eyebrow {
+  color: var(--violet);
+}
+.today-now.accent-red .today-now-eyebrow {
+  color: var(--red);
+}
+.today-now-title {
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
+  text-wrap: pretty;
+}
+.today-now-sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+.today-now-action {
+  align-self: stretch;
+  min-height: 46px;
+  border-color: var(--line-strong);
+  background: rgba(112, 229, 255, 0.09);
+  color: var(--cyan);
+}
+.today-now.accent-green .today-now-action {
+  border-color: rgba(84, 239, 177, 0.34);
+  background: rgba(84, 239, 177, 0.1);
+  color: var(--green);
+}
+.today-now.accent-violet .today-now-action {
+  border-color: rgba(173, 147, 255, 0.34);
+  background: rgba(173, 147, 255, 0.1);
+  color: var(--violet);
+}
+.today-now.accent-red .today-now-action {
+  border-color: rgba(255, 120, 142, 0.34);
+  background: rgba(255, 120, 142, 0.1);
+  color: var(--red);
+}
+.today-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.today-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.028);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.today-row:hover {
+  border-color: var(--line-strong);
+}
+.today-row b {
+  flex-grow: 1;
+  font-size: 13px;
+  font-weight: 700;
+}
+.today-row small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.today-row-mark {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(191, 211, 255, 0.25);
+  border-radius: 6px;
+}
+.today-row-mark.cal {
+  border-radius: 50%;
+  border-color: rgba(255, 211, 107, 0.5);
+}
+.today-empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 2px;
+}
+.today-momentum {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.today-streak {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.today-streak > span {
+  width: 62px;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.today-streak-bar {
+  display: flex;
+  gap: 4px;
+  flex-grow: 1;
+}
+.today-streak-bar i {
+  flex-grow: 1;
+  height: 7px;
+  border-radius: 3px;
+  background: var(--line);
+}
+.today-streak-bar i.on.cyan {
+  background: var(--cyan);
+}
+.today-streak-bar i.on.green {
+  background: var(--green);
+}
+@media (max-width: 900px) {
+  .today-head h1 {
+    font-size: 24px;
+  }
+  .today-now-title {
+    font-size: 20px;
+  }
+}
+
+/* ============ Trading — Kennzahlen und Verlauf ============ */
+.trading-stats {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.stats-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.stats-head h2 {
+  margin: 4px 0 0;
+}
+.stats-ranges {
+  display: flex;
+  gap: 6px;
+}
+.stats-range {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 32px;
+}
+.stats-range.active {
+  background: rgba(112, 229, 255, 0.09);
+  border-color: var(--line-strong);
+  color: var(--cyan);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.stats-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.028);
+}
+.stats-tile small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  order: 2;
+}
+.stats-tile strong {
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+}
+.stats-tile strong.pos {
+  color: var(--green);
+}
+.stats-tile strong.neg {
+  color: var(--red);
+}
+.stats-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.stats-figure-title {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.stats-chart {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+.stats-empty {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+.stats-days {
+  display: flex;
+  gap: 3px;
+  align-items: stretch;
+  height: 104px;
+}
+.stats-day {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.stats-day-top,
+.stats-day-bottom {
+  flex: 1 1 0;
+  display: flex;
+}
+.stats-day-top {
+  align-items: flex-end;
+}
+.stats-day-bottom {
+  align-items: flex-start;
+  border-top: 1px solid var(--line);
+}
+.stats-day i {
+  width: 100%;
+  border-radius: 3px;
+  display: block;
+}
+.stats-day i.pos {
+  background: var(--green);
+}
+.stats-day i.neg {
+  background: var(--red);
+}
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stats-chart {
+    height: 120px;
+  }
+}

@@ -594,6 +594,7 @@ function renderTradingAnalytics() {
 }
 
 function renderTrading() {
+  if (typeof renderTradingStats === 'function') renderTradingStats();
   const settledTrades = trades.filter(
     trade => (trade.result || deriveTradeResult(trade.pnl_usd)) !== 'open',
   );
