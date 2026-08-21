@@ -1,507 +1,2065 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CPRB OS</title><link rel="manifest" href="manifest.webmanifest?v=2"><meta name="theme-color" content="#080b12"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CPRB OS"><link rel="icon" href="icons/cprb-og-192.png" type="image/png"><link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link rel="stylesheet" href="styles.css?v=5"></head><body>
-<section id="auth" class="auth"><div class="authbox"><h1><span style="color:var(--cyan)">CPRB</span> OS</h1><p class="sub">Dein persönliches Operating System.</p><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="password" type="password"><button class="btn primary" onclick="login()">Anmelden</button><p id="authMsg" class="sub"></p></div></section>
-<div id="app" class="app hide"><header class="mobile-header"><div class="mobile-brand"><img class="mobile-brand-logo" src="icons/cprb-og-192.png" alt="CPRB OG"><div><b>CPRB OS</b><small>Personal Operating System</small></div></div><button class="mobile-trade-btn" onclick="openTrade()" aria-label="Neuen Trade erfassen">+ Trade</button></header><aside class="sidebar"><div class="brand">CPRB <b>OS</b><small>Personal Operating System</small></div><button class="nav active" data-page="home">⌂ Home</button><button class="nav" data-page="trading">↗ Trading</button><button class="nav" data-page="goals">🎯 Goals & Vision</button><button class="nav" data-page="tasks">✓ To-dos</button><button class="nav" data-page="weekly">↻ Weekly Review</button><button class="nav" data-page="reminders">🔔 Erinnerungen</button><button class="nav" data-page="fitness">💪 Fitness</button><button class="nav" data-page="notes">📝 Notizen</button><button class="nav" data-page="library">📖 Bibliothek</button><button class="nav" data-page="academy">📚 Academy</button><button class="nav" data-page="calendar">📅 Kalender</button><button class="nav" data-page="account">⚙ Konto</button></aside><main class="main"><div class="layout-shell"><div>
-<section id="home" class="page active"><div id="pwaNotice" class="pwa-notice"><span>Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span><button id="installBtn" class="btn primary">Als App installieren</button></div><div class="top"><div><h1 id="greeting">Guten Morgen 👋</h1><div id="todayText" class="sub"></div></div><div class="actions"><button class="btn" onclick="showPage('tasks')">To-dos</button><button class="btn primary" onclick="openTrade()">+ Trade</button></div></div>
-<div class="grid hero-grid"><div class="card focus-card"><div class="eyebrow">Deine Top-Priorität heute</div><div id="mainFocus" class="focus-title">Wähle deine Top-Priorität.</div><div id="nextFocus" class="sub">Markiere eine Aufgabe mit ☆.</div><div class="home-task-section"><div class="task-heading"><button class="task-heading-link" type="button" onclick="showPage('tasks')">Heutige Aufgaben →</button><b id="homeTaskProgress">0/0 erledigt</b></div><div id="homeTaskList" class="home-task-list"></div></div></div><div id="heroGoal" class="card vision-card"><div class="vision-content"><span class="pill">DEIN NORDSTERN</span><h2>Noch kein Long-Term-Ziel</h2><p class="sub">Füge ein Ziel mit Bild hinzu.</p></div></div></div>
-<h2 style="margin-top:24px">Trading Snapshot</h2><div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="pnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="winrate" class="value">0%</div></div><div class="card stat"><div class="label">Profit Factor</div><div id="profitFactor" class="value">0</div></div><div class="card stat"><div class="label">Trades</div><div id="tradeCount" class="value">0</div></div></div>
-<h2 style="margin-top:24px">Schnellaktionen</h2><div class="grid thirds"><div class="card dashboard-action"><strong>Trade dokumentieren</strong><span>Entry, Risiko, Setup und Ergebnis.</span><button class="btn primary" onclick="openTrade()">Trade erfassen</button></div><div class="card dashboard-action"><strong>Tag planen</strong><span>Aufgaben anlegen, wiederholen und priorisieren.</span><button class="btn" onclick="showPage('tasks')">To-do-Liste</button></div><div class="card dashboard-action"><strong>Vision erweitern</strong><span>Verbinde dein Ziel mit dem nächsten Schritt.</span><button class="btn" onclick="openGoal()">Ziel hinzufügen</button></div></div>
-<div id="homeFitnessOverview" class="card home-fitness-overview"><div><div class="eyebrow">Fitness heute</div><h2 id="homeFitnessPlan">2er-Split einrichten</h2><p id="homeFitnessStatus" class="sub">Dein Trainingsplan ist noch offen.</p></div><button class="btn" onclick="showPage('fitness')">Fitness öffnen</button></div>
-<button type="button" class="card home-weekly-card" data-page="weekly"><span class="home-weekly-icon">↻</span><span><small>WEEKLY REVIEW</small><b>Deine Woche auf einen Blick</b><em id="homeWeeklyPrompt">System Score wird berechnet…</em></span><strong>Öffnen →</strong></button><h2 style="margin-top:24px">Dein Weg</h2><div id="homeGoals" class="grid thirds"></div></section>
-
-<section id="trading" class="page">
-  <div class="top"><div><div class="eyebrow">CPRB Trading Cockpit</div><h1>Trading Journal</h1><div class="sub">Plan prüfen, Risiko berechnen und Ausführung ehrlich auswerten.</div></div><button id="openTradeBtn" class="btn primary" onclick="openTrade()">+ Trade planen</button></div>
-  <div id="tradingSetupNotice" class="task-setup-notice hide">Trading Journal v2 muss noch in Supabase eingerichtet werden.</div>
-  <div id="tradingCockpitSetupNotice" class="task-setup-notice hide">Das Trading Cockpit muss noch mit der neuen Supabase-Migration aktiviert werden.</div>
-
-  <section class="trading-cockpit-grid">
-    <article id="cockpitDayStatus" class="card cockpit-day-status">
-      <div id="cockpitDayIcon" class="cockpit-status-icon">✓</div>
-      <div class="cockpit-status-copy"><div class="eyebrow">HEUTIGER SYSTEM-CHECK</div><h2 id="cockpitDayTitle">Bereit für deinen Plan</h2><p id="cockpitDayCopy" class="sub">Checkliste vollständig machen und nur ein A-Setup ausführen.</p></div>
-      <div class="cockpit-day-metrics"><div><small>Trades heute</small><b id="cockpitTodayTrades">0/2</b></div><div><small>Heute in R</small><b id="cockpitTodayR">0.00R</b></div></div>
-      <button class="btn primary" type="button" onclick="openTrade()">Trade-Check starten</button>
-    </article>
-
-    <form id="tradingSettingsForm" class="card cockpit-settings">
-      <div><div class="eyebrow">FESTE RISIKO-REGELN</div><h2>Cockpit einstellen</h2><p class="sub">Diese Werte werden bei jedem neuen Trade automatisch eingesetzt.</p></div>
-      <div class="cockpit-settings-grid">
-        <label>Kontostand USD<input id="tradeAccountBalance" type="number" min="0" step=".01" required></label>
-        <label>Risiko pro Trade %<input id="tradeDefaultRisk" type="number" min=".01" max="5" step=".01" required></label>
-        <label>Kontraktwert je 1.0 Bewegung<input id="tradeDefaultContract" type="number" min=".000001" step="any" required></label>
-        <label>Tagesverlust-Limit in R<input id="tradeDailyLossLimit" type="number" min=".25" max="20" step=".25" required></label>
-        <label>Maximale Trades pro Tag<input id="tradeMaxTrades" type="number" min="1" max="20" step="1" required></label>
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>CPRB OS</title>
+    <link rel="manifest" href="manifest.webmanifest?v=2" />
+    <meta name="theme-color" content="#080b12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CPRB OS" />
+    <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles.css?v=5" />
+  </head>
+  <body>
+    <section id="auth" class="auth">
+      <div class="authbox">
+        <h1><span style="color: var(--cyan)">CPRB</span> OS</h1>
+        <p class="sub">Dein persönliches Operating System.</p>
+        <label>E-Mail</label><input id="email" type="email" /><label>Passwort</label
+        ><input id="password" type="password" /><button class="btn primary" onclick="login()">
+          Anmelden
+        </button>
+        <p id="authMsg" class="sub"></p>
       </div>
-      <small class="cockpit-contract-hint">Bei XAUUSD entspricht 1 Standard-Lot häufig ungefähr 100 USD je 1.0 Preisbewegung. Bitte die Spezifikation deines Brokers prüfen.</small>
-      <button id="saveTradingSettingsBtn" class="btn" type="submit">Cockpit speichern</button>
-    </form>
-  </section>
-
-  <div class="cockpit-analytics">
-    <article class="card"><span>◎</span><div><small>Ø Regel-Score</small><strong id="cockpitAverageScore">–</strong></div></article>
-    <article class="card"><span>✓</span><div><small>Nach Plan</small><strong id="cockpitPlanRate">–</strong></div></article>
-    <article class="card"><span>−R</span><div><small>Fehlerkosten</small><strong id="cockpitErrorCost">0.00R</strong></div></article>
-    <article class="card cockpit-break-stat"><span>!</span><div><small>Häufigster Regelbruch</small><strong id="cockpitTopBreak">Noch keine Daten</strong><em id="cockpitTopBreakMeta">Beginnt mit deinem ersten Cockpit-Trade</em></div></article>
-  </div>
-
-  <div class="grid stats"><div class="card stat"><div class="label">Netto P&L</div><div id="tpnl" class="value">$0</div></div><div class="card stat"><div class="label">Winrate</div><div id="twinrate" class="value">0%</div></div><div class="card stat"><div class="label">Ø R</div><div id="tavgR" class="value">0R</div></div><div class="card stat"><div class="label">Trades</div><div id="tcount" class="value">0</div></div></div>
-  <div class="card trading-table-card"><div class="table-wrap"><table><thead><tr><th>Datum</th><th>Markt</th><th>Richtung</th><th>Session</th><th>Setup</th><th>Ergebnis</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody id="tradeRows"></tbody></table></div></div>
-</section>
-
-<section id="goals" class="page"><div class="top"><div><h1>Goals & Vision</h1><div class="sub">Ziel, Warum und nächster Schritt.</div></div><button class="btn primary" onclick="openGoal()">+ Neues Ziel</button></div><h2>Long-Term</h2><div id="longGoals" class="grid thirds"></div><h2 style="margin-top:24px">Short-Term</h2><div id="shortGoals" class="grid thirds"></div></section>
-<section id="tasks" class="page"><div class="top"><div><div class="eyebrow">Dein Tag auf einen Blick</div><h1>To-do-Liste</h1><div class="sub">Aufgaben abhaken, offen lassen, täglich wiederholen und eine Top-Priorität setzen.</div></div></div><div class="tasks-workspace"><section class="card task-panel"><div class="task-panel-head"><div><div class="eyebrow">Heute & offen</div><h2>Deine Aufgaben</h2></div><div id="taskCounter" class="task-counter">0/0</div></div><form id="taskForm" class="task-entry"><input id="taskTitle" maxlength="180" required placeholder="Neue Aufgabe hinzufügen…"><select id="taskCategory" aria-label="Kategorie"><option>Allgemein</option><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Privat</option></select><button class="btn primary" aria-label="Aufgabe hinzufügen">+</button><div class="task-mode-options"><label class="task-repeat-toggle"><input id="taskRepeatDaily" type="checkbox"><span>↻ Jeden Tag wiederholen</span><small>CPRB erstellt die Aufgabe automatisch jeden Morgen.</small></label><label class="task-carry-toggle"><input id="taskKeepUntilDone" type="checkbox"><span>◎ Offen lassen, bis erledigt</span><small>Bleibt auch nächste Woche sichtbar, bis du sie abhackst.</small></label></div></form><div id="taskSetupNotice" class="task-setup-notice hide">Die Aufgaben-Datenbank muss noch eingerichtet werden.</div><div id="taskPrioritySetupNotice" class="task-setup-notice hide">Top-Prioritäten brauchen noch die neue To-do-Prioritäts-Migration in Supabase.</div><div id="persistentTaskSetupNotice" class="task-setup-notice hide">Dauerhaft offene Aufgaben brauchen noch die neue Supabase-Migration.</div><div id="recurringSetupNotice" class="task-setup-notice hide">Tägliche Wiederholungen müssen noch über die Habits-Migration aktiviert werden.</div><div class="task-progress-track"><div id="taskProgressBar"></div></div><div id="dailyTaskList" class="daily-task-list"></div><div class="recurring-manager"><div class="recurring-manager-head"><div><div class="eyebrow">Automatisch</div><h3>Tägliche Aufgaben</h3></div></div><div id="recurringTaskList" class="recurring-task-list"></div></div></section></div></section>
-
-<section id="weekly" class="page">
-  <div class="top weekly-page-top">
-    <div><div class="eyebrow">Dein persönlicher Check-in</div><h1>Weekly Review</h1><div class="sub">Erkennen, was funktioniert – und die nächste Woche bewusst führen.</div></div>
-    <div class="weekly-period-nav">
-      <button class="btn icon-btn" type="button" onclick="shiftWeeklyReview(-1)" aria-label="Vorherige Woche">←</button>
-      <div><b id="weeklyRange">–</b><small id="weeklyRangeStatus">Diese Woche</small></div>
-      <button id="weeklyNextBtn" class="btn icon-btn" type="button" onclick="shiftWeeklyReview(1)" aria-label="Nächste Woche">→</button>
-    </div>
-  </div>
-  <div id="weeklySetupNotice" class="task-setup-notice hide">Die Weekly-Review-Datenbank muss noch in Supabase eingerichtet werden. Deine automatische Wochenanalyse funktioniert bereits.</div>
-  <section class="card weekly-hero">
-    <div id="weeklyScoreRing" class="weekly-score-ring"><div><strong id="weeklyScoreValue">0%</strong><small>System Score</small></div></div>
-    <div><div class="eyebrow">CPRB SYSTEM CHECK</div><h2 id="weeklyScoreTitle">Jetzt Kurs setzen</h2><p id="weeklyScoreCopy" class="sub">Deine Woche wird analysiert…</p></div>
-    <button class="btn" type="button" onclick="showPage('tasks')">To-dos öffnen</button>
-  </section>
-  <div class="weekly-stats">
-    <article class="card weekly-stat"><span>📈 Trading</span><strong id="weeklyPnl" class="weekly-metric">$0</strong><small id="weeklyTradeMeta">Noch keine Trades</small></article>
-    <article class="card weekly-stat"><span>💪 Fitness</span><strong id="weeklyWorkouts" class="weekly-metric">0</strong><small id="weeklyFitnessMeta">Ziel: 2 Einheiten</small></article>
-    <article class="card weekly-stat"><span>✓ Aufgaben</span><strong id="weeklyTasksDone" class="weekly-metric">0/0</strong><small id="weeklyTaskMeta">Noch keine Aufgaben</small></article>
-    <article class="card weekly-stat"><span>◎ Aktive Tage</span><strong id="weeklyFocusDays" class="weekly-metric">0</strong><small id="weeklyFocusMeta">0 Tage mit Aufgaben</small></article>
-    <article class="card weekly-stat"><span>🎯 Goals</span><strong id="weeklyGoalProgress" class="weekly-metric">–</strong><small id="weeklyGoalMeta">Noch keine Ziele</small></article>
-  </div>
-  <div class="weekly-layout">
-    <form id="weeklyForm" class="card weekly-form">
-      <div class="weekly-section-head"><div><div class="eyebrow">Deine Reflexion</div><h2>Woche abschließen</h2></div><div class="weekly-rating-value" id="weeklyRatingValue">7/10</div></div>
-      <label>Wie fühlte sich die Woche an?</label>
-      <input id="weeklyRating" class="weekly-rating" type="range" min="1" max="10" value="7">
-      <div class="weekly-form-grid">
-        <div><label>Größte Erfolge</label><textarea id="weeklyWins" placeholder="Was lief richtig gut?"></textarea></div>
-        <div><label>Herausforderungen</label><textarea id="weeklyChallenges" placeholder="Was hat dich ausgebremst?"></textarea></div>
-        <div class="full"><label>Wichtigstes Learning</label><textarea id="weeklyLearning" placeholder="Was nimmst du aus dieser Woche mit?"></textarea></div>
-        <div class="full"><label>Fokus der nächsten Woche</label><input id="weeklyNextFocus" maxlength="220" placeholder="Der eine Satz, der deine Woche führt…"></div>
-      </div>
-      <div class="weekly-priority-head"><div><div class="eyebrow">Top 3</div><h3>Prioritäten für nächste Woche</h3></div></div>
-      <div class="weekly-priorities">
-        <label><span>1</span><input id="weeklyPriority1" maxlength="180" placeholder="Wichtigste Priorität"></label>
-        <label><span>2</span><input id="weeklyPriority2" maxlength="180" placeholder="Zweite Priorität"></label>
-        <label><span>3</span><input id="weeklyPriority3" maxlength="180" placeholder="Dritte Priorität"></label>
-      </div>
-      <button id="weeklySaveBtn" class="btn primary weekly-save-btn">Weekly Review speichern</button>
-    </form>
-    <aside class="card weekly-insights-card"><div class="eyebrow">Automatische Analyse</div><h2>Deine Insights</h2><p class="sub">CPRB bewertet deinen Prozess – nicht nur das Ergebnis.</p><div id="weeklyInsights" class="weekly-insights"></div></aside>
-  </div>
-</section>
-
-<section id="fitness" class="page">
-  <div class="top">
-    <div><h1>Fitness Plan</h1><div class="sub">Dein 2er-Split, Training und Fortschritt an einem Ort.</div></div>
-    <div class="actions"><button class="btn" onclick="openExercise()">+ Übung</button><button id="fitnessStartBtn" class="btn primary" onclick="startFitnessWorkout()">Training starten</button></div>
-  </div>
-  <div id="fitnessSetupNotice" class="task-setup-notice hide">Die Fitness-Datenbank muss noch eingerichtet werden.</div>
-  <div id="fitnessSetSetupNotice" class="task-setup-notice hide">Fitness v2 wartet noch auf die Satzprotokoll-Migration in Supabase.</div>
-  <div class="grid fitness-stats">
-    <div class="card stat"><div class="label">Trainings diese Woche</div><div id="fitnessWeekCount" class="value">0</div></div>
-    <div class="card stat"><div class="label">Aktiver Plan</div><div id="fitnessCurrentPlan" class="value fitness-stat-text">–</div></div>
-    <div class="card stat"><div class="label">Letztes Training</div><div id="fitnessLastWorkout" class="value fitness-stat-text">–</div></div>
-  </div>
-  <div id="fitnessEmptyState" class="card fitness-empty hide">
-    <div class="fitness-empty-icon">💪</div><h2>Deinen 2er-Split einrichten</h2>
-    <p class="sub">Training A und B werden angelegt. Vorhandene Übungen übernehmen wir automatisch in Training A.</p>
-    <button class="btn primary" onclick="createDefaultFitnessPlans()">2er-Split erstellen</button>
-  </div>
-  <section id="activeWorkout" class="card active-workout hide"></section>
-  <div id="fitnessWorkspace" class="fitness-workspace hide">
-    <section class="card fitness-plan-card">
-      <div class="fitness-plan-toolbar"><div id="fitnessPlanTabs" class="fitness-plan-tabs"></div><button class="btn" onclick="openExercise()">+ Übung</button></div>
-      <div id="fitnessPlanList" class="fitness-plan-list"></div>
     </section>
-    <aside class="card fitness-history-card"><div class="eyebrow">Verlauf</div><h2>Letzte Trainings</h2><div id="fitnessHistory" class="fitness-history"></div></aside>
-  </div>
-</section>
-
-<section id="notes" class="page">
-  <div class="top"><div><div class="eyebrow">Text & Handschrift</div><h1>Notizen</h1><div class="sub">Gedanken tippen oder direkt mit dem Apple Pencil festhalten.</div></div><div class="actions"><button class="btn" onclick="openNote()">+ Textnotiz</button><button id="openPencilNoteBtn" class="btn primary" onclick="openPencilNote()">✎ Pencil-Notiz</button></div></div>
-  <div id="pencilNotesSetupNotice" class="task-setup-notice hide">Apple-Pencil-Notizen müssen noch mit der Pencil-v1-Migration in Supabase aktiviert werden.</div>
-  <div id="notesList" class="grid thirds"></div>
-</section>
-
-<section id="academy" class="page">
-  <div class="top">
-    <div><h1>Trading Academy</h1><div class="sub">Dein eigenes Trading-Lehrbuch mit konkreten Chart-Beispielen.</div></div>
-    <button class="btn primary" onclick="openAcademyNote()">+ Lernnotiz</button>
-  </div>
-  <div class="card academy-toolbar">
-    <input id="academySearch" placeholder="MSS, FVG, SMT..." oninput="renderAcademy()">
-    <select id="academyCategory" onchange="renderAcademy()">
-      <option value="">Alle Kategorien</option>
-      <option>Market Structure</option><option>Liquidity</option><option>Entry Models</option>
-      <option>Risk Management</option><option>Psychologie</option><option>Sessions</option><option>Andere</option>
-    </select>
-  </div>
-  <div id="academyGrid" class="academy-grid" style="margin-top:15px"></div>
-</section>
-
-
-<section id="library" class="page">
-  <div class="top library-page-top">
-    <div><div class="eyebrow">Dein digitales Bücherregal</div><h1>Bibliothek</h1><div class="sub">Private PDFs lesen – mit Cover, Suche und gespeichertem Fortschritt.</div></div>
-    <button id="openLibraryUploadBtn" class="btn primary" type="button" onclick="openLibraryUpload()">+ Buch hinzufügen</button>
-  </div>
-  <div id="librarySetupNotice" class="task-setup-notice hide">Die Bibliotheks-Datenbank und der private PDF-Speicher müssen noch in Supabase eingerichtet werden.</div>
-  <div class="library-stats">
-    <article class="card"><span>📚</span><div><strong id="libraryCount">0</strong><small>Bücher</small></div></article>
-    <article class="card"><span>📖</span><div><strong id="libraryReadingCount">0</strong><small>Am Lesen</small></div></article>
-    <article class="card"><span>✓</span><div><strong id="libraryFinishedCount">0</strong><small>Abgeschlossen</small></div></article>
-  </div>
-  <section id="libraryContinue" class="card library-continue hide">
-    <div id="libraryContinueCover" class="library-continue-cover"><span>📖</span></div>
-    <div><div class="eyebrow">Zuletzt gelesen</div><h2 id="libraryContinueTitle">–</h2><p id="libraryContinueMeta" class="sub">–</p></div>
-    <button id="libraryContinueBtn" class="btn primary" type="button">Weiterlesen</button>
-  </section>
-  <div class="card library-toolbar">
-    <label class="library-search"><span>⌕</span><input id="librarySearch" placeholder="Titel oder Autor suchen…" oninput="renderLibrary()"></label>
-    <select id="libraryCategoryFilter" onchange="renderLibrary()" aria-label="Kategorie filtern">
-      <option value="">Alle Kategorien</option>
-      <option>Trading</option><option>Finanzen</option><option>Mindset</option><option>Persönliche Entwicklung</option><option>Fitness</option><option>Biografie</option><option>Andere</option>
-    </select>
-  </div>
-  <div id="libraryGrid" class="library-grid"></div>
-  <section class="card library-private-note"><span>🔒</span><div><b>Deine PDFs bleiben privat</b><p>Die Dateien liegen in einem geschützten Supabase-Bucket und werden nur über zeitlich begrenzte Links geöffnet.</p></div></section>
-</section>
-
-<section id="calendar" class="page">
-  <div class="top">
-    <div><div class="eyebrow">CPRB Kalender v2</div><h1>Kalender</h1><div class="sub">Termine, Geburtstage und Erinnerungen an einem Ort.</div></div>
-    <button class="btn primary" onclick="openCalendarEvent()">+ Termin</button>
-  </div>
-  <div id="calendarV2SetupNotice" class="task-setup-notice hide">Jährliche Termine und Kalender-Erinnerungen müssen noch mit der Kalender-v2-Migration in Supabase aktiviert werden.</div>
-  <div class="calendar-shell">
-    <div class="card calendar-card">
-      <div class="calendar-title-row">
-        <button class="btn icon-btn" onclick="shiftCalendar(-1)">←</button>
-        <h2 id="calendarTitle" style="margin:0"></h2>
-        <button class="btn icon-btn" onclick="shiftCalendar(1)">→</button>
-      </div>
-      <div id="calendarGrid" class="calendar-grid" style="margin-top:12px"></div>
-    </div>
-    <div class="card">
-      <div class="calendar-title-row"><h3 id="selectedDateTitle">Termine</h3><button class="btn" onclick="openCalendarEvent(selectedCalendarDate)">+</button></div>
-      <div id="selectedDateEvents" class="event-list"></div>
-    </div>
-  </div>
-</section>
-
-<section id="reminders" class="page">
-  <div class="top"><div><div class="eyebrow">CPRB Smart Reminders</div><h1>Erinnerungen</h1><div class="sub">CPRB meldet sich zur richtigen Zeit – du entscheidest wann und wofür.</div></div></div>
-  <div id="reminderSetupNotice" class="task-setup-notice hide">Die Habits-&-Reminders-Datenbank muss noch in Supabase eingerichtet werden.</div>
-  <section class="card notification-status-card">
-    <div class="notification-status-icon">🔔</div>
-    <div><div class="eyebrow">Dieses Gerät</div><div class="notification-status-title"><h2>Push-Benachrichtigungen</h2><span id="notificationStatus" class="notification-state">Nicht aktiviert</span></div><p id="notificationStatusCopy" class="sub">Status wird geprüft…</p></div>
-    <div class="notification-status-actions"><button id="enableNotificationsBtn" class="btn primary" type="button" onclick="enableSmartNotifications()">Push aktivieren</button><button id="disableNotificationsBtn" class="btn hide" type="button" onclick="disableSmartNotifications()">Deaktivieren</button><button id="testNotificationBtn" class="btn" type="button" onclick="testSmartNotification()">Test senden</button></div>
-  </section>
-  <form id="reminderForm">
-    <div class="reminder-grid">
-      <article class="card reminder-card">
-        <div class="reminder-card-head"><div><span class="reminder-icon">✓</span><div><h2>Tagesplanung</h2><p>Starte mit Aufgaben und einer klaren Top-Priorität.</p></div></div><label class="reminder-switch"><input id="dailyFocusReminderEnabled" type="checkbox"><span></span></label></div>
-        <label>Uhrzeit<input id="dailyFocusReminderTime" type="time" value="08:00"></label>
-      </article>
-      <article class="card reminder-card">
-        <div class="reminder-card-head"><div><span class="reminder-icon">📈</span><div><h2>Trading</h2><p>Plan und Regeln vor der Session prüfen.</p></div></div><label class="reminder-switch"><input id="tradingReminderEnabled" type="checkbox"><span></span></label></div>
-        <label>Uhrzeit<input id="tradingReminderTime" type="time" value="08:30"></label>
-      </article>
-      <article class="card reminder-card">
-        <div class="reminder-card-head"><div><span class="reminder-icon">💪</span><div><h2>Fitness</h2><p>Trainingstage und Uhrzeit frei wählen.</p></div></div><label class="reminder-switch"><input id="fitnessReminderEnabled" type="checkbox"><span></span></label></div>
-        <label>Uhrzeit<input id="fitnessReminderTime" type="time" value="17:30"></label>
-        <div class="fitness-reminder-days" aria-label="Trainingstage">
-          <label><input class="fitness-reminder-day" type="checkbox" value="1"><span>Mo</span></label><label><input class="fitness-reminder-day" type="checkbox" value="2"><span>Di</span></label><label><input class="fitness-reminder-day" type="checkbox" value="3"><span>Mi</span></label><label><input class="fitness-reminder-day" type="checkbox" value="4"><span>Do</span></label><label><input class="fitness-reminder-day" type="checkbox" value="5"><span>Fr</span></label><label><input class="fitness-reminder-day" type="checkbox" value="6"><span>Sa</span></label><label><input class="fitness-reminder-day" type="checkbox" value="0"><span>So</span></label>
+    <div id="app" class="app hide">
+      <header class="mobile-header">
+        <div class="mobile-brand">
+          <img class="mobile-brand-logo" src="icons/cprb-og-192.png" alt="CPRB OG" />
+          <div><b>CPRB OS</b><small>Personal Operating System</small></div>
         </div>
-      </article>
-      <article class="card reminder-card">
-        <div class="reminder-card-head"><div><span class="reminder-icon">↻</span><div><h2>Weekly Review</h2><p>Woche abschließen und die nächste planen.</p></div></div><label class="reminder-switch"><input id="weeklyReminderEnabled" type="checkbox"><span></span></label></div>
-        <div class="reminder-inline-fields"><label>Tag<select id="weeklyReminderDay"><option value="0">Sonntag</option><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option></select></label><label>Uhrzeit<input id="weeklyReminderTime" type="time" value="18:00"></label></div>
-      </article>
-      <article class="card reminder-card reminder-quiet-card">
-        <div class="reminder-card-head"><div><span class="reminder-icon">☾</span><div><h2>Ruhezeit</h2><p>In diesem Zeitraum sendet CPRB keine geplanten Erinnerungen.</p></div></div><span id="reminderTimezone" class="timezone-pill">Europe/Vienna</span></div>
-        <div class="reminder-inline-fields"><label>Von<input id="quietStart" type="time" value="22:00"></label><label>Bis<input id="quietEnd" type="time" value="07:00"></label></div>
-      </article>
-    </div>
-    <button id="saveRemindersBtn" class="btn primary reminder-save-btn">Erinnerungen speichern</button>
-  </form>
-  <section class="card reminder-how-card"><span>🔒</span><div><b>Privat und freiwillig</b><p>Benachrichtigungen werden nur nach deiner ausdrücklichen Freigabe aktiviert. Jede Erinnerung kann einzeln ausgeschaltet werden.</p></div></section>
-</section>
-<section id="account" class="page">
-  <div class="top account-page-top"><div><div class="eyebrow">Deine Daten gehören dir</div><h1>Konto & Backup</h1><div class="sub">Sichere CPRB unabhängig von Supabase auf deinem eigenen Gerät.</div></div><button class="btn" onclick="logout()">Abmelden</button></div>
-  <section class="account-grid">
-    <article class="card account-profile-card">
-      <span class="account-avatar">CP</span>
-      <div><small>Angemeldet als</small><b id="who"></b><em>Persönliches CPRB-Konto</em></div>
-    </article>
-    <article id="backupStatusCard" class="card backup-status-card due">
-      <span id="backupStatusIcon">!</span>
-      <div><small>LETZTE SICHERUNG</small><b id="backupStatusTitle">Noch kein Backup</b><em id="backupStatusCopy">Erstelle jetzt deine erste Sicherung.</em></div>
-    </article>
-  </section>
+        <button class="mobile-trade-btn" onclick="openTrade()" aria-label="Neuen Trade erfassen">
+          + Trade
+        </button>
+      </header>
+      <aside class="sidebar">
+        <div class="brand">CPRB <b>OS</b><small>Personal Operating System</small></div>
+        <button class="nav active" data-page="home">⌂ Home</button
+        ><button class="nav" data-page="trading">↗ Trading</button
+        ><button class="nav" data-page="goals">🎯 Goals & Vision</button
+        ><button class="nav" data-page="tasks">✓ To-dos</button
+        ><button class="nav" data-page="weekly">↻ Weekly Review</button
+        ><button class="nav" data-page="reminders">🔔 Erinnerungen</button
+        ><button class="nav" data-page="fitness">💪 Fitness</button
+        ><button class="nav" data-page="notes">📝 Notizen</button
+        ><button class="nav" data-page="library">📖 Bibliothek</button
+        ><button class="nav" data-page="academy">📚 Academy</button
+        ><button class="nav" data-page="calendar">📅 Kalender</button
+        ><button class="nav" data-page="account">⚙ Konto</button>
+      </aside>
+      <main class="main">
+        <div class="layout-shell">
+          <div>
+            <section id="home" class="page active">
+              <div id="pwaNotice" class="pwa-notice">
+                <span
+                  >Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span
+                ><button id="installBtn" class="btn primary">Als App installieren</button>
+              </div>
+              <div class="top">
+                <div>
+                  <h1 id="greeting">Guten Morgen 👋</h1>
+                  <div id="todayText" class="sub"></div>
+                </div>
+                <div class="actions">
+                  <button class="btn" onclick="showPage('tasks')">To-dos</button
+                  ><button class="btn primary" onclick="openTrade()">+ Trade</button>
+                </div>
+              </div>
+              <div class="grid hero-grid">
+                <div class="card focus-card">
+                  <div class="eyebrow">Deine Top-Priorität heute</div>
+                  <div id="mainFocus" class="focus-title">Wähle deine Top-Priorität.</div>
+                  <div id="nextFocus" class="sub">Markiere eine Aufgabe mit ☆.</div>
+                  <div class="home-task-section">
+                    <div class="task-heading">
+                      <button class="task-heading-link" type="button" onclick="showPage('tasks')">
+                        Heutige Aufgaben →</button
+                      ><b id="homeTaskProgress">0/0 erledigt</b>
+                    </div>
+                    <div id="homeTaskList" class="home-task-list"></div>
+                  </div>
+                </div>
+                <div id="heroGoal" class="card vision-card">
+                  <div class="vision-content">
+                    <span class="pill">DEIN NORDSTERN</span>
+                    <h2>Noch kein Long-Term-Ziel</h2>
+                    <p class="sub">Füge ein Ziel mit Bild hinzu.</p>
+                  </div>
+                </div>
+              </div>
+              <h2 style="margin-top: 24px">Trading Snapshot</h2>
+              <div class="grid stats">
+                <div class="card stat">
+                  <div class="label">Netto P&L</div>
+                  <div id="pnl" class="value">$0</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Winrate</div>
+                  <div id="winrate" class="value">0%</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Profit Factor</div>
+                  <div id="profitFactor" class="value">0</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Trades</div>
+                  <div id="tradeCount" class="value">0</div>
+                </div>
+              </div>
+              <h2 style="margin-top: 24px">Schnellaktionen</h2>
+              <div class="grid thirds">
+                <div class="card dashboard-action">
+                  <strong>Trade dokumentieren</strong><span>Entry, Risiko, Setup und Ergebnis.</span
+                  ><button class="btn primary" onclick="openTrade()">Trade erfassen</button>
+                </div>
+                <div class="card dashboard-action">
+                  <strong>Tag planen</strong
+                  ><span>Aufgaben anlegen, wiederholen und priorisieren.</span
+                  ><button class="btn" onclick="showPage('tasks')">To-do-Liste</button>
+                </div>
+                <div class="card dashboard-action">
+                  <strong>Vision erweitern</strong
+                  ><span>Verbinde dein Ziel mit dem nächsten Schritt.</span
+                  ><button class="btn" onclick="openGoal()">Ziel hinzufügen</button>
+                </div>
+              </div>
+              <div id="homeFitnessOverview" class="card home-fitness-overview">
+                <div>
+                  <div class="eyebrow">Fitness heute</div>
+                  <h2 id="homeFitnessPlan">2er-Split einrichten</h2>
+                  <p id="homeFitnessStatus" class="sub">Dein Trainingsplan ist noch offen.</p>
+                </div>
+                <button class="btn" onclick="showPage('fitness')">Fitness öffnen</button>
+              </div>
+              <button type="button" class="card home-weekly-card" data-page="weekly">
+                <span class="home-weekly-icon">↻</span
+                ><span
+                  ><small>WEEKLY REVIEW</small><b>Deine Woche auf einen Blick</b
+                  ><em id="homeWeeklyPrompt">System Score wird berechnet…</em></span
+                ><strong>Öffnen →</strong>
+              </button>
+              <h2 style="margin-top: 24px">Dein Weg</h2>
+              <div id="homeGoals" class="grid thirds"></div>
+            </section>
 
-  <section class="backup-layout">
-    <article class="card backup-card backup-create-card">
-      <div class="backup-card-head"><span>↓</span><div><div class="eyebrow">Backup erstellen</div><h2>Deine CPRB-Sicherung</h2><p class="sub">Mit Passwort verschlüsselt und nur von CPRB wieder lesbar.</p></div></div>
-      <label>Backup-Passwort<input id="backupPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Mindestens 6 Zeichen"></label>
-      <small class="backup-password-hint">Nicht dein Login-Passwort. Gut aufbewahren – ohne dieses Passwort kann das Backup nicht geöffnet werden.</small>
-      <div class="backup-choice-grid">
-        <button id="backupDataBtn" class="backup-choice" type="button" onclick="createCprbBackup(false)"><span>⚡</span><b>Daten-Backup</b><small>Trades, Ziele, Training, Aufgaben und Einstellungen. Schnell und klein.</small></button>
-        <button id="backupCompleteBtn" class="backup-choice recommended" type="button" onclick="createCprbBackup(true)"><span>🔒</span><b>Komplettes Backup</b><small>Zusätzlich PDFs, Cover und Bilder. Am besten am Windows-Laptop.</small><em>EMPFOHLEN</em></button>
+            <section id="trading" class="page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">CPRB Trading Cockpit</div>
+                  <h1>Trading Journal</h1>
+                  <div class="sub">
+                    Plan prüfen, Risiko berechnen und Ausführung ehrlich auswerten.
+                  </div>
+                </div>
+                <button id="openTradeBtn" class="btn primary" onclick="openTrade()">
+                  + Trade planen
+                </button>
+              </div>
+              <div id="tradingSetupNotice" class="task-setup-notice hide">
+                Trading Journal v2 muss noch in Supabase eingerichtet werden.
+              </div>
+              <div id="tradingCockpitSetupNotice" class="task-setup-notice hide">
+                Das Trading Cockpit muss noch mit der neuen Supabase-Migration aktiviert werden.
+              </div>
+
+              <section class="trading-cockpit-grid">
+                <article id="cockpitDayStatus" class="card cockpit-day-status">
+                  <div id="cockpitDayIcon" class="cockpit-status-icon">✓</div>
+                  <div class="cockpit-status-copy">
+                    <div class="eyebrow">HEUTIGER SYSTEM-CHECK</div>
+                    <h2 id="cockpitDayTitle">Bereit für deinen Plan</h2>
+                    <p id="cockpitDayCopy" class="sub">
+                      Checkliste vollständig machen und nur ein A-Setup ausführen.
+                    </p>
+                  </div>
+                  <div class="cockpit-day-metrics">
+                    <div><small>Trades heute</small><b id="cockpitTodayTrades">0/2</b></div>
+                    <div><small>Heute in R</small><b id="cockpitTodayR">0.00R</b></div>
+                  </div>
+                  <button class="btn primary" type="button" onclick="openTrade()">
+                    Trade-Check starten
+                  </button>
+                </article>
+
+                <form id="tradingSettingsForm" class="card cockpit-settings">
+                  <div>
+                    <div class="eyebrow">FESTE RISIKO-REGELN</div>
+                    <h2>Cockpit einstellen</h2>
+                    <p class="sub">
+                      Diese Werte werden bei jedem neuen Trade automatisch eingesetzt.
+                    </p>
+                  </div>
+                  <div class="cockpit-settings-grid">
+                    <label
+                      >Kontostand USD<input
+                        id="tradeAccountBalance"
+                        type="number"
+                        min="0"
+                        step=".01"
+                        required
+                    /></label>
+                    <label
+                      >Risiko pro Trade %<input
+                        id="tradeDefaultRisk"
+                        type="number"
+                        min=".01"
+                        max="5"
+                        step=".01"
+                        required
+                    /></label>
+                    <label
+                      >Kontraktwert je 1.0 Bewegung<input
+                        id="tradeDefaultContract"
+                        type="number"
+                        min=".000001"
+                        step="any"
+                        required
+                    /></label>
+                    <label
+                      >Tagesverlust-Limit in R<input
+                        id="tradeDailyLossLimit"
+                        type="number"
+                        min=".25"
+                        max="20"
+                        step=".25"
+                        required
+                    /></label>
+                    <label
+                      >Maximale Trades pro Tag<input
+                        id="tradeMaxTrades"
+                        type="number"
+                        min="1"
+                        max="20"
+                        step="1"
+                        required
+                    /></label>
+                  </div>
+                  <small class="cockpit-contract-hint"
+                    >Bei XAUUSD entspricht 1 Standard-Lot häufig ungefähr 100 USD je 1.0
+                    Preisbewegung. Bitte die Spezifikation deines Brokers prüfen.</small
+                  >
+                  <button id="saveTradingSettingsBtn" class="btn" type="submit">
+                    Cockpit speichern
+                  </button>
+                </form>
+              </section>
+
+              <div class="cockpit-analytics">
+                <article class="card">
+                  <span>◎</span>
+                  <div><small>Ø Regel-Score</small><strong id="cockpitAverageScore">–</strong></div>
+                </article>
+                <article class="card">
+                  <span>✓</span>
+                  <div><small>Nach Plan</small><strong id="cockpitPlanRate">–</strong></div>
+                </article>
+                <article class="card">
+                  <span>−R</span>
+                  <div><small>Fehlerkosten</small><strong id="cockpitErrorCost">0.00R</strong></div>
+                </article>
+                <article class="card cockpit-break-stat">
+                  <span>!</span>
+                  <div>
+                    <small>Häufigster Regelbruch</small
+                    ><strong id="cockpitTopBreak">Noch keine Daten</strong
+                    ><em id="cockpitTopBreakMeta">Beginnt mit deinem ersten Cockpit-Trade</em>
+                  </div>
+                </article>
+              </div>
+
+              <div class="grid stats">
+                <div class="card stat">
+                  <div class="label">Netto P&L</div>
+                  <div id="tpnl" class="value">$0</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Winrate</div>
+                  <div id="twinrate" class="value">0%</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Ø R</div>
+                  <div id="tavgR" class="value">0R</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Trades</div>
+                  <div id="tcount" class="value">0</div>
+                </div>
+              </div>
+              <div class="card trading-table-card">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Datum</th>
+                        <th>Markt</th>
+                        <th>Richtung</th>
+                        <th>Session</th>
+                        <th>Setup</th>
+                        <th>Ergebnis</th>
+                        <th>P&L</th>
+                        <th>R</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="tradeRows"></tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <section id="goals" class="page">
+              <div class="top">
+                <div>
+                  <h1>Goals & Vision</h1>
+                  <div class="sub">Ziel, Warum und nächster Schritt.</div>
+                </div>
+                <button class="btn primary" onclick="openGoal()">+ Neues Ziel</button>
+              </div>
+              <h2>Long-Term</h2>
+              <div id="longGoals" class="grid thirds"></div>
+              <h2 style="margin-top: 24px">Short-Term</h2>
+              <div id="shortGoals" class="grid thirds"></div>
+            </section>
+            <section id="tasks" class="page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">Dein Tag auf einen Blick</div>
+                  <h1>To-do-Liste</h1>
+                  <div class="sub">
+                    Aufgaben abhaken, offen lassen, täglich wiederholen und eine Top-Priorität
+                    setzen.
+                  </div>
+                </div>
+              </div>
+              <div class="tasks-workspace">
+                <section class="card task-panel">
+                  <div class="task-panel-head">
+                    <div>
+                      <div class="eyebrow">Heute & offen</div>
+                      <h2>Deine Aufgaben</h2>
+                    </div>
+                    <div id="taskCounter" class="task-counter">0/0</div>
+                  </div>
+                  <form id="taskForm" class="task-entry">
+                    <input
+                      id="taskTitle"
+                      maxlength="180"
+                      required
+                      placeholder="Neue Aufgabe hinzufügen…"
+                    /><select id="taskCategory" aria-label="Kategorie">
+                      <option>Allgemein</option>
+                      <option>Trading</option>
+                      <option>Fitness</option>
+                      <option>Lernen</option>
+                      <option>Privat</option></select
+                    ><button class="btn primary" aria-label="Aufgabe hinzufügen">+</button>
+                    <div class="task-mode-options">
+                      <label class="task-repeat-toggle"
+                        ><input id="taskRepeatDaily" type="checkbox" /><span
+                          >↻ Jeden Tag wiederholen</span
+                        ><small>CPRB erstellt die Aufgabe automatisch jeden Morgen.</small></label
+                      ><label class="task-carry-toggle"
+                        ><input id="taskKeepUntilDone" type="checkbox" /><span
+                          >◎ Offen lassen, bis erledigt</span
+                        ><small
+                          >Bleibt auch nächste Woche sichtbar, bis du sie abhackst.</small
+                        ></label
+                      >
+                    </div>
+                  </form>
+                  <div id="taskSetupNotice" class="task-setup-notice hide">
+                    Die Aufgaben-Datenbank muss noch eingerichtet werden.
+                  </div>
+                  <div id="taskPrioritySetupNotice" class="task-setup-notice hide">
+                    Top-Prioritäten brauchen noch die neue To-do-Prioritäts-Migration in Supabase.
+                  </div>
+                  <div id="persistentTaskSetupNotice" class="task-setup-notice hide">
+                    Dauerhaft offene Aufgaben brauchen noch die neue Supabase-Migration.
+                  </div>
+                  <div id="recurringSetupNotice" class="task-setup-notice hide">
+                    Tägliche Wiederholungen müssen noch über die Habits-Migration aktiviert werden.
+                  </div>
+                  <div class="task-progress-track"><div id="taskProgressBar"></div></div>
+                  <div id="dailyTaskList" class="daily-task-list"></div>
+                  <div class="recurring-manager">
+                    <div class="recurring-manager-head">
+                      <div>
+                        <div class="eyebrow">Automatisch</div>
+                        <h3>Tägliche Aufgaben</h3>
+                      </div>
+                    </div>
+                    <div id="recurringTaskList" class="recurring-task-list"></div>
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            <section id="weekly" class="page">
+              <div class="top weekly-page-top">
+                <div>
+                  <div class="eyebrow">Dein persönlicher Check-in</div>
+                  <h1>Weekly Review</h1>
+                  <div class="sub">
+                    Erkennen, was funktioniert – und die nächste Woche bewusst führen.
+                  </div>
+                </div>
+                <div class="weekly-period-nav">
+                  <button
+                    class="btn icon-btn"
+                    type="button"
+                    onclick="shiftWeeklyReview(-1)"
+                    aria-label="Vorherige Woche"
+                  >
+                    ←
+                  </button>
+                  <div>
+                    <b id="weeklyRange">–</b><small id="weeklyRangeStatus">Diese Woche</small>
+                  </div>
+                  <button
+                    id="weeklyNextBtn"
+                    class="btn icon-btn"
+                    type="button"
+                    onclick="shiftWeeklyReview(1)"
+                    aria-label="Nächste Woche"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+              <div id="weeklySetupNotice" class="task-setup-notice hide">
+                Die Weekly-Review-Datenbank muss noch in Supabase eingerichtet werden. Deine
+                automatische Wochenanalyse funktioniert bereits.
+              </div>
+              <section class="card weekly-hero">
+                <div id="weeklyScoreRing" class="weekly-score-ring">
+                  <div><strong id="weeklyScoreValue">0%</strong><small>System Score</small></div>
+                </div>
+                <div>
+                  <div class="eyebrow">CPRB SYSTEM CHECK</div>
+                  <h2 id="weeklyScoreTitle">Jetzt Kurs setzen</h2>
+                  <p id="weeklyScoreCopy" class="sub">Deine Woche wird analysiert…</p>
+                </div>
+                <button class="btn" type="button" onclick="showPage('tasks')">To-dos öffnen</button>
+              </section>
+              <div class="weekly-stats">
+                <article class="card weekly-stat">
+                  <span>📈 Trading</span><strong id="weeklyPnl" class="weekly-metric">$0</strong
+                  ><small id="weeklyTradeMeta">Noch keine Trades</small>
+                </article>
+                <article class="card weekly-stat">
+                  <span>💪 Fitness</span><strong id="weeklyWorkouts" class="weekly-metric">0</strong
+                  ><small id="weeklyFitnessMeta">Ziel: 2 Einheiten</small>
+                </article>
+                <article class="card weekly-stat">
+                  <span>✓ Aufgaben</span
+                  ><strong id="weeklyTasksDone" class="weekly-metric">0/0</strong
+                  ><small id="weeklyTaskMeta">Noch keine Aufgaben</small>
+                </article>
+                <article class="card weekly-stat">
+                  <span>◎ Aktive Tage</span
+                  ><strong id="weeklyFocusDays" class="weekly-metric">0</strong
+                  ><small id="weeklyFocusMeta">0 Tage mit Aufgaben</small>
+                </article>
+                <article class="card weekly-stat">
+                  <span>🎯 Goals</span
+                  ><strong id="weeklyGoalProgress" class="weekly-metric">–</strong
+                  ><small id="weeklyGoalMeta">Noch keine Ziele</small>
+                </article>
+              </div>
+              <div class="weekly-layout">
+                <form id="weeklyForm" class="card weekly-form">
+                  <div class="weekly-section-head">
+                    <div>
+                      <div class="eyebrow">Deine Reflexion</div>
+                      <h2>Woche abschließen</h2>
+                    </div>
+                    <div class="weekly-rating-value" id="weeklyRatingValue">7/10</div>
+                  </div>
+                  <label>Wie fühlte sich die Woche an?</label>
+                  <input
+                    id="weeklyRating"
+                    class="weekly-rating"
+                    type="range"
+                    min="1"
+                    max="10"
+                    value="7"
+                  />
+                  <div class="weekly-form-grid">
+                    <div>
+                      <label>Größte Erfolge</label
+                      ><textarea id="weeklyWins" placeholder="Was lief richtig gut?"></textarea>
+                    </div>
+                    <div>
+                      <label>Herausforderungen</label
+                      ><textarea
+                        id="weeklyChallenges"
+                        placeholder="Was hat dich ausgebremst?"
+                      ></textarea>
+                    </div>
+                    <div class="full">
+                      <label>Wichtigstes Learning</label
+                      ><textarea
+                        id="weeklyLearning"
+                        placeholder="Was nimmst du aus dieser Woche mit?"
+                      ></textarea>
+                    </div>
+                    <div class="full">
+                      <label>Fokus der nächsten Woche</label
+                      ><input
+                        id="weeklyNextFocus"
+                        maxlength="220"
+                        placeholder="Der eine Satz, der deine Woche führt…"
+                      />
+                    </div>
+                  </div>
+                  <div class="weekly-priority-head">
+                    <div>
+                      <div class="eyebrow">Top 3</div>
+                      <h3>Prioritäten für nächste Woche</h3>
+                    </div>
+                  </div>
+                  <div class="weekly-priorities">
+                    <label
+                      ><span>1</span
+                      ><input
+                        id="weeklyPriority1"
+                        maxlength="180"
+                        placeholder="Wichtigste Priorität"
+                    /></label>
+                    <label
+                      ><span>2</span
+                      ><input id="weeklyPriority2" maxlength="180" placeholder="Zweite Priorität"
+                    /></label>
+                    <label
+                      ><span>3</span
+                      ><input id="weeklyPriority3" maxlength="180" placeholder="Dritte Priorität"
+                    /></label>
+                  </div>
+                  <button id="weeklySaveBtn" class="btn primary weekly-save-btn">
+                    Weekly Review speichern
+                  </button>
+                </form>
+                <aside class="card weekly-insights-card">
+                  <div class="eyebrow">Automatische Analyse</div>
+                  <h2>Deine Insights</h2>
+                  <p class="sub">CPRB bewertet deinen Prozess – nicht nur das Ergebnis.</p>
+                  <div id="weeklyInsights" class="weekly-insights"></div>
+                </aside>
+              </div>
+            </section>
+
+            <section id="fitness" class="page">
+              <div class="top">
+                <div>
+                  <h1>Fitness Plan</h1>
+                  <div class="sub">Dein 2er-Split, Training und Fortschritt an einem Ort.</div>
+                </div>
+                <div class="actions">
+                  <button class="btn" onclick="openExercise()">+ Übung</button
+                  ><button id="fitnessStartBtn" class="btn primary" onclick="startFitnessWorkout()">
+                    Training starten
+                  </button>
+                </div>
+              </div>
+              <div id="fitnessSetupNotice" class="task-setup-notice hide">
+                Die Fitness-Datenbank muss noch eingerichtet werden.
+              </div>
+              <div id="fitnessSetSetupNotice" class="task-setup-notice hide">
+                Fitness v2 wartet noch auf die Satzprotokoll-Migration in Supabase.
+              </div>
+              <div class="grid fitness-stats">
+                <div class="card stat">
+                  <div class="label">Trainings diese Woche</div>
+                  <div id="fitnessWeekCount" class="value">0</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Aktiver Plan</div>
+                  <div id="fitnessCurrentPlan" class="value fitness-stat-text">–</div>
+                </div>
+                <div class="card stat">
+                  <div class="label">Letztes Training</div>
+                  <div id="fitnessLastWorkout" class="value fitness-stat-text">–</div>
+                </div>
+              </div>
+              <div id="fitnessEmptyState" class="card fitness-empty hide">
+                <div class="fitness-empty-icon">💪</div>
+                <h2>Deinen 2er-Split einrichten</h2>
+                <p class="sub">
+                  Training A und B werden angelegt. Vorhandene Übungen übernehmen wir automatisch in
+                  Training A.
+                </p>
+                <button class="btn primary" onclick="createDefaultFitnessPlans()">
+                  2er-Split erstellen
+                </button>
+              </div>
+              <section id="activeWorkout" class="card active-workout hide"></section>
+              <div id="fitnessWorkspace" class="fitness-workspace hide">
+                <section class="card fitness-plan-card">
+                  <div class="fitness-plan-toolbar">
+                    <div id="fitnessPlanTabs" class="fitness-plan-tabs"></div>
+                    <button class="btn" onclick="openExercise()">+ Übung</button>
+                  </div>
+                  <div id="fitnessPlanList" class="fitness-plan-list"></div>
+                </section>
+                <aside class="card fitness-history-card">
+                  <div class="eyebrow">Verlauf</div>
+                  <h2>Letzte Trainings</h2>
+                  <div id="fitnessHistory" class="fitness-history"></div>
+                </aside>
+              </div>
+            </section>
+
+            <section id="notes" class="page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">Text & Handschrift</div>
+                  <h1>Notizen</h1>
+                  <div class="sub">
+                    Gedanken tippen oder direkt mit dem Apple Pencil festhalten.
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn" onclick="openNote()">+ Textnotiz</button
+                  ><button id="openPencilNoteBtn" class="btn primary" onclick="openPencilNote()">
+                    ✎ Pencil-Notiz
+                  </button>
+                </div>
+              </div>
+              <div id="pencilNotesSetupNotice" class="task-setup-notice hide">
+                Apple-Pencil-Notizen müssen noch mit der Pencil-v1-Migration in Supabase aktiviert
+                werden.
+              </div>
+              <div id="notesList" class="grid thirds"></div>
+            </section>
+
+            <section id="academy" class="page">
+              <div class="top">
+                <div>
+                  <h1>Trading Academy</h1>
+                  <div class="sub">
+                    Dein eigenes Trading-Lehrbuch mit konkreten Chart-Beispielen.
+                  </div>
+                </div>
+                <button class="btn primary" onclick="openAcademyNote()">+ Lernnotiz</button>
+              </div>
+              <div class="card academy-toolbar">
+                <input
+                  id="academySearch"
+                  placeholder="MSS, FVG, SMT..."
+                  oninput="renderAcademy()"
+                />
+                <select id="academyCategory" onchange="renderAcademy()">
+                  <option value="">Alle Kategorien</option>
+                  <option>Market Structure</option>
+                  <option>Liquidity</option>
+                  <option>Entry Models</option>
+                  <option>Risk Management</option>
+                  <option>Psychologie</option>
+                  <option>Sessions</option>
+                  <option>Andere</option>
+                </select>
+              </div>
+              <div id="academyGrid" class="academy-grid" style="margin-top: 15px"></div>
+            </section>
+
+            <section id="library" class="page">
+              <div class="top library-page-top">
+                <div>
+                  <div class="eyebrow">Dein digitales Bücherregal</div>
+                  <h1>Bibliothek</h1>
+                  <div class="sub">
+                    Private PDFs lesen – mit Cover, Suche und gespeichertem Fortschritt.
+                  </div>
+                </div>
+                <button
+                  id="openLibraryUploadBtn"
+                  class="btn primary"
+                  type="button"
+                  onclick="openLibraryUpload()"
+                >
+                  + Buch hinzufügen
+                </button>
+              </div>
+              <div id="librarySetupNotice" class="task-setup-notice hide">
+                Die Bibliotheks-Datenbank und der private PDF-Speicher müssen noch in Supabase
+                eingerichtet werden.
+              </div>
+              <div class="library-stats">
+                <article class="card">
+                  <span>📚</span>
+                  <div><strong id="libraryCount">0</strong><small>Bücher</small></div>
+                </article>
+                <article class="card">
+                  <span>📖</span>
+                  <div><strong id="libraryReadingCount">0</strong><small>Am Lesen</small></div>
+                </article>
+                <article class="card">
+                  <span>✓</span>
+                  <div>
+                    <strong id="libraryFinishedCount">0</strong><small>Abgeschlossen</small>
+                  </div>
+                </article>
+              </div>
+              <section id="libraryContinue" class="card library-continue hide">
+                <div id="libraryContinueCover" class="library-continue-cover"><span>📖</span></div>
+                <div>
+                  <div class="eyebrow">Zuletzt gelesen</div>
+                  <h2 id="libraryContinueTitle">–</h2>
+                  <p id="libraryContinueMeta" class="sub">–</p>
+                </div>
+                <button id="libraryContinueBtn" class="btn primary" type="button">
+                  Weiterlesen
+                </button>
+              </section>
+              <div class="card library-toolbar">
+                <label class="library-search"
+                  ><span>⌕</span
+                  ><input
+                    id="librarySearch"
+                    placeholder="Titel oder Autor suchen…"
+                    oninput="renderLibrary()"
+                /></label>
+                <select
+                  id="libraryCategoryFilter"
+                  onchange="renderLibrary()"
+                  aria-label="Kategorie filtern"
+                >
+                  <option value="">Alle Kategorien</option>
+                  <option>Trading</option>
+                  <option>Finanzen</option>
+                  <option>Mindset</option>
+                  <option>Persönliche Entwicklung</option>
+                  <option>Fitness</option>
+                  <option>Biografie</option>
+                  <option>Andere</option>
+                </select>
+              </div>
+              <div id="libraryGrid" class="library-grid"></div>
+              <section class="card library-private-note">
+                <span>🔒</span>
+                <div>
+                  <b>Deine PDFs bleiben privat</b>
+                  <p>
+                    Die Dateien liegen in einem geschützten Supabase-Bucket und werden nur über
+                    zeitlich begrenzte Links geöffnet.
+                  </p>
+                </div>
+              </section>
+            </section>
+
+            <section id="calendar" class="page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">CPRB Kalender v2</div>
+                  <h1>Kalender</h1>
+                  <div class="sub">Termine, Geburtstage und Erinnerungen an einem Ort.</div>
+                </div>
+                <button class="btn primary" onclick="openCalendarEvent()">+ Termin</button>
+              </div>
+              <div id="calendarV2SetupNotice" class="task-setup-notice hide">
+                Jährliche Termine und Kalender-Erinnerungen müssen noch mit der
+                Kalender-v2-Migration in Supabase aktiviert werden.
+              </div>
+              <div class="calendar-shell">
+                <div class="card calendar-card">
+                  <div class="calendar-title-row">
+                    <button class="btn icon-btn" onclick="shiftCalendar(-1)">←</button>
+                    <h2 id="calendarTitle" style="margin: 0"></h2>
+                    <button class="btn icon-btn" onclick="shiftCalendar(1)">→</button>
+                  </div>
+                  <div id="calendarGrid" class="calendar-grid" style="margin-top: 12px"></div>
+                </div>
+                <div class="card">
+                  <div class="calendar-title-row">
+                    <h3 id="selectedDateTitle">Termine</h3>
+                    <button class="btn" onclick="openCalendarEvent(selectedCalendarDate)">+</button>
+                  </div>
+                  <div id="selectedDateEvents" class="event-list"></div>
+                </div>
+              </div>
+            </section>
+
+            <section id="reminders" class="page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">CPRB Smart Reminders</div>
+                  <h1>Erinnerungen</h1>
+                  <div class="sub">
+                    CPRB meldet sich zur richtigen Zeit – du entscheidest wann und wofür.
+                  </div>
+                </div>
+              </div>
+              <div id="reminderSetupNotice" class="task-setup-notice hide">
+                Die Habits-&-Reminders-Datenbank muss noch in Supabase eingerichtet werden.
+              </div>
+              <section class="card notification-status-card">
+                <div class="notification-status-icon">🔔</div>
+                <div>
+                  <div class="eyebrow">Dieses Gerät</div>
+                  <div class="notification-status-title">
+                    <h2>Push-Benachrichtigungen</h2>
+                    <span id="notificationStatus" class="notification-state">Nicht aktiviert</span>
+                  </div>
+                  <p id="notificationStatusCopy" class="sub">Status wird geprüft…</p>
+                </div>
+                <div class="notification-status-actions">
+                  <button
+                    id="enableNotificationsBtn"
+                    class="btn primary"
+                    type="button"
+                    onclick="enableSmartNotifications()"
+                  >
+                    Push aktivieren</button
+                  ><button
+                    id="disableNotificationsBtn"
+                    class="btn hide"
+                    type="button"
+                    onclick="disableSmartNotifications()"
+                  >
+                    Deaktivieren</button
+                  ><button
+                    id="testNotificationBtn"
+                    class="btn"
+                    type="button"
+                    onclick="testSmartNotification()"
+                  >
+                    Test senden
+                  </button>
+                </div>
+              </section>
+              <form id="reminderForm">
+                <div class="reminder-grid">
+                  <article class="card reminder-card">
+                    <div class="reminder-card-head">
+                      <div>
+                        <span class="reminder-icon">✓</span>
+                        <div>
+                          <h2>Tagesplanung</h2>
+                          <p>Starte mit Aufgaben und einer klaren Top-Priorität.</p>
+                        </div>
+                      </div>
+                      <label class="reminder-switch"
+                        ><input id="dailyFocusReminderEnabled" type="checkbox" /><span></span
+                      ></label>
+                    </div>
+                    <label
+                      >Uhrzeit<input id="dailyFocusReminderTime" type="time" value="08:00"
+                    /></label>
+                  </article>
+                  <article class="card reminder-card">
+                    <div class="reminder-card-head">
+                      <div>
+                        <span class="reminder-icon">📈</span>
+                        <div>
+                          <h2>Trading</h2>
+                          <p>Plan und Regeln vor der Session prüfen.</p>
+                        </div>
+                      </div>
+                      <label class="reminder-switch"
+                        ><input id="tradingReminderEnabled" type="checkbox" /><span></span
+                      ></label>
+                    </div>
+                    <label
+                      >Uhrzeit<input id="tradingReminderTime" type="time" value="08:30"
+                    /></label>
+                  </article>
+                  <article class="card reminder-card">
+                    <div class="reminder-card-head">
+                      <div>
+                        <span class="reminder-icon">💪</span>
+                        <div>
+                          <h2>Fitness</h2>
+                          <p>Trainingstage und Uhrzeit frei wählen.</p>
+                        </div>
+                      </div>
+                      <label class="reminder-switch"
+                        ><input id="fitnessReminderEnabled" type="checkbox" /><span></span
+                      ></label>
+                    </div>
+                    <label
+                      >Uhrzeit<input id="fitnessReminderTime" type="time" value="17:30"
+                    /></label>
+                    <div class="fitness-reminder-days" aria-label="Trainingstage">
+                      <label
+                        ><input class="fitness-reminder-day" type="checkbox" value="1" /><span
+                          >Mo</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="2" /><span
+                          >Di</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="3" /><span
+                          >Mi</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="4" /><span
+                          >Do</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="5" /><span
+                          >Fr</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="6" /><span
+                          >Sa</span
+                        ></label
+                      ><label
+                        ><input class="fitness-reminder-day" type="checkbox" value="0" /><span
+                          >So</span
+                        ></label
+                      >
+                    </div>
+                  </article>
+                  <article class="card reminder-card">
+                    <div class="reminder-card-head">
+                      <div>
+                        <span class="reminder-icon">↻</span>
+                        <div>
+                          <h2>Weekly Review</h2>
+                          <p>Woche abschließen und die nächste planen.</p>
+                        </div>
+                      </div>
+                      <label class="reminder-switch"
+                        ><input id="weeklyReminderEnabled" type="checkbox" /><span></span
+                      ></label>
+                    </div>
+                    <div class="reminder-inline-fields">
+                      <label
+                        >Tag<select id="weeklyReminderDay">
+                          <option value="0">Sonntag</option>
+                          <option value="1">Montag</option>
+                          <option value="2">Dienstag</option>
+                          <option value="3">Mittwoch</option>
+                          <option value="4">Donnerstag</option>
+                          <option value="5">Freitag</option>
+                          <option value="6">Samstag</option>
+                        </select></label
+                      ><label
+                        >Uhrzeit<input id="weeklyReminderTime" type="time" value="18:00"
+                      /></label>
+                    </div>
+                  </article>
+                  <article class="card reminder-card reminder-quiet-card">
+                    <div class="reminder-card-head">
+                      <div>
+                        <span class="reminder-icon">☾</span>
+                        <div>
+                          <h2>Ruhezeit</h2>
+                          <p>In diesem Zeitraum sendet CPRB keine geplanten Erinnerungen.</p>
+                        </div>
+                      </div>
+                      <span id="reminderTimezone" class="timezone-pill">Europe/Vienna</span>
+                    </div>
+                    <div class="reminder-inline-fields">
+                      <label>Von<input id="quietStart" type="time" value="22:00" /></label
+                      ><label>Bis<input id="quietEnd" type="time" value="07:00" /></label>
+                    </div>
+                  </article>
+                </div>
+                <button id="saveRemindersBtn" class="btn primary reminder-save-btn">
+                  Erinnerungen speichern
+                </button>
+              </form>
+              <section class="card reminder-how-card">
+                <span>🔒</span>
+                <div>
+                  <b>Privat und freiwillig</b>
+                  <p>
+                    Benachrichtigungen werden nur nach deiner ausdrücklichen Freigabe aktiviert.
+                    Jede Erinnerung kann einzeln ausgeschaltet werden.
+                  </p>
+                </div>
+              </section>
+            </section>
+            <section id="account" class="page">
+              <div class="top account-page-top">
+                <div>
+                  <div class="eyebrow">Deine Daten gehören dir</div>
+                  <h1>Konto & Backup</h1>
+                  <div class="sub">
+                    Sichere CPRB unabhängig von Supabase auf deinem eigenen Gerät.
+                  </div>
+                </div>
+                <button class="btn" onclick="logout()">Abmelden</button>
+              </div>
+              <section class="account-grid">
+                <article class="card account-profile-card">
+                  <span class="account-avatar">CP</span>
+                  <div>
+                    <small>Angemeldet als</small><b id="who"></b><em>Persönliches CPRB-Konto</em>
+                  </div>
+                </article>
+                <article id="backupStatusCard" class="card backup-status-card due">
+                  <span id="backupStatusIcon">!</span>
+                  <div>
+                    <small>LETZTE SICHERUNG</small><b id="backupStatusTitle">Noch kein Backup</b
+                    ><em id="backupStatusCopy">Erstelle jetzt deine erste Sicherung.</em>
+                  </div>
+                </article>
+              </section>
+
+              <section class="backup-layout">
+                <article class="card backup-card backup-create-card">
+                  <div class="backup-card-head">
+                    <span>↓</span>
+                    <div>
+                      <div class="eyebrow">Backup erstellen</div>
+                      <h2>Deine CPRB-Sicherung</h2>
+                      <p class="sub">Mit Passwort verschlüsselt und nur von CPRB wieder lesbar.</p>
+                    </div>
+                  </div>
+                  <label
+                    >Backup-Passwort<input
+                      id="backupPassword"
+                      type="password"
+                      minlength="6"
+                      autocomplete="new-password"
+                      placeholder="Mindestens 6 Zeichen"
+                  /></label>
+                  <small class="backup-password-hint"
+                    >Nicht dein Login-Passwort. Gut aufbewahren – ohne dieses Passwort kann das
+                    Backup nicht geöffnet werden.</small
+                  >
+                  <div class="backup-choice-grid">
+                    <button
+                      id="backupDataBtn"
+                      class="backup-choice"
+                      type="button"
+                      onclick="createCprbBackup(false)"
+                    >
+                      <span>⚡</span><b>Daten-Backup</b
+                      ><small
+                        >Trades, Ziele, Training, Aufgaben und Einstellungen. Schnell und
+                        klein.</small
+                      >
+                    </button>
+                    <button
+                      id="backupCompleteBtn"
+                      class="backup-choice recommended"
+                      type="button"
+                      onclick="createCprbBackup(true)"
+                    >
+                      <span>🔒</span><b>Komplettes Backup</b
+                      ><small>Zusätzlich PDFs, Cover und Bilder. Am besten am Windows-Laptop.</small
+                      ><em>EMPFOHLEN</em>
+                    </button>
+                  </div>
+                  <div id="backupProgress" class="backup-progress hide">
+                    <div><span id="backupProgressBar"></span></div>
+                    <small id="backupProgressText">Backup wird vorbereitet…</small>
+                  </div>
+                </article>
+
+                <article class="card backup-card backup-restore-card">
+                  <div class="backup-card-head">
+                    <span>↥</span>
+                    <div>
+                      <div class="eyebrow">Wiederherstellen</div>
+                      <h2>Backup einlesen</h2>
+                      <p class="sub">
+                        Bestehende Einträge bleiben erhalten, gleiche Einträge werden aktualisiert.
+                      </p>
+                    </div>
+                  </div>
+                  <label class="backup-file-zone" for="backupFile"
+                    ><span>📦</span>
+                    <div>
+                      <b id="backupFileName">CPRB-Backup auswählen</b><small>.cprbbackup</small>
+                    </div>
+                    <input
+                      id="backupFile"
+                      type="file"
+                      accept=".cprbbackup,application/octet-stream"
+                      hidden
+                  /></label>
+                  <label
+                    >Backup-Passwort<input
+                      id="restorePassword"
+                      type="password"
+                      minlength="6"
+                      autocomplete="current-password"
+                      placeholder="Passwort der Sicherung"
+                  /></label>
+                  <button
+                    id="restoreBackupBtn"
+                    class="btn primary backup-action-btn"
+                    type="button"
+                    onclick="restoreCprbBackup()"
+                  >
+                    Backup wiederherstellen
+                  </button>
+                  <div id="restoreProgress" class="backup-progress hide">
+                    <div><span id="restoreProgressBar"></span></div>
+                    <small id="restoreProgressText">Backup wird geprüft…</small>
+                  </div>
+                  <small class="backup-safe-note"
+                    >✓ Sichere Zusammenführung: CPRB löscht beim Wiederherstellen keine neueren
+                    Einträge.</small
+                  >
+                </article>
+              </section>
+
+              <section class="card export-card">
+                <div>
+                  <div class="eyebrow">Lesbarer Export</div>
+                  <h2>Einzelne Bereiche exportieren</h2>
+                  <p class="sub">
+                    CSV-Dateien lassen sich direkt in Excel oder Google Tabellen öffnen.
+                  </p>
+                </div>
+                <div class="export-actions">
+                  <select id="exportModule" aria-label="Bereich auswählen">
+                    <option value="trading">Trading</option>
+                    <option value="fitness">Fitness</option>
+                    <option value="focus">To-dos & Tagesplanung</option>
+                    <option value="goals">Ziele</option></select
+                  ><button id="exportCsvBtn" class="btn" type="button" onclick="exportCprbCsv()">
+                    CSV herunterladen
+                  </button>
+                </div>
+              </section>
+            </section>
+          </div>
+          <aside class="right-rail">
+            <div class="module-card" onclick="showPage('weekly')">
+              <div class="icon">↻</div>
+              <b>Weekly Review</b><span>Woche analysieren und planen</span>
+            </div>
+            <div class="module-card" onclick="showPage('fitness')">
+              <div class="icon">💪</div>
+              <b>Fitness</b><span>Übungen und Trainingsplan</span>
+            </div>
+            <div class="module-card" onclick="showPage('notes')">
+              <div class="icon">📝</div>
+              <b>Notizen</b><span>Gedanken und Screenshots</span>
+            </div>
+            <div class="module-card" onclick="showPage('library')">
+              <div class="icon">📖</div>
+              <b>Bibliothek</b><span>PDFs lesen und fortsetzen</span>
+            </div>
+            <div class="module-card" onclick="showPage('academy')">
+              <div class="icon">📚</div>
+              <b>Academy</b><span>MSS, FVG, SMT und mehr</span>
+            </div>
+            <div class="module-card" onclick="showPage('calendar')">
+              <div class="icon">📅</div>
+              <b>Kalender</b><span>Termine und Routinen</span>
+            </div>
+          </aside>
+        </div>
+      </main>
+      <nav class="mobile-nav" aria-label="Mobile Hauptnavigation">
+        <button class="mobile-nav-btn active" data-page="home">
+          <span>⌂</span><small>Home</small></button
+        ><button class="mobile-nav-btn" data-page="trading">
+          <span>↗</span><small>Trading</small></button
+        ><button class="mobile-nav-btn" data-page="tasks">
+          <span>✓</span><small>To-dos</small></button
+        ><button class="mobile-nav-btn" data-page="fitness">
+          <span>💪</span><small>Fitness</small></button
+        ><button
+          id="mobileMoreButton"
+          class="mobile-nav-btn"
+          type="button"
+          onclick="openMobileMore()"
+        >
+          <span>•••</span><small>Mehr</small>
+        </button>
+      </nav>
+      <div id="mobileMoreSheet" class="mobile-sheet-backdrop" onclick="closeMobileMore()">
+        <section
+          class="mobile-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobileMoreTitle"
+          onclick="event.stopPropagation()"
+        >
+          <div class="mobile-sheet-handle"></div>
+          <div class="mobile-sheet-title">
+            <div>
+              <div class="eyebrow">CPRB OS</div>
+              <h2 id="mobileMoreTitle">Mehr</h2>
+            </div>
+            <button class="btn" type="button" onclick="closeMobileMore()">✕</button>
+          </div>
+          <div class="mobile-more-grid">
+            <button data-page="reminders">
+              <span>🔔</span><b>Erinnerungen</b><small>Push & Routinen</small></button
+            ><button data-page="weekly">
+              <span>↻</span><b>Weekly Review</b><small>Woche abschließen</small></button
+            ><button data-page="goals">
+              <span>🎯</span><b>Goals</b><small>Vision & Ziele</small></button
+            ><button data-page="library">
+              <span>📖</span><b>Bibliothek</b><small>PDFs & Fortschritt</small></button
+            ><button data-page="notes">
+              <span>📝</span><b>Notizen</b><small>Gedanken sammeln</small></button
+            ><button data-page="academy">
+              <span>📚</span><b>Academy</b><small>Trading lernen</small></button
+            ><button data-page="calendar">
+              <span>📅</span><b>Kalender</b><small>Termine planen</small></button
+            ><button data-page="account">
+              <span>⚙</span><b>Konto</b><small>Einstellungen</small>
+            </button>
+          </div>
+        </section>
       </div>
-      <div id="backupProgress" class="backup-progress hide"><div><span id="backupProgressBar"></span></div><small id="backupProgressText">Backup wird vorbereitet…</small></div>
-    </article>
-
-    <article class="card backup-card backup-restore-card">
-      <div class="backup-card-head"><span>↥</span><div><div class="eyebrow">Wiederherstellen</div><h2>Backup einlesen</h2><p class="sub">Bestehende Einträge bleiben erhalten, gleiche Einträge werden aktualisiert.</p></div></div>
-      <label class="backup-file-zone" for="backupFile"><span>📦</span><div><b id="backupFileName">CPRB-Backup auswählen</b><small>.cprbbackup</small></div><input id="backupFile" type="file" accept=".cprbbackup,application/octet-stream" hidden></label>
-      <label>Backup-Passwort<input id="restorePassword" type="password" minlength="6" autocomplete="current-password" placeholder="Passwort der Sicherung"></label>
-      <button id="restoreBackupBtn" class="btn primary backup-action-btn" type="button" onclick="restoreCprbBackup()">Backup wiederherstellen</button>
-      <div id="restoreProgress" class="backup-progress hide"><div><span id="restoreProgressBar"></span></div><small id="restoreProgressText">Backup wird geprüft…</small></div>
-      <small class="backup-safe-note">✓ Sichere Zusammenführung: CPRB löscht beim Wiederherstellen keine neueren Einträge.</small>
-    </article>
-  </section>
-
-  <section class="card export-card">
-    <div><div class="eyebrow">Lesbarer Export</div><h2>Einzelne Bereiche exportieren</h2><p class="sub">CSV-Dateien lassen sich direkt in Excel oder Google Tabellen öffnen.</p></div>
-    <div class="export-actions"><select id="exportModule" aria-label="Bereich auswählen"><option value="trading">Trading</option><option value="fitness">Fitness</option><option value="focus">To-dos & Tagesplanung</option><option value="goals">Ziele</option></select><button id="exportCsvBtn" class="btn" type="button" onclick="exportCprbCsv()">CSV herunterladen</button></div>
-  </section>
-</section></div>
-<aside class="right-rail">
-  <div class="module-card" onclick="showPage('weekly')"><div class="icon">↻</div><b>Weekly Review</b><span>Woche analysieren und planen</span></div>
-  <div class="module-card" onclick="showPage('fitness')"><div class="icon">💪</div><b>Fitness</b><span>Übungen und Trainingsplan</span></div>
-  <div class="module-card" onclick="showPage('notes')"><div class="icon">📝</div><b>Notizen</b><span>Gedanken und Screenshots</span></div>
-  <div class="module-card" onclick="showPage('library')"><div class="icon">📖</div><b>Bibliothek</b><span>PDFs lesen und fortsetzen</span></div>
-  <div class="module-card" onclick="showPage('academy')"><div class="icon">📚</div><b>Academy</b><span>MSS, FVG, SMT und mehr</span></div>
-  <div class="module-card" onclick="showPage('calendar')"><div class="icon">📅</div><b>Kalender</b><span>Termine und Routinen</span></div>
-</aside>
-</div></main><nav class="mobile-nav" aria-label="Mobile Hauptnavigation"><button class="mobile-nav-btn active" data-page="home"><span>⌂</span><small>Home</small></button><button class="mobile-nav-btn" data-page="trading"><span>↗</span><small>Trading</small></button><button class="mobile-nav-btn" data-page="tasks"><span>✓</span><small>To-dos</small></button><button class="mobile-nav-btn" data-page="fitness"><span>💪</span><small>Fitness</small></button><button id="mobileMoreButton" class="mobile-nav-btn" type="button" onclick="openMobileMore()"><span>•••</span><small>Mehr</small></button></nav><div id="mobileMoreSheet" class="mobile-sheet-backdrop" onclick="closeMobileMore()"><section class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">CPRB OS</div><h2 id="mobileMoreTitle">Mehr</h2></div><button class="btn" type="button" onclick="closeMobileMore()">✕</button></div><div class="mobile-more-grid"><button data-page="reminders"><span>🔔</span><b>Erinnerungen</b><small>Push & Routinen</small></button><button data-page="weekly"><span>↻</span><b>Weekly Review</b><small>Woche abschließen</small></button><button data-page="goals"><span>🎯</span><b>Goals</b><small>Vision & Ziele</small></button><button data-page="library"><span>📖</span><b>Bibliothek</b><small>PDFs & Fortschritt</small></button><button data-page="notes"><span>📝</span><b>Notizen</b><small>Gedanken sammeln</small></button><button data-page="academy"><span>📚</span><b>Academy</b><small>Trading lernen</small></button><button data-page="calendar"><span>📅</span><b>Kalender</b><small>Termine planen</small></button><button data-page="account"><span>⚙</span><b>Konto</b><small>Einstellungen</small></button></div></section></div><div id="installGuide" class="mobile-sheet-backdrop" onclick="closeInstallGuide()"><section class="mobile-sheet install-sheet" role="dialog" aria-modal="true" aria-labelledby="installGuideTitle" onclick="event.stopPropagation()"><div class="mobile-sheet-handle"></div><div class="mobile-sheet-title"><div><div class="eyebrow">iPhone Installation</div><h2 id="installGuideTitle">CPRB als App nutzen</h2></div><button class="btn" type="button" onclick="closeInstallGuide()">✕</button></div><ol class="install-steps"><li><span>1</span><div><b>In Safari öffnen</b><small>Die Installation funktioniert direkt im Safari-Browser.</small></div></li><li><span>2</span><div><b>Teilen antippen</b><small>Unten auf das Teilen-Symbol drücken.</small></div></li><li><span>3</span><div><b>Zum Home-Bildschirm</b><small>Auswählen und mit „Hinzufügen“ bestätigen.</small></div></li></ol><button class="btn primary install-done-btn" type="button" onclick="closeInstallGuide()">Verstanden</button></section></div></div>
-
-<div id="tradeModal" class="modal">
-<form id="tradeForm" class="card trade-form-card">
-  <div class="top"><div><div class="eyebrow">CPRB PRE-TRADE SYSTEM</div><h2 id="tradeModalTitle">Trade planen</h2><div class="sub">Erst freigeben, dann ausführen, danach ehrlich reviewen.</div></div><button type="button" class="btn" onclick="closeTrade()">✕</button></div>
-
-  <div class="grid form-grid trade-basic-fields">
-    <div><label>Datum</label><input id="tDate" type="date" required></div>
-    <div><label>Markt</label><input id="tMarket" required maxlength="20" placeholder="XAUUSD"></div>
-    <div><label>Richtung</label><select id="tDirection"><option>Long</option><option>Short</option></select></div>
-    <div><label>Session</label><select id="tSession"><option>London</option><option>New York</option><option>Asia</option><option>Andere</option></select></div>
-    <div><label>Setup</label><input id="tSetup" maxlength="100" placeholder="SMT + MSS + FVG"></div>
-    <div><label>Setup-Tags</label><input id="tTags" maxlength="200" placeholder="SMT, MSS, FVG"></div>
-  </div>
-
-  <section class="trade-planner">
-    <div class="trade-planner-head"><div><div class="eyebrow">RISIKO-RECHNER</div><h3>Position vor dem Klick planen</h3></div><div id="tradeGate" class="trade-gate blocked"><span></span><div><b id="tradeGateTitle">Trade noch nicht freigegeben</b><small id="tradeGateCopy">Checkliste und Risikodaten vervollständigen.</small></div></div></div>
-    <div class="trade-risk-fields">
-      <label>Kontostand USD<input id="tAccountBalance" type="number" min="0" step=".01" required></label>
-      <label>Risiko %<input id="tRiskPercent" type="number" min=".01" max="5" step=".01" required></label>
-      <label>Kontraktwert<input id="tContractValue" type="number" min=".000001" step="any" required></label>
-      <label>Entry<input id="tEntry" type="number" step="any" required></label>
-      <label>Stop Loss<input id="tStop" type="number" step="any" required></label>
-      <label>Take Profit<input id="tTp" type="number" step="any"></label>
-      <label>Risiko USD<input id="tRisk" type="number" readonly></label>
-      <label>Positionsgröße<input id="tPositionSize" type="number" readonly></label>
-    </div>
-    <div class="trade-risk-output">
-      <div><small>Risikobetrag</small><b id="tradeRiskAmount">$0.00</b></div>
-      <div><small>Stop-Distanz</small><b id="tradeStopDistance">–</b></div>
-      <div><small>Einheiten / Lots</small><b id="tradePositionSize">–</b></div>
-      <div><small>Geplantes CRV</small><b id="tradePlannedR">–</b></div>
-    </div>
-  </section>
-
-  <section class="trade-checklist-section">
-    <div class="trade-checklist-head"><div><div class="eyebrow">60-SEKUNDEN-CHECK</div><h3>A-Setup bestätigen</h3></div><strong id="tRuleScore">0%</strong></div>
-    <div class="trade-checklist-progress"><span id="tradeChecklistProgress"></span></div>
-    <div class="trade-checklist-grid">
-      <label><input class="trade-precheck" data-trade-check="scenario" type="checkbox"><span>1</span><div><b>Szenario definiert</b><small>Long oder Short wurde vor der Session geplant.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="liquidity" type="checkbox"><span>2</span><div><b>Ziel-Liquidität klar</b><small>Das logische Ziel der Bewegung ist markiert.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="sweep" type="checkbox"><span>3</span><div><b>Sweep / SMT</b><small>Liquiditätsereignis oder sinnvolle Divergenz bestätigt.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="structure" type="checkbox"><span>4</span><div><b>MSS + Displacement</b><small>Der Strukturwechsel ist klar und nicht nur vermutet.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="entry_zone" type="checkbox"><span>5</span><div><b>Geplante Entry-Zone</b><small>Kein Hinterherspringen mitten in der Bewegung.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="news" type="checkbox"><span>6</span><div><b>News geprüft</b><small>Zeitfenster und wichtige Nachrichten passen.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="invalidation" type="checkbox"><span>7</span><div><b>Stop ist logisch</b><small>Die Invalidierung macht die Idee objektiv falsch.</small></div></label>
-      <label><input class="trade-precheck" data-trade-check="emotion" type="checkbox"><span>8</span><div><b>Emotional neutral</b><small>Ein voller Verlust kann ruhig akzeptiert werden.</small></div></label>
-    </div>
-  </section>
-
-  <section class="trade-review-form">
-    <div><div class="eyebrow">NACH DEM TRADE</div><h3>Ergebnis und Ausführung</h3><p class="sub">Für einen offenen Trade-Plan können P&L und Review zunächst leer bleiben.</p></div>
-    <div class="grid form-grid">
-      <div><label>P&L USD</label><input id="tPnl" type="number" step=".01" placeholder="Leer = Trade noch offen"></div>
-      <div><label>R-Multiple</label><input id="tR" type="number" step=".01"></div>
-      <div><label>Ergebnis</label><select id="tResult"><option value="auto">Automatisch / offen</option><option value="win">Win</option><option value="loss">Loss</option><option value="breakeven">Break-even</option><option value="open">Offen</option></select></div>
-      <div><label>Emotion vorher</label><select id="tEmotion"><option>Ruhig</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
-      <div><label>Emotion danach</label><select id="tEmotionAfter"><option>Ruhig</option><option>Erleichtert</option><option>Unsicher</option><option>FOMO</option><option>Gierig</option><option>Frustriert</option></select></div>
-      <div class="trade-rule-field"><label>Regelcheck danach</label><label class="trade-rule-toggle"><input id="tFollowedPlan" type="checkbox"><span></span>Plan wirklich eingehalten</label></div>
-      <div class="full trade-execution-score"><div><label>Qualität der Ausführung</label><small>Bewerte deinen Prozess, nicht nur das Ergebnis.</small></div><input id="tExecutionScore" type="range" min="1" max="10" value="7"><strong id="tExecutionScoreValue">7/10</strong></div>
-      <div class="full trade-image-grid">
-        <div><label>Chart vorher</label><div class="trade-image-picker" onclick="document.getElementById('tBeforeImage').click()"><img id="tBeforePreview" class="hide" alt="Chart vor dem Trade"><span id="tBeforeLabel">Vorher-Screenshot auswählen</span><input id="tBeforeImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
-        <div><label>Chart nachher</label><div class="trade-image-picker" onclick="document.getElementById('tAfterImage').click()"><img id="tAfterPreview" class="hide" alt="Chart nach dem Trade"><span id="tAfterLabel">Nachher-Screenshot auswählen</span><input id="tAfterImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
+      <div id="installGuide" class="mobile-sheet-backdrop" onclick="closeInstallGuide()">
+        <section
+          class="mobile-sheet install-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="installGuideTitle"
+          onclick="event.stopPropagation()"
+        >
+          <div class="mobile-sheet-handle"></div>
+          <div class="mobile-sheet-title">
+            <div>
+              <div class="eyebrow">iPhone Installation</div>
+              <h2 id="installGuideTitle">CPRB als App nutzen</h2>
+            </div>
+            <button class="btn" type="button" onclick="closeInstallGuide()">✕</button>
+          </div>
+          <ol class="install-steps">
+            <li>
+              <span>1</span>
+              <div>
+                <b>In Safari öffnen</b
+                ><small>Die Installation funktioniert direkt im Safari-Browser.</small>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div><b>Teilen antippen</b><small>Unten auf das Teilen-Symbol drücken.</small></div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <b>Zum Home-Bildschirm</b><small>Auswählen und mit „Hinzufügen“ bestätigen.</small>
+              </div>
+            </li>
+          </ol>
+          <button class="btn primary install-done-btn" type="button" onclick="closeInstallGuide()">
+            Verstanden
+          </button>
+        </section>
       </div>
-      <div class="full"><label>Trade-Notizen</label><textarea id="tNotes" placeholder="Was war der Plan?"></textarea></div>
-      <div class="full"><label>Fehler</label><textarea id="tMistakes" placeholder="Was habe ich falsch oder unklar gemacht?"></textarea></div>
-      <div class="full"><label>Learning</label><textarea id="tLearning" placeholder="Was mache ich beim nächsten Mal konkret besser?"></textarea></div>
-      <div class="full trade-submit-row"><small id="tradeSubmitHint">CPRB prüft gerade deinen Plan.</small><button id="tradeSubmitLabel" class="btn primary">Trade-Plan speichern</button></div>
     </div>
-  </section>
-</form>
-</div>
 
-<div id="tradeDetailModal" class="modal">
-  <div class="card trade-detail-card">
-    <div class="top"><div><div class="eyebrow">Trade Review</div><h2 id="tradeDetailTitle">Trade</h2></div><button class="btn" onclick="closeTradeDetail()">✕</button></div>
-    <div id="tradeDetailContent"></div>
-  </div>
-</div>
+    <div id="tradeModal" class="modal">
+      <form id="tradeForm" class="card trade-form-card">
+        <div class="top">
+          <div>
+            <div class="eyebrow">CPRB PRE-TRADE SYSTEM</div>
+            <h2 id="tradeModalTitle">Trade planen</h2>
+            <div class="sub">Erst freigeben, dann ausführen, danach ehrlich reviewen.</div>
+          </div>
+          <button type="button" class="btn" onclick="closeTrade()">✕</button>
+        </div>
 
-<div id="goalModal" class="modal"><form id="goalForm" class="card"><div class="top"><h2>Neues Ziel</h2><button type="button" class="btn" onclick="closeGoal()">✕</button></div><div class="grid form-grid"><div><label>Titel</label><input id="gTitle" required></div><div><label>Typ</label><select id="gType"><option value="short">Short-Term</option><option value="long">Long-Term</option></select></div><div><label>Kategorie</label><input id="gCategory"></div><div><label>Zieldatum</label><input id="gDate" type="date"></div><div class="full"><label>Warum?</label><textarea id="gWhy"></textarea></div><div class="full"><label>Nächster Schritt</label><input id="gNext"></div><div><label>Aktuell</label><input id="gCurrent" type="number" value="0"></div><div><label>Zielwert</label><input id="gTarget" type="number" value="100"></div><div class="full"><label>Bild</label><input id="gImage" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="full"><button class="btn primary">Ziel speichern</button></div></div></form></div>
+        <div class="grid form-grid trade-basic-fields">
+          <div><label>Datum</label><input id="tDate" type="date" required /></div>
+          <div>
+            <label>Markt</label><input id="tMarket" required maxlength="20" placeholder="XAUUSD" />
+          </div>
+          <div>
+            <label>Richtung</label
+            ><select id="tDirection">
+              <option>Long</option>
+              <option>Short</option>
+            </select>
+          </div>
+          <div>
+            <label>Session</label
+            ><select id="tSession">
+              <option>London</option>
+              <option>New York</option>
+              <option>Asia</option>
+              <option>Andere</option>
+            </select>
+          </div>
+          <div>
+            <label>Setup</label><input id="tSetup" maxlength="100" placeholder="SMT + MSS + FVG" />
+          </div>
+          <div>
+            <label>Setup-Tags</label
+            ><input id="tTags" maxlength="200" placeholder="SMT, MSS, FVG" />
+          </div>
+        </div>
 
+        <section class="trade-planner">
+          <div class="trade-planner-head">
+            <div>
+              <div class="eyebrow">RISIKO-RECHNER</div>
+              <h3>Position vor dem Klick planen</h3>
+            </div>
+            <div id="tradeGate" class="trade-gate blocked">
+              <span></span>
+              <div>
+                <b id="tradeGateTitle">Trade noch nicht freigegeben</b
+                ><small id="tradeGateCopy">Checkliste und Risikodaten vervollständigen.</small>
+              </div>
+            </div>
+          </div>
+          <div class="trade-risk-fields">
+            <label
+              >Kontostand USD<input id="tAccountBalance" type="number" min="0" step=".01" required
+            /></label>
+            <label
+              >Risiko %<input id="tRiskPercent" type="number" min=".01" max="5" step=".01" required
+            /></label>
+            <label
+              >Kontraktwert<input
+                id="tContractValue"
+                type="number"
+                min=".000001"
+                step="any"
+                required
+            /></label>
+            <label>Entry<input id="tEntry" type="number" step="any" required /></label>
+            <label>Stop Loss<input id="tStop" type="number" step="any" required /></label>
+            <label>Take Profit<input id="tTp" type="number" step="any" /></label>
+            <label>Risiko USD<input id="tRisk" type="number" readonly /></label>
+            <label>Positionsgröße<input id="tPositionSize" type="number" readonly /></label>
+          </div>
+          <div class="trade-risk-output">
+            <div><small>Risikobetrag</small><b id="tradeRiskAmount">$0.00</b></div>
+            <div><small>Stop-Distanz</small><b id="tradeStopDistance">–</b></div>
+            <div><small>Einheiten / Lots</small><b id="tradePositionSize">–</b></div>
+            <div><small>Geplantes CRV</small><b id="tradePlannedR">–</b></div>
+          </div>
+        </section>
 
-<div id="exerciseModal" class="modal">
-<form id="exerciseForm" class="card">
-  <div class="top"><div><h2>Übung hinzufügen</h2><div class="sub">Ordne die Übung direkt Training A oder B zu.</div></div><button type="button" class="btn" onclick="closeExercise()">✕</button></div>
-  <div class="grid form-grid">
-    <div><label>Trainingsplan</label><select id="exPlan" required></select></div>
-    <div><label>Übung</label><input id="exName" required maxlength="100" placeholder="Bankdrücken"></div>
-    <div><label>Muskelgruppe</label><input id="exMuscle" maxlength="60" placeholder="Brust"></div>
-    <div><label>Ziel-Sätze</label><input id="exSets" type="number" min="1" max="20" value="3"></div>
-    <div><label>Ziel-Wiederholungen</label><input id="exReps" type="number" min="1" max="100" value="10"></div>
-    <div><label>Startgewicht kg</label><input id="exWeight" type="number" min="0" step=".5" value="0"></div>
-    <div class="full"><button class="btn primary">Übung speichern</button></div>
-  </div>
-</form>
-</div>
+        <section class="trade-checklist-section">
+          <div class="trade-checklist-head">
+            <div>
+              <div class="eyebrow">60-SEKUNDEN-CHECK</div>
+              <h3>A-Setup bestätigen</h3>
+            </div>
+            <strong id="tRuleScore">0%</strong>
+          </div>
+          <div class="trade-checklist-progress"><span id="tradeChecklistProgress"></span></div>
+          <div class="trade-checklist-grid">
+            <label
+              ><input class="trade-precheck" data-trade-check="scenario" type="checkbox" /><span
+                >1</span
+              >
+              <div>
+                <b>Szenario definiert</b
+                ><small>Long oder Short wurde vor der Session geplant.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="liquidity" type="checkbox" /><span
+                >2</span
+              >
+              <div>
+                <b>Ziel-Liquidität klar</b
+                ><small>Das logische Ziel der Bewegung ist markiert.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="sweep" type="checkbox" /><span
+                >3</span
+              >
+              <div>
+                <b>Sweep / SMT</b
+                ><small>Liquiditätsereignis oder sinnvolle Divergenz bestätigt.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="structure" type="checkbox" /><span
+                >4</span
+              >
+              <div>
+                <b>MSS + Displacement</b
+                ><small>Der Strukturwechsel ist klar und nicht nur vermutet.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="entry_zone" type="checkbox" /><span
+                >5</span
+              >
+              <div>
+                <b>Geplante Entry-Zone</b
+                ><small>Kein Hinterherspringen mitten in der Bewegung.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="news" type="checkbox" /><span
+                >6</span
+              >
+              <div>
+                <b>News geprüft</b><small>Zeitfenster und wichtige Nachrichten passen.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="invalidation" type="checkbox" /><span
+                >7</span
+              >
+              <div>
+                <b>Stop ist logisch</b
+                ><small>Die Invalidierung macht die Idee objektiv falsch.</small>
+              </div></label
+            >
+            <label
+              ><input class="trade-precheck" data-trade-check="emotion" type="checkbox" /><span
+                >8</span
+              >
+              <div>
+                <b>Emotional neutral</b
+                ><small>Ein voller Verlust kann ruhig akzeptiert werden.</small>
+              </div></label
+            >
+          </div>
+        </section>
 
-<div id="fitnessProgressModal" class="modal">
-  <div class="card fitness-progress-modal">
-    <div class="top"><div><div class="eyebrow">Satzgenauer Verlauf</div><h2 id="fitnessProgressTitle">Übung</h2></div><button type="button" class="btn" onclick="closeFitnessProgress()">✕</button></div>
-    <div id="fitnessProgressContent" class="fitness-progress-content"></div>
-  </div>
-</div>
-
-<div id="noteModal" class="modal">
-<form id="noteForm" class="card">
-  <div class="top"><h2>Notiz erstellen</h2><button type="button" class="btn" onclick="closeNote()">✕</button></div>
-  <div class="grid form-grid">
-    <div><label>Titel</label><input id="nTitle" required></div>
-    <div><label>Kategorie</label><select id="nCategory"><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Allgemein</option></select></div>
-    <div class="full"><label>Inhalt</label><textarea id="nContent"></textarea></div>
-    <div class="full"><button class="btn primary">Speichern</button></div>
-  </div>
-</form>
-</div>
-
-<div id="pencilNoteModal" class="modal pencil-modal">
-  <section class="card pencil-editor-card" role="dialog" aria-modal="true" aria-labelledby="pencilEditorHeading">
-    <header class="pencil-editor-header">
-      <div><div class="eyebrow">Apple Pencil</div><h2 id="pencilEditorHeading">Neue Pencil-Notiz</h2></div>
-      <div class="actions"><button id="savePencilNoteBtn" class="btn primary" type="button" onclick="savePencilNote()">Pencil-Notiz speichern</button><button class="btn" type="button" onclick="closePencilNote()">✕</button></div>
-    </header>
-    <div class="pencil-editor-meta">
-      <label>Titel<input id="pencilTitle" maxlength="180" placeholder="Meine handschriftliche Notiz"></label>
-      <label>Kategorie<select id="pencilCategory"><option>Allgemein</option><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Privat</option></select></label>
-      <label>Papier<select id="pencilPaper"><option value="lined">Liniert</option><option value="grid">Kariert</option><option value="dotted">Gepunktet</option><option value="blank">Blanko</option></select></label>
+        <section class="trade-review-form">
+          <div>
+            <div class="eyebrow">NACH DEM TRADE</div>
+            <h3>Ergebnis und Ausführung</h3>
+            <p class="sub">
+              Für einen offenen Trade-Plan können P&L und Review zunächst leer bleiben.
+            </p>
+          </div>
+          <div class="grid form-grid">
+            <div>
+              <label>P&L USD</label
+              ><input id="tPnl" type="number" step=".01" placeholder="Leer = Trade noch offen" />
+            </div>
+            <div><label>R-Multiple</label><input id="tR" type="number" step=".01" /></div>
+            <div>
+              <label>Ergebnis</label
+              ><select id="tResult">
+                <option value="auto">Automatisch / offen</option>
+                <option value="win">Win</option>
+                <option value="loss">Loss</option>
+                <option value="breakeven">Break-even</option>
+                <option value="open">Offen</option>
+              </select>
+            </div>
+            <div>
+              <label>Emotion vorher</label
+              ><select id="tEmotion">
+                <option>Ruhig</option>
+                <option>Unsicher</option>
+                <option>FOMO</option>
+                <option>Gierig</option>
+                <option>Frustriert</option>
+              </select>
+            </div>
+            <div>
+              <label>Emotion danach</label
+              ><select id="tEmotionAfter">
+                <option>Ruhig</option>
+                <option>Erleichtert</option>
+                <option>Unsicher</option>
+                <option>FOMO</option>
+                <option>Gierig</option>
+                <option>Frustriert</option>
+              </select>
+            </div>
+            <div class="trade-rule-field">
+              <label>Regelcheck danach</label
+              ><label class="trade-rule-toggle"
+                ><input id="tFollowedPlan" type="checkbox" /><span></span>Plan wirklich
+                eingehalten</label
+              >
+            </div>
+            <div class="full trade-execution-score">
+              <div>
+                <label>Qualität der Ausführung</label
+                ><small>Bewerte deinen Prozess, nicht nur das Ergebnis.</small>
+              </div>
+              <input id="tExecutionScore" type="range" min="1" max="10" value="7" /><strong
+                id="tExecutionScoreValue"
+                >7/10</strong
+              >
+            </div>
+            <div class="full trade-image-grid">
+              <div>
+                <label>Chart vorher</label>
+                <div
+                  class="trade-image-picker"
+                  onclick="document.getElementById('tBeforeImage').click()"
+                >
+                  <img id="tBeforePreview" class="hide" alt="Chart vor dem Trade" /><span
+                    id="tBeforeLabel"
+                    >Vorher-Screenshot auswählen</span
+                  ><input
+                    id="tBeforeImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    hidden
+                  />
+                </div>
+              </div>
+              <div>
+                <label>Chart nachher</label>
+                <div
+                  class="trade-image-picker"
+                  onclick="document.getElementById('tAfterImage').click()"
+                >
+                  <img id="tAfterPreview" class="hide" alt="Chart nach dem Trade" /><span
+                    id="tAfterLabel"
+                    >Nachher-Screenshot auswählen</span
+                  ><input
+                    id="tAfterImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    hidden
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="full">
+              <label>Trade-Notizen</label
+              ><textarea id="tNotes" placeholder="Was war der Plan?"></textarea>
+            </div>
+            <div class="full">
+              <label>Fehler</label
+              ><textarea
+                id="tMistakes"
+                placeholder="Was habe ich falsch oder unklar gemacht?"
+              ></textarea>
+            </div>
+            <div class="full">
+              <label>Learning</label
+              ><textarea
+                id="tLearning"
+                placeholder="Was mache ich beim nächsten Mal konkret besser?"
+              ></textarea>
+            </div>
+            <div class="full trade-submit-row">
+              <small id="tradeSubmitHint">CPRB prüft gerade deinen Plan.</small
+              ><button id="tradeSubmitLabel" class="btn primary">Trade-Plan speichern</button>
+            </div>
+          </div>
+        </section>
+      </form>
     </div>
-    <div class="pencil-toolbar" aria-label="Pencil-Werkzeuge">
-      <div class="pencil-tool-group"><button class="pencil-tool active" data-tool="pen" type="button" onclick="setPencilTool('pen')">✎ Stift</button><button class="pencil-tool" data-tool="eraser" type="button" onclick="setPencilTool('eraser')">▱ Radierer</button></div>
-      <div class="pencil-colors" aria-label="Stiftfarbe"><button class="pencil-color active" data-color="#162033" style="--pencil-color:#162033" type="button" onclick="setPencilColor('#162033')" aria-label="Schwarz"></button><button class="pencil-color" data-color="#1769d2" style="--pencil-color:#1769d2" type="button" onclick="setPencilColor('#1769d2')" aria-label="Blau"></button><button class="pencil-color" data-color="#d9364f" style="--pencil-color:#d9364f" type="button" onclick="setPencilColor('#d9364f')" aria-label="Rot"></button><button class="pencil-color" data-color="#16865b" style="--pencil-color:#16865b" type="button" onclick="setPencilColor('#16865b')" aria-label="Grün"></button></div>
-      <label class="pencil-size-control"><span>Stärke <b id="pencilSizeLabel">5 px</b></span><input id="pencilSize" type="range" min="2" max="14" value="5"></label>
-      <div class="pencil-history"><button id="pencilUndoBtn" class="btn" type="button" onclick="undoPencilStroke()" aria-label="Rückgängig">↶</button><button id="pencilRedoBtn" class="btn" type="button" onclick="redoPencilStroke()" aria-label="Wiederholen">↷</button><button class="btn danger" type="button" onclick="clearPencilSheet()">Leeren</button></div>
+
+    <div id="tradeDetailModal" class="modal">
+      <div class="card trade-detail-card">
+        <div class="top">
+          <div>
+            <div class="eyebrow">Trade Review</div>
+            <h2 id="tradeDetailTitle">Trade</h2>
+          </div>
+          <button class="btn" onclick="closeTradeDetail()">✕</button>
+        </div>
+        <div id="tradeDetailContent"></div>
+      </div>
     </div>
-    <div class="pencil-hint"><span> Pencil</span><small>Druckstärke wird automatisch erkannt. Mit dem Finger kannst du über das Blatt scrollen.</small></div>
-    <main class="pencil-stage"><canvas id="pencilCanvas" width="1200" height="1697" aria-label="Handschriftliche Zeichenfläche"></canvas></main>
-  </section>
-</div>
 
-
-<div id="libraryBookModal" class="modal">
-  <form id="libraryBookForm" class="card library-upload-card">
-    <div class="top"><div><div class="eyebrow">Private PDF-Bibliothek</div><h2>Buch hinzufügen</h2><div class="sub">CPRB erstellt automatisch ein Cover und erkennt die Seitenzahl.</div></div><button type="button" class="btn" onclick="closeLibraryUpload()">✕</button></div>
-    <label class="library-upload-zone" for="bookPdf">
-      <span>📄</span><div><b id="bookFileName">PDF auswählen</b><small>Bis 50 MB · Upload kann bei Unterbrechungen fortgesetzt werden</small></div>
-      <input id="bookPdf" type="file" accept="application/pdf,.pdf" required hidden>
-    </label>
-    <div class="grid form-grid">
-      <div class="span2"><label>Titel</label><input id="bookTitle" required maxlength="180" placeholder="z. B. Trading in the Zone"></div>
-      <div><label>Autor</label><input id="bookAuthor" maxlength="160" placeholder="Mark Douglas"></div>
-      <div><label>Kategorie</label><select id="bookCategory"><option>Trading</option><option>Finanzen</option><option>Mindset</option><option>Persönliche Entwicklung</option><option>Fitness</option><option>Biografie</option><option>Andere</option></select></div>
-      <div class="full"><label>Beschreibung (optional)</label><textarea id="bookDescription" maxlength="2000" placeholder="Warum möchtest du dieses Buch lesen?"></textarea></div>
+    <div id="goalModal" class="modal">
+      <form id="goalForm" class="card">
+        <div class="top">
+          <h2>Neues Ziel</h2>
+          <button type="button" class="btn" onclick="closeGoal()">✕</button>
+        </div>
+        <div class="grid form-grid">
+          <div><label>Titel</label><input id="gTitle" required /></div>
+          <div>
+            <label>Typ</label
+            ><select id="gType">
+              <option value="short">Short-Term</option>
+              <option value="long">Long-Term</option>
+            </select>
+          </div>
+          <div><label>Kategorie</label><input id="gCategory" /></div>
+          <div><label>Zieldatum</label><input id="gDate" type="date" /></div>
+          <div class="full"><label>Warum?</label><textarea id="gWhy"></textarea></div>
+          <div class="full"><label>Nächster Schritt</label><input id="gNext" /></div>
+          <div><label>Aktuell</label><input id="gCurrent" type="number" value="0" /></div>
+          <div><label>Zielwert</label><input id="gTarget" type="number" value="100" /></div>
+          <div class="full">
+            <label>Bild</label
+            ><input id="gImage" type="file" accept="image/jpeg,image/png,image/webp" />
+          </div>
+          <div class="full"><button class="btn primary">Ziel speichern</button></div>
+        </div>
+      </form>
     </div>
-    <div id="bookUploadProgress" class="library-upload-progress hide"><div><span id="bookUploadProgressBar"></span></div><small id="bookUploadProgressText">Wird vorbereitet…</small></div>
-    <button id="bookSaveBtn" class="btn primary library-upload-submit">Buch hochladen</button>
-  </form>
-</div>
 
-<div id="libraryReader" class="library-reader" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="libraryReaderTitle">
-  <header class="library-reader-header">
-    <button class="library-reader-close" type="button" onclick="closeLibraryReader()" aria-label="Reader schließen">←</button>
-    <div><b id="libraryReaderTitle">Buch</b><small id="libraryReaderAuthor"></small></div>
-    <button id="libraryOpenOriginalBtn" class="btn" type="button">Original öffnen</button>
-  </header>
-  <div class="library-reader-toolbar">
-    <button id="libraryPrevPage" class="btn" type="button" onclick="changeLibraryPage(-1)" aria-label="Vorherige Seite">←</button>
-    <label class="library-page-control"><input id="libraryPageInput" type="number" min="1" value="1" onchange="goToLibraryPage()" aria-label="Seite"><span id="libraryPageTotal">/ 1</span></label>
-    <button id="libraryNextPage" class="btn" type="button" onclick="changeLibraryPage(1)" aria-label="Nächste Seite">→</button>
-    <span class="library-reader-divider"></span>
-    <button class="btn" type="button" onclick="changeLibraryZoom(-.15)" aria-label="Verkleinern">−</button>
-    <b id="libraryZoomLabel">100%</b>
-    <button class="btn" type="button" onclick="changeLibraryZoom(.15)" aria-label="Vergrößern">+</button>
-  </div>
-  <main id="libraryReaderStage" class="library-reader-stage">
-    <div id="libraryReaderLoading" class="library-reader-loading"><span></span><b>PDF wird geladen…</b></div>
-    <canvas id="libraryReaderCanvas" class="hide"></canvas>
-  </main>
-  <footer class="library-reader-footer"><div><span id="libraryReaderProgressBar"></span></div><small id="libraryReaderProgressText">0% gelesen</small></footer>
-</div>
-
-<div id="academyModal" class="modal">
-<form id="academyForm" class="card">
-  <div class="top"><div><h2>Lernnotiz erstellen</h2><div class="sub">Erklärung, Regeln und dein TradingView-Beispiel.</div></div><button type="button" class="btn" onclick="closeAcademyNote()">✕</button></div>
-  <div class="grid form-grid">
-    <div><label>Titel</label><input id="aTitle" required placeholder="MSS – Market Structure Shift"></div>
-    <div><label>Kategorie</label><select id="aCategory"><option>Market Structure</option><option>Liquidity</option><option>Entry Models</option><option>Risk Management</option><option>Psychologie</option><option>Sessions</option><option>Andere</option></select></div>
-    <div class="full"><label>Definition / Erklärung</label><textarea id="aDefinition"></textarea></div>
-    <div><label>Regeln und Bedingungen</label><textarea id="aRules"></textarea></div>
-    <div><label>Konkretes Beispiel</label><textarea id="aExample"></textarea></div>
-    <div><label>Häufige Fehler</label><textarea id="aMistakes"></textarea></div>
-    <div><label>Eigene Checkliste</label><textarea id="aChecklist"></textarea></div>
-    <div class="full"><label>Tags (mit Komma trennen)</label><input id="aTags" placeholder="MSS, Displacement, FVG"></div>
-    <div class="full"><label>TradingView-Screenshot</label><div class="drop-zone" onclick="document.getElementById('aImage').click()">Screenshot auswählen<input id="aImage" type="file" accept="image/jpeg,image/png,image/webp" hidden></div></div>
-    <div class="full"><button class="btn primary">Lernnotiz speichern</button></div>
-  </div>
-</form>
-</div>
-
-<div id="academyDetailModal" class="modal">
-  <div class="card academy-detail">
-    <div class="top"><h2 id="academyDetailTitle"></h2><button class="btn" onclick="closeAcademyDetail()">✕</button></div>
-    <div id="academyDetailContent"></div>
-  </div>
-</div>
-
-<div id="calendarModal" class="modal">
-<form id="calendarForm" class="card" style="max-width:760px">
-  <div class="top"><h2>Termin eintragen</h2><button type="button" class="btn" onclick="closeCalendarEvent()">✕</button></div>
-  <div class="grid form-grid">
-    <div class="span2"><label>Titel</label><input id="cTitle" required></div>
-    <div><label>Datum</label><input id="cDate" type="date" required></div>
-    <div><label>Kategorie</label><select id="cCategory"><option>Trading</option><option>Fitness</option><option>Lernen</option><option>Arbeit</option><option>Privat</option><option>Geburtstag</option></select></div>
-    <div><label>Von</label><input id="cStart" type="time"></div>
-    <div><label>Bis</label><input id="cEnd" type="time"></div>
-    <div><label>Wiederholung</label><select id="cRecurrence"><option value="none">Keine Wiederholung</option><option value="yearly">Jedes Jahr</option></select></div>
-    <div id="calendarReminderFields" class="calendar-reminder-fields inactive">
-      <label class="calendar-reminder-toggle"><input id="cReminderEnabled" type="checkbox"><span>🔔 Push-Erinnerung</span></label>
-      <label>Uhrzeit<input id="cReminderTime" type="time" value="08:00" disabled></label>
+    <div id="exerciseModal" class="modal">
+      <form id="exerciseForm" class="card">
+        <div class="top">
+          <div>
+            <h2>Übung hinzufügen</h2>
+            <div class="sub">Ordne die Übung direkt Training A oder B zu.</div>
+          </div>
+          <button type="button" class="btn" onclick="closeExercise()">✕</button>
+        </div>
+        <div class="grid form-grid">
+          <div>
+            <label>Trainingsplan</label
+            ><select id="exPlan" required></select>
+          </div>
+          <div>
+            <label>Übung</label
+            ><input id="exName" required maxlength="100" placeholder="Bankdrücken" />
+          </div>
+          <div>
+            <label>Muskelgruppe</label><input id="exMuscle" maxlength="60" placeholder="Brust" />
+          </div>
+          <div>
+            <label>Ziel-Sätze</label><input id="exSets" type="number" min="1" max="20" value="3" />
+          </div>
+          <div>
+            <label>Ziel-Wiederholungen</label
+            ><input id="exReps" type="number" min="1" max="100" value="10" />
+          </div>
+          <div>
+            <label>Startgewicht kg</label
+            ><input id="exWeight" type="number" min="0" step=".5" value="0" />
+          </div>
+          <div class="full"><button class="btn primary">Übung speichern</button></div>
+        </div>
+      </form>
     </div>
-    <div class="full calendar-form-hint">Für Push-Mitteilungen muss „Push aktivieren“ unter Erinnerungen auf deinem Handy eingeschaltet sein.</div>
-    <div class="full"><label>Beschreibung</label><textarea id="cDescription"></textarea></div>
-    <div class="full"><button class="btn primary">Termin speichern</button></div>
-  </div>
-</form>
-</div>
-<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="modules/core.js?v=2"></script><script src="modules/focus.js?v=3"></script><script src="modules/goals.js"></script><script src="modules/trading.js"></script><script src="modules/fitness.js?v=2"></script><script src="modules/notes.js?v=2"></script><script src="modules/academy.js"></script><script src="modules/library.js"></script><script src="modules/calendar.js?v=2"></script><script src="modules/weekly.js?v=2"></script><script src="modules/reminders.js"></script><script src="modules/backup.js?v=6"></script><script src="modules/pwa.js?v=3"></script><script src="app.js"></script></body></html>
+
+    <div id="fitnessProgressModal" class="modal">
+      <div class="card fitness-progress-modal">
+        <div class="top">
+          <div>
+            <div class="eyebrow">Satzgenauer Verlauf</div>
+            <h2 id="fitnessProgressTitle">Übung</h2>
+          </div>
+          <button type="button" class="btn" onclick="closeFitnessProgress()">✕</button>
+        </div>
+        <div id="fitnessProgressContent" class="fitness-progress-content"></div>
+      </div>
+    </div>
+
+    <div id="noteModal" class="modal">
+      <form id="noteForm" class="card">
+        <div class="top">
+          <h2>Notiz erstellen</h2>
+          <button type="button" class="btn" onclick="closeNote()">✕</button>
+        </div>
+        <div class="grid form-grid">
+          <div><label>Titel</label><input id="nTitle" required /></div>
+          <div>
+            <label>Kategorie</label
+            ><select id="nCategory">
+              <option>Trading</option>
+              <option>Fitness</option>
+              <option>Lernen</option>
+              <option>Allgemein</option>
+            </select>
+          </div>
+          <div class="full"><label>Inhalt</label><textarea id="nContent"></textarea></div>
+          <div class="full"><button class="btn primary">Speichern</button></div>
+        </div>
+      </form>
+    </div>
+
+    <div id="pencilNoteModal" class="modal pencil-modal">
+      <section
+        class="card pencil-editor-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pencilEditorHeading"
+      >
+        <header class="pencil-editor-header">
+          <div>
+            <div class="eyebrow">Apple Pencil</div>
+            <h2 id="pencilEditorHeading">Neue Pencil-Notiz</h2>
+          </div>
+          <div class="actions">
+            <button
+              id="savePencilNoteBtn"
+              class="btn primary"
+              type="button"
+              onclick="savePencilNote()"
+            >
+              Pencil-Notiz speichern</button
+            ><button class="btn" type="button" onclick="closePencilNote()">✕</button>
+          </div>
+        </header>
+        <div class="pencil-editor-meta">
+          <label
+            >Titel<input
+              id="pencilTitle"
+              maxlength="180"
+              placeholder="Meine handschriftliche Notiz"
+          /></label>
+          <label
+            >Kategorie<select id="pencilCategory">
+              <option>Allgemein</option>
+              <option>Trading</option>
+              <option>Fitness</option>
+              <option>Lernen</option>
+              <option>Privat</option>
+            </select></label
+          >
+          <label
+            >Papier<select id="pencilPaper">
+              <option value="lined">Liniert</option>
+              <option value="grid">Kariert</option>
+              <option value="dotted">Gepunktet</option>
+              <option value="blank">Blanko</option>
+            </select></label
+          >
+        </div>
+        <div class="pencil-toolbar" aria-label="Pencil-Werkzeuge">
+          <div class="pencil-tool-group">
+            <button
+              class="pencil-tool active"
+              data-tool="pen"
+              type="button"
+              onclick="setPencilTool('pen')"
+            >
+              ✎ Stift</button
+            ><button
+              class="pencil-tool"
+              data-tool="eraser"
+              type="button"
+              onclick="setPencilTool('eraser')"
+            >
+              ▱ Radierer
+            </button>
+          </div>
+          <div class="pencil-colors" aria-label="Stiftfarbe">
+            <button
+              class="pencil-color active"
+              data-color="#162033"
+              style="--pencil-color: #162033"
+              type="button"
+              onclick="setPencilColor('#162033')"
+              aria-label="Schwarz"
+            ></button
+            ><button
+              class="pencil-color"
+              data-color="#1769d2"
+              style="--pencil-color: #1769d2"
+              type="button"
+              onclick="setPencilColor('#1769d2')"
+              aria-label="Blau"
+            ></button
+            ><button
+              class="pencil-color"
+              data-color="#d9364f"
+              style="--pencil-color: #d9364f"
+              type="button"
+              onclick="setPencilColor('#d9364f')"
+              aria-label="Rot"
+            ></button
+            ><button
+              class="pencil-color"
+              data-color="#16865b"
+              style="--pencil-color: #16865b"
+              type="button"
+              onclick="setPencilColor('#16865b')"
+              aria-label="Grün"
+            ></button>
+          </div>
+          <label class="pencil-size-control"
+            ><span>Stärke <b id="pencilSizeLabel">5 px</b></span
+            ><input id="pencilSize" type="range" min="2" max="14" value="5"
+          /></label>
+          <div class="pencil-history">
+            <button
+              id="pencilUndoBtn"
+              class="btn"
+              type="button"
+              onclick="undoPencilStroke()"
+              aria-label="Rückgängig"
+            >
+              ↶</button
+            ><button
+              id="pencilRedoBtn"
+              class="btn"
+              type="button"
+              onclick="redoPencilStroke()"
+              aria-label="Wiederholen"
+            >
+              ↷</button
+            ><button class="btn danger" type="button" onclick="clearPencilSheet()">Leeren</button>
+          </div>
+        </div>
+        <div class="pencil-hint">
+          <span> Pencil</span
+          ><small
+            >Druckstärke wird automatisch erkannt. Mit dem Finger kannst du über das Blatt
+            scrollen.</small
+          >
+        </div>
+        <main class="pencil-stage">
+          <canvas
+            id="pencilCanvas"
+            width="1200"
+            height="1697"
+            aria-label="Handschriftliche Zeichenfläche"
+          ></canvas>
+        </main>
+      </section>
+    </div>
+
+    <div id="libraryBookModal" class="modal">
+      <form id="libraryBookForm" class="card library-upload-card">
+        <div class="top">
+          <div>
+            <div class="eyebrow">Private PDF-Bibliothek</div>
+            <h2>Buch hinzufügen</h2>
+            <div class="sub">CPRB erstellt automatisch ein Cover und erkennt die Seitenzahl.</div>
+          </div>
+          <button type="button" class="btn" onclick="closeLibraryUpload()">✕</button>
+        </div>
+        <label class="library-upload-zone" for="bookPdf">
+          <span>📄</span>
+          <div>
+            <b id="bookFileName">PDF auswählen</b
+            ><small>Bis 50 MB · Upload kann bei Unterbrechungen fortgesetzt werden</small>
+          </div>
+          <input id="bookPdf" type="file" accept="application/pdf,.pdf" required hidden />
+        </label>
+        <div class="grid form-grid">
+          <div class="span2">
+            <label>Titel</label
+            ><input
+              id="bookTitle"
+              required
+              maxlength="180"
+              placeholder="z. B. Trading in the Zone"
+            />
+          </div>
+          <div>
+            <label>Autor</label><input id="bookAuthor" maxlength="160" placeholder="Mark Douglas" />
+          </div>
+          <div>
+            <label>Kategorie</label
+            ><select id="bookCategory">
+              <option>Trading</option>
+              <option>Finanzen</option>
+              <option>Mindset</option>
+              <option>Persönliche Entwicklung</option>
+              <option>Fitness</option>
+              <option>Biografie</option>
+              <option>Andere</option>
+            </select>
+          </div>
+          <div class="full">
+            <label>Beschreibung (optional)</label
+            ><textarea
+              id="bookDescription"
+              maxlength="2000"
+              placeholder="Warum möchtest du dieses Buch lesen?"
+            ></textarea>
+          </div>
+        </div>
+        <div id="bookUploadProgress" class="library-upload-progress hide">
+          <div><span id="bookUploadProgressBar"></span></div>
+          <small id="bookUploadProgressText">Wird vorbereitet…</small>
+        </div>
+        <button id="bookSaveBtn" class="btn primary library-upload-submit">Buch hochladen</button>
+      </form>
+    </div>
+
+    <div
+      id="libraryReader"
+      class="library-reader"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="libraryReaderTitle"
+    >
+      <header class="library-reader-header">
+        <button
+          class="library-reader-close"
+          type="button"
+          onclick="closeLibraryReader()"
+          aria-label="Reader schließen"
+        >
+          ←
+        </button>
+        <div><b id="libraryReaderTitle">Buch</b><small id="libraryReaderAuthor"></small></div>
+        <button id="libraryOpenOriginalBtn" class="btn" type="button">Original öffnen</button>
+      </header>
+      <div class="library-reader-toolbar">
+        <button
+          id="libraryPrevPage"
+          class="btn"
+          type="button"
+          onclick="changeLibraryPage(-1)"
+          aria-label="Vorherige Seite"
+        >
+          ←
+        </button>
+        <label class="library-page-control"
+          ><input
+            id="libraryPageInput"
+            type="number"
+            min="1"
+            value="1"
+            onchange="goToLibraryPage()"
+            aria-label="Seite"
+          /><span id="libraryPageTotal">/ 1</span></label
+        >
+        <button
+          id="libraryNextPage"
+          class="btn"
+          type="button"
+          onclick="changeLibraryPage(1)"
+          aria-label="Nächste Seite"
+        >
+          →
+        </button>
+        <span class="library-reader-divider"></span>
+        <button
+          class="btn"
+          type="button"
+          onclick="changeLibraryZoom(-0.15)"
+          aria-label="Verkleinern"
+        >
+          −
+        </button>
+        <b id="libraryZoomLabel">100%</b>
+        <button class="btn" type="button" onclick="changeLibraryZoom(0.15)" aria-label="Vergrößern">
+          +
+        </button>
+      </div>
+      <main id="libraryReaderStage" class="library-reader-stage">
+        <div id="libraryReaderLoading" class="library-reader-loading">
+          <span></span><b>PDF wird geladen…</b>
+        </div>
+        <canvas id="libraryReaderCanvas" class="hide"></canvas>
+      </main>
+      <footer class="library-reader-footer">
+        <div><span id="libraryReaderProgressBar"></span></div>
+        <small id="libraryReaderProgressText">0% gelesen</small>
+      </footer>
+    </div>
+
+    <div id="academyModal" class="modal">
+      <form id="academyForm" class="card">
+        <div class="top">
+          <div>
+            <h2>Lernnotiz erstellen</h2>
+            <div class="sub">Erklärung, Regeln und dein TradingView-Beispiel.</div>
+          </div>
+          <button type="button" class="btn" onclick="closeAcademyNote()">✕</button>
+        </div>
+        <div class="grid form-grid">
+          <div>
+            <label>Titel</label
+            ><input id="aTitle" required placeholder="MSS – Market Structure Shift" />
+          </div>
+          <div>
+            <label>Kategorie</label
+            ><select id="aCategory">
+              <option>Market Structure</option>
+              <option>Liquidity</option>
+              <option>Entry Models</option>
+              <option>Risk Management</option>
+              <option>Psychologie</option>
+              <option>Sessions</option>
+              <option>Andere</option>
+            </select>
+          </div>
+          <div class="full">
+            <label>Definition / Erklärung</label><textarea id="aDefinition"></textarea>
+          </div>
+          <div><label>Regeln und Bedingungen</label><textarea id="aRules"></textarea></div>
+          <div><label>Konkretes Beispiel</label><textarea id="aExample"></textarea></div>
+          <div><label>Häufige Fehler</label><textarea id="aMistakes"></textarea></div>
+          <div><label>Eigene Checkliste</label><textarea id="aChecklist"></textarea></div>
+          <div class="full">
+            <label>Tags (mit Komma trennen)</label
+            ><input id="aTags" placeholder="MSS, Displacement, FVG" />
+          </div>
+          <div class="full">
+            <label>TradingView-Screenshot</label>
+            <div class="drop-zone" onclick="document.getElementById('aImage').click()">
+              Screenshot auswählen<input
+                id="aImage"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                hidden
+              />
+            </div>
+          </div>
+          <div class="full"><button class="btn primary">Lernnotiz speichern</button></div>
+        </div>
+      </form>
+    </div>
+
+    <div id="academyDetailModal" class="modal">
+      <div class="card academy-detail">
+        <div class="top">
+          <h2 id="academyDetailTitle"></h2>
+          <button class="btn" onclick="closeAcademyDetail()">✕</button>
+        </div>
+        <div id="academyDetailContent"></div>
+      </div>
+    </div>
+
+    <div id="calendarModal" class="modal">
+      <form id="calendarForm" class="card" style="max-width: 760px">
+        <div class="top">
+          <h2>Termin eintragen</h2>
+          <button type="button" class="btn" onclick="closeCalendarEvent()">✕</button>
+        </div>
+        <div class="grid form-grid">
+          <div class="span2"><label>Titel</label><input id="cTitle" required /></div>
+          <div><label>Datum</label><input id="cDate" type="date" required /></div>
+          <div>
+            <label>Kategorie</label
+            ><select id="cCategory">
+              <option>Trading</option>
+              <option>Fitness</option>
+              <option>Lernen</option>
+              <option>Arbeit</option>
+              <option>Privat</option>
+              <option>Geburtstag</option>
+            </select>
+          </div>
+          <div><label>Von</label><input id="cStart" type="time" /></div>
+          <div><label>Bis</label><input id="cEnd" type="time" /></div>
+          <div>
+            <label>Wiederholung</label
+            ><select id="cRecurrence">
+              <option value="none">Keine Wiederholung</option>
+              <option value="yearly">Jedes Jahr</option>
+            </select>
+          </div>
+          <div id="calendarReminderFields" class="calendar-reminder-fields inactive">
+            <label class="calendar-reminder-toggle"
+              ><input id="cReminderEnabled" type="checkbox" /><span>🔔 Push-Erinnerung</span></label
+            >
+            <label>Uhrzeit<input id="cReminderTime" type="time" value="08:00" disabled /></label>
+          </div>
+          <div class="full calendar-form-hint">
+            Für Push-Mitteilungen muss „Push aktivieren“ unter Erinnerungen auf deinem Handy
+            eingeschaltet sein.
+          </div>
+          <div class="full"><label>Beschreibung</label><textarea id="cDescription"></textarea></div>
+          <div class="full"><button class="btn primary">Termin speichern</button></div>
+        </div>
+      </form>
+    </div>
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="modules/core.js?v=2"></script>
+    <script src="modules/focus.js?v=3"></script>
+    <script src="modules/goals.js"></script>
+    <script src="modules/trading.js"></script>
+    <script src="modules/fitness.js?v=2"></script>
+    <script src="modules/notes.js?v=2"></script>
+    <script src="modules/academy.js"></script>
+    <script src="modules/library.js"></script>
+    <script src="modules/calendar.js?v=2"></script>
+    <script src="modules/weekly.js?v=2"></script>
+    <script src="modules/reminders.js"></script>
+    <script src="modules/backup.js?v=6"></script>
+    <script src="modules/pwa.js?v=3"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

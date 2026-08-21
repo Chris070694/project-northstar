@@ -8,8 +8,8 @@ const migration=fs.readFileSync(path.join(root,'supabase/migrations/20260805_vis
 
 assert.match(migration,/alter table public\.vision_goals[\s\S]*add column if not exists image_path text/i);
 assert.match(migration,/pg_notify\('pgrst','reload schema'\)/i);
-assert.match(source,/if\(imagePath&&!saved\)/);
-assert.match(source,/storage\.from\('northstar-media'\)\.remove\(\[imagePath\]\)/);
+assert.match(source,/if\s*\(\s*imagePath\s*&&\s*!saved\s*\)/);
+assert.match(source,/storage\.from\('northstar-media'\)\.remove\(\[\s*imagePath\s*\]\)/);
 assert.match(source,/isMissingGoalImageSchema/);
 
 console.log('vision goal image schema and failed-upload cleanup: OK');
