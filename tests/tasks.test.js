@@ -58,7 +58,7 @@ assert.match(persistentMigration,/add column if not exists keep_until_done boole
 assert.match(persistentMigration,/where keep_until_done and not is_completed/i);
 
 const focusSource=fs.readFileSync(path.join(root,'modules/focus.js'),'utf8');
-assert.match(focusSource,/eq\('keep_until_done',true\).*eq\('is_completed',false\).*lt\('task_date',d\)/s);
-assert.match(focusSource,/task_date:d,[\s\S]*is_priority:false/);
+assert.match(focusSource,/eq\('keep_until_done',\s*true\)[\s\S]*eq\('is_completed',\s*false\)[\s\S]*lt\('task_date',\s*d\)/);
+assert.match(focusSource,/task_date:\s*d,[\s\S]*is_priority:\s*false/);
 
 console.log('dashboard task completion, carry-until-done and one-priority setup: OK');

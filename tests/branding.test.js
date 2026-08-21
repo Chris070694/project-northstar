@@ -10,9 +10,9 @@ const backup=fs.readFileSync(path.join(root,'modules/backup.js'),'utf8');
 assert.doesNotMatch(index,/Project Northstar/i);
 assert.match(index,/<title>CPRB OS<\/title>/);
 assert.match(index,/apple-mobile-web-app-title" content="CPRB OS"/);
-assert.match(index,/class="brand">CPRB <b>OS<\/b>/);
+assert.match(index,/class="brand">\s*CPRB\s*<b>OS<\/b>/);
 assert.equal(manifest.name,'CPRB OS');
 assert.equal(manifest.short_name,'CPRB OS');
-assert.match(backup,/app:'CPRB OS'/);
+assert.match(backup,/app:\s*'CPRB OS'/);
 
 console.log('CPRB OS branding is consistent: OK');

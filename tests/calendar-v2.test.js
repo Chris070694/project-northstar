@@ -53,8 +53,8 @@ assert.match(migration,/add column if not exists recurrence text not null defaul
 assert.match(migration,/add column if not exists reminder_enabled boolean not null default false/i);
 assert.match(migration,/calendar_events_reminders_idx/i);
 assert.match(reminderFunction,/dueCalendarReminders/);
-assert.match(reminderFunction,/type:`calendar:\$\{event\.id\}`/);
+assert.match(reminderFunction,/type:\s*`calendar:\$\{event\.id\}`/);
 assert.match(reminderFunction,/page=calendar&date=/);
-assert.match(backupSource,/\{name:'calendar_events'\}/);
+assert.match(backupSource,/\{\s*name:\s*'calendar_events'\s*\}/);
 
 console.log('calendar v2 yearly events, reminder fields and push dispatch: OK');

@@ -47,19 +47,19 @@ const eraser=vm.runInContext(`pencilStrokeWidth(5,.5,'eraser')`,context);
 assert.ok(firm>light,'Apple Pencil pressure must increase line width');
 assert.ok(eraser>firm,'Eraser must be wider than the pen');
 
-assert.match(source,/event\.pointerType==='touch'/);
+assert.match(source,/event\.pointerType\s*===\s*'touch'/);
 assert.match(source,/event\.getCoalescedEvents/);
 assert.match(source,/drawing\.json/);
 assert.match(source,/preview\.png/);
-assert.match(source,/note_type:'handwriting'/);
+assert.match(source,/note_type:\s*'handwriting'/);
 assert.match(html,/id="pencilCanvas"[\s\S]*width="1200"[\s\S]*height="1697"/);
 assert.match(html,/id="pencilUndoBtn"/);
 assert.match(html,/value="lined">Liniert[\s\S]*value="grid">Kariert[\s\S]*value="dotted">Gepunktet/);
-assert.match(css,/#pencilCanvas[^{]*\{[^}]*touch-action:pan-y pinch-zoom/);
+assert.match(css,/#pencilCanvas[^{]*\{[^}]*touch-action:\s*pan-y pinch-zoom/);
 assert.match(migration,/add column if not exists note_type text not null default 'text'/i);
 assert.match(migration,/add column if not exists drawing_path text/i);
 assert.match(migration,/notes_note_type_check/i);
-assert.match(backup,/\{name:'notes'\}/);
+assert.match(backup,/\{\s*name:\s*'notes'\s*\}/);
 assert.match(backup,/key\.endsWith\('_path'\)/);
 
 console.log('pencil notes pressure, tools, private storage, migration and backup coverage: OK');
