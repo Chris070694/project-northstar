@@ -205,10 +205,10 @@ function renderTodayAnchor() {
     ${anchor.is_completed ? '<div class="today-anchor-flag">erledigt</div>' : ''}`;
 }
 
-function renderTodayNow() {
+function renderTodayNow(state = todayNowState()) {
   const box = $('#todayNow');
   if (!box) return;
-  const card = todayNowCard(todayNowState());
+  const card = todayNowCard(state);
   box.className = `card today-now accent-${card.accent}`;
   box.innerHTML = `<div class="today-now-eyebrow">${card.eyebrow}</div>
     <div class="today-now-title">${card.title}</div>
@@ -216,12 +216,11 @@ function renderTodayNow() {
     <button class="btn today-now-action" type="button" onclick="${card.onclick}">${card.action}</button>`;
 }
 
-function renderTodayNext() {
+function renderTodayNext(state = todayNowState()) {
   const box = $('#todayNext');
   if (!box) return;
   const rows = [];
   /* Was schon in der Jetzt-Karte steht, taucht hier nicht nochmal auf. */
-  const state = todayNowState();
   const shownTaskId = state.kind === 'task' ? state.task.id : null;
 
   todayOpenTasks()
@@ -254,7 +253,8 @@ function todayMomentumRow(label, activeDays, color) {
     const day = new Date(today);
     day.setDate(today.getDate() - offset);
     const on = activeDays.has(todayDateKey(day));
-    cells.push(`<i class="${on ? 'on ' + color : ''}"></i>`);
+    const delay = (0.08 + (TODAY_MOMENTUM_DAYS - 1 - offset) * 0.028).toFixed(2);
+    cells.push(`<i class="${on ? 'on ' + color : ''}" style="animation-delay:${delay}s"></i>`);
   }
   return `<div class="today-streak"><span>${label}</span><div class="today-streak-bar">${cells.join('')}</div></div>`;
 }
@@ -281,8 +281,10 @@ function renderToday() {
       day: '2-digit',
       month: 'long',
     }).format(new Date());
+  /* Einmal bestimmen, überall dasselbe Bild. */
+  const state = todayNowState();
   renderTodayAnchor();
-  renderTodayNow();
-  renderTodayNext();
+  renderTodayNow(state);
+  renderTodayNext(state);
   renderTodayMomentum();
 }

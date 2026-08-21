@@ -1,4 +1,4 @@
-const CACHE = 'cprb-heute-und-kennzahlen-v1';
+const CACHE = 'cprb-bewegung-v1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,7 +12,8 @@ const APP_SHELL = [
   './modules/core.js?v=3',
   './modules/today.js?v=1',
   './modules/trading.js?v=2',
-  './modules/stats.js?v=1',
+  './modules/stats.js?v=2',
+  './modules/motion.js?v=1',
   './modules/focus.js?v=3',
   './modules/goals.js',
   './modules/fitness.js?v=2',

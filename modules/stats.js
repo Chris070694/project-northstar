@@ -176,8 +176,8 @@ function statsEquityChart(curve) {
         <stop offset="0" stop-color="#70e5ff" stop-opacity="0.26"></stop>
         <stop offset="1" stop-color="#70e5ff" stop-opacity="0"></stop>
       </linearGradient></defs>
-      <path d="${area}" fill="url(#statsEquityFill)"></path>
-      <path d="M ${line}" fill="none" stroke="#70e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path class="stats-fill" d="${area}" fill="url(#statsEquityFill)"></path>
+      <path class="stats-line" d="M ${line}" fill="none" stroke="#70e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>`;
 }
 
@@ -188,13 +188,14 @@ function statsDailyChart(days) {
   const shown = days.slice(-30);
   const peak = Math.max(...shown.map(day => Math.abs(day.value)), 1);
   const bars = shown
-    .map(day => {
+    .map((day, index) => {
       const share = Math.abs(day.value) / peak;
       const height = Math.max(3, Math.round(share * 46));
       const positive = day.value >= 0;
+      const delay = (0.05 + index * 0.035).toFixed(2);
       return `<div class="stats-day" title="${escapeHtml(day.date)}: ${escapeHtml(formatStatsMoney(day.value))}">
-        <div class="stats-day-top">${positive ? `<i style="height:${height}px" class="pos"></i>` : ''}</div>
-        <div class="stats-day-bottom">${positive ? '' : `<i style="height:${height}px" class="neg"></i>`}</div>
+        <div class="stats-day-top">${positive ? `<i style="height:${height}px;animation-delay:${delay}s" class="pos"></i>` : ''}</div>
+        <div class="stats-day-bottom">${positive ? '' : `<i style="height:${height}px;animation-delay:${delay}s" class="neg"></i>`}</div>
       </div>`;
     })
     .join('');
@@ -261,4 +262,8 @@ function renderTradingStats() {
       <div class="stats-figure-title">Tagesergebnis</div>
       ${statsDailyChart(statsDailyPnl(closed))}
     </div>`;
+
+  /* Die Linie braucht ihre eigene Länge, damit sie sich zeichnen kann. */
+  const line = box.querySelector?.('.stats-line');
+  if (line?.getTotalLength) line.style.setProperty('--stats-len', line.getTotalLength());
 }

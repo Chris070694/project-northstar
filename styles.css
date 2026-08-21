@@ -5515,3 +5515,228 @@ tbody tr:hover td {
     height: 120px;
   }
 }
+
+/* ============ Bewegung — die Schicht, die aus Seiten eine App macht ============ */
+:root {
+  /* Eine Kurve für alles: schneller Start, weiches Ausrollen. */
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Alles Antippbare gibt sofort nach — noch bevor Daten geladen sind. */
+.app .btn,
+.app .nav,
+.app .mobile-nav-btn,
+.app .mobile-trade-btn,
+.app .today-row,
+.app .stats-range,
+.app .home-weekly-card,
+.app .mobile-more-grid button,
+.app .dashboard-action button {
+  transition:
+    transform 0.24s var(--spring),
+    border-color 0.24s ease,
+    background 0.24s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.app .btn:active,
+.app .nav:active,
+.app .mobile-nav-btn:active,
+.app .mobile-trade-btn:active,
+.app .today-row:active,
+.app .stats-range:active,
+.app .home-weekly-card:active,
+.app .mobile-more-grid button:active,
+.app .dashboard-action button:active {
+  transform: scale(0.968);
+}
+.app .btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Der aktive Tab quittiert die Auswahl. */
+.mobile-nav-btn.active span {
+  display: inline-block;
+  animation: motion-pop 0.44s var(--spring);
+}
+@keyframes motion-pop {
+  0% {
+    transform: scale(1);
+  }
+  38% {
+    transform: scale(1.22) translateY(-2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Karten laufen versetzt ein, damit der Blick eine Leserichtung bekommt. */
+.page.active > * {
+  animation: motion-rise 0.5s var(--spring) both;
+}
+.page.active > *:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.page.active > *:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.page.active > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.page.active > *:nth-child(4) {
+  animation-delay: 0.14s;
+}
+.page.active > *:nth-child(5) {
+  animation-delay: 0.18s;
+}
+.page.active > *:nth-child(n + 6) {
+  animation-delay: 0.22s;
+}
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(13px) scale(0.987);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Seitenwechsel schiebt in Laufrichtung. */
+::view-transition-old(root) {
+  animation: motion-out 0.24s var(--spring) both;
+}
+::view-transition-new(root) {
+  animation: motion-in 0.32s var(--spring) both;
+}
+@keyframes motion-out {
+  to {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--motion-dir, 1) * 16px));
+  }
+}
+@keyframes motion-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--motion-dir, 1) * 20px));
+  }
+}
+
+/* Der Titel wandert beim Scrollen in die Kopfzeile. */
+.mobile-header-title {
+  display: none;
+}
+.mobile-header {
+  transition: background 0.3s ease;
+}
+.mobile-sheet {
+  touch-action: none;
+}
+.mobile-sheet.dragging {
+  transition: none;
+}
+
+/* Kapitalkurve zeichnet sich, Balken wachsen aus der Nulllinie. */
+.stats-chart path.stats-line {
+  stroke-dasharray: var(--stats-len, 0);
+  stroke-dashoffset: var(--stats-len, 0);
+  animation: motion-draw 1.05s var(--spring) 0.12s forwards;
+}
+.stats-chart path.stats-fill {
+  opacity: 0;
+  animation: motion-fade 0.6s ease 0.62s forwards;
+}
+@keyframes motion-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes motion-fade {
+  to {
+    opacity: 1;
+  }
+}
+.stats-day i {
+  transform: scaleY(0);
+  animation: motion-grow 0.55s var(--spring) both;
+}
+.stats-day-top i {
+  transform-origin: bottom;
+}
+.stats-day-bottom i {
+  transform-origin: top;
+}
+@keyframes motion-grow {
+  to {
+    transform: scaleY(1);
+  }
+}
+.today-streak-bar i {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: motion-wipe 0.4s var(--spring) both;
+}
+@keyframes motion-wipe {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .mobile-header-title {
+    display: block;
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 820;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transform: translateY(7px);
+    transition:
+      opacity 0.3s var(--spring),
+      transform 0.4s var(--spring);
+  }
+  .mobile-header.scrolled .mobile-header-title {
+    opacity: 1;
+    transform: none;
+  }
+  .mobile-header.scrolled .mobile-brand > div {
+    display: none;
+  }
+  .mobile-brand,
+  .mobile-brand > div {
+    transition: opacity 0.3s var(--spring);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.active > *,
+  .mobile-nav-btn.active span,
+  .stats-day i,
+  .today-streak-bar i,
+  .stats-chart path.stats-line,
+  .stats-chart path.stats-fill {
+    animation: none !important;
+  }
+  .stats-chart path.stats-line {
+    stroke-dashoffset: 0;
+  }
+  .stats-chart path.stats-fill {
+    opacity: 1;
+  }
+  .page.active > * {
+    opacity: 1;
+    transform: none;
+  }
+  .stats-day i {
+    transform: scaleY(1);
+  }
+  .today-streak-bar i {
+    transform: scaleX(1);
+  }
+}

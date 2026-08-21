@@ -145,9 +145,10 @@ run(`fitnessPlans=[]; calendarEvents=[]; activeFitnessSession=null;
        {id:'n1',title:'Erste offene Aufgabe',category:'Privat',is_completed:false,is_priority:false},
        {id:'n2',title:'Zweite offene Aufgabe',category:'Privat',is_completed:false,is_priority:false}
      ];`);
-const nowTask = run("todayNowCard(todayNowState(new Date('2026-08-21T06:00:00'))).title");
-assert.equal(nowTask, 'Erste offene Aufgabe');
-run('renderTodayNext()');
+run("motionTestState = todayNowState(new Date('2026-08-21T06:00:00'))");
+assert.equal(run('todayNowCard(motionTestState).title'), 'Erste offene Aufgabe');
+/* Zustand fest vorgeben — sonst h\u00e4ngt der Test an der Uhrzeit des Testlaufs. */
+run('renderTodayNext(motionTestState)');
 assert.doesNotMatch(
   element('#todayNext').innerHTML,
   /Erste offene Aufgabe/,

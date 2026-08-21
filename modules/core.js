@@ -47,11 +47,17 @@ function showPage(id) {
   if (id === 'focus') id = 'tasks';
   const target = $('#' + id);
   if (!target?.classList.contains('page')) return;
-  $$('.page').forEach(page => page.classList.remove('active'));
-  target.classList.add('active');
+  const previous = $('.page.active')?.id;
+  const swap = () => {
+    $$('.page').forEach(page => page.classList.remove('active'));
+    target.classList.add('active');
+    if (id === 'today') renderToday();
+    if (typeof motionAfterPage === 'function') motionAfterPage();
+  };
+  if (typeof motionSwapPage === 'function') motionSwapPage(previous, id, swap);
+  else swap();
   updateNavigation(id);
   closeMobileSheet();
-  if (id === 'today') renderToday();
   const url = new URL(location.href);
   id === 'today' ? url.searchParams.delete('page') : url.searchParams.set('page', id);
   history.replaceState(null, '', url);
