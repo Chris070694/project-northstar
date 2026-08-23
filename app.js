@@ -39,15 +39,6 @@ async function loadAll() {
     renderHydration();
     renderBackupCenter();
     renderToday();
-    const h = new Date().getHours();
-    $('#greeting').textContent =
-      (h < 11 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend') + ' 👋';
-    $('#todayText').textContent = new Intl.DateTimeFormat('de-DE', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    }).format(new Date());
   } catch (err) {
     console.error(err);
     alert('Daten konnten nicht geladen werden: ' + err.message);

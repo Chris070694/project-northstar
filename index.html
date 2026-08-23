@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body>
     <section id="auth" class="auth">
@@ -39,7 +39,6 @@
       <aside class="sidebar">
         <div class="brand">CPRB <b>OS</b><small>Personal Operating System</small></div>
         <button class="nav active" data-page="today">◎ Heute</button
-        ><button class="nav" data-page="home">⌂ Dashboard</button
         ><button class="nav" data-page="trading">↗ Trading</button
         ><button class="nav" data-page="goals">🎯 Goals & Vision</button
         ><button class="nav" data-page="tasks">✓ To-dos</button
@@ -56,57 +55,42 @@
         <div class="layout-shell">
           <div>
             <section id="today" class="page active">
+              <div id="pwaNotice" class="pwa-notice">
+                <span
+                  >Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span
+                ><button id="installBtn" class="btn primary">Als App installieren</button>
+              </div>
               <div class="today-head">
                 <h1 id="todayGreeting">Guten Morgen</h1>
                 <div id="todayDate" class="sub"></div>
               </div>
               <div id="todayAnchor" class="card today-anchor"></div>
               <div id="todayNow" class="card today-now"></div>
-              <div class="today-section-label">Heute noch</div>
-              <div id="todayNext" class="today-list"></div>
+              <section class="card today-tasks-card">
+                <div class="today-tasks-head">
+                  <button class="task-heading-link" type="button" onclick="showPage('tasks')">
+                    Heutige Aufgaben →</button
+                  ><b id="homeTaskProgress">0/0 erledigt</b>
+                </div>
+                <div id="homeTaskList" class="home-task-list"></div>
+              </section>
+              <div id="todayNextSection" class="today-next-section">
+                <div class="today-section-label">Termine heute</div>
+                <div id="todayNext" class="today-list"></div>
+              </div>
               <div class="today-section-label">Momentum · 14 Tage</div>
               <div id="todayMomentum" class="today-momentum"></div>
-            </section>
 
-            <section id="home" class="page">
-              <div id="pwaNotice" class="pwa-notice">
-                <span
-                  >Installiere CPRB OS auf deinem Handy – schnell erreichbar und im App-Modus.</span
-                ><button id="installBtn" class="btn primary">Als App installieren</button>
-              </div>
-              <div class="top">
-                <div>
-                  <h1 id="greeting">Guten Morgen 👋</h1>
-                  <div id="todayText" class="sub"></div>
-                </div>
-                <div class="actions">
-                  <button class="btn" onclick="showPage('tasks')">To-dos</button
-                  ><button class="btn primary" onclick="openTrade()">+ Trade</button>
+              <div class="today-divider"><span>Überblick</span></div>
+
+              <div id="heroGoal" class="card vision-card">
+                <div class="vision-content">
+                  <span class="pill">DEIN NORDSTERN</span>
+                  <h2>Noch kein Long-Term-Ziel</h2>
+                  <p class="sub">Füge ein Ziel mit Bild hinzu.</p>
                 </div>
               </div>
-              <div class="grid hero-grid">
-                <div class="card focus-card">
-                  <div class="eyebrow">Deine Top-Priorität heute</div>
-                  <div id="mainFocus" class="focus-title">Wähle deine Top-Priorität.</div>
-                  <div id="nextFocus" class="sub">Markiere eine Aufgabe mit ☆.</div>
-                  <div class="home-task-section">
-                    <div class="task-heading">
-                      <button class="task-heading-link" type="button" onclick="showPage('tasks')">
-                        Heutige Aufgaben →</button
-                      ><b id="homeTaskProgress">0/0 erledigt</b>
-                    </div>
-                    <div id="homeTaskList" class="home-task-list"></div>
-                  </div>
-                </div>
-                <div id="heroGoal" class="card vision-card">
-                  <div class="vision-content">
-                    <span class="pill">DEIN NORDSTERN</span>
-                    <h2>Noch kein Long-Term-Ziel</h2>
-                    <p class="sub">Füge ein Ziel mit Bild hinzu.</p>
-                  </div>
-                </div>
-              </div>
-              <h2 style="margin-top: 24px">Trading Snapshot</h2>
+              <div class="today-section-label">Trading Snapshot</div>
               <div class="grid stats">
                 <div class="card stat">
                   <div class="label">Netto P&L</div>
@@ -125,39 +109,7 @@
                   <div id="tradeCount" class="value">0</div>
                 </div>
               </div>
-              <h2 style="margin-top: 24px">Schnellaktionen</h2>
-              <div class="grid thirds">
-                <div class="card dashboard-action">
-                  <strong>Trade dokumentieren</strong><span>Entry, Risiko, Setup und Ergebnis.</span
-                  ><button class="btn primary" onclick="openTrade()">Trade erfassen</button>
-                </div>
-                <div class="card dashboard-action">
-                  <strong>Tag planen</strong
-                  ><span>Aufgaben anlegen, wiederholen und priorisieren.</span
-                  ><button class="btn" onclick="showPage('tasks')">To-do-Liste</button>
-                </div>
-                <div class="card dashboard-action">
-                  <strong>Vision erweitern</strong
-                  ><span>Verbinde dein Ziel mit dem nächsten Schritt.</span
-                  ><button class="btn" onclick="openGoal()">Ziel hinzufügen</button>
-                </div>
-              </div>
-              <div id="homeFitnessOverview" class="card home-fitness-overview">
-                <div>
-                  <div class="eyebrow">Fitness heute</div>
-                  <h2 id="homeFitnessPlan">2er-Split einrichten</h2>
-                  <p id="homeFitnessStatus" class="sub">Dein Trainingsplan ist noch offen.</p>
-                </div>
-                <button class="btn" onclick="showPage('fitness')">Fitness öffnen</button>
-              </div>
-              <button type="button" class="card home-weekly-card" data-page="weekly">
-                <span class="home-weekly-icon">↻</span
-                ><span
-                  ><small>WEEKLY REVIEW</small><b>Deine Woche auf einen Blick</b
-                  ><em id="homeWeeklyPrompt">System Score wird berechnet…</em></span
-                ><strong>Öffnen →</strong>
-              </button>
-              <h2 style="margin-top: 24px">Dein Weg</h2>
+              <div class="today-section-label">Dein Weg</div>
               <div id="homeGoals" class="grid thirds"></div>
             </section>
 
@@ -1280,8 +1232,6 @@
               <span>📅</span><b>Kalender</b><small>Termine planen</small></button
             ><button data-page="reminders">
               <span>🔔</span><b>Erinnerungen</b><small>Push & Routinen</small></button
-            ><button data-page="home">
-              <span>⌂</span><b>Dashboard</b><small>Zahlen im Überblick</small></button
             ><button data-page="account">
               <span>⚙</span><b>Konto</b><small>Einstellungen</small>
             </button>
@@ -2144,21 +2094,21 @@
         </div>
       </div>
     </div>
-    <script src="modules/core.js?v=4"></script>
-    <script src="modules/today.js?v=1"></script>
-    <script src="modules/focus.js?v=3"></script>
+    <script src="modules/core.js?v=5"></script>
+    <script src="modules/today.js?v=2"></script>
+    <script src="modules/focus.js?v=4"></script>
     <script src="modules/goals.js"></script>
     <script src="modules/trading.js?v=2"></script>
     <script src="modules/stats.js?v=2"></script>
     <script src="modules/motion.js?v=1"></script>
-    <script src="modules/fitness.js?v=3"></script>
+    <script src="modules/fitness.js?v=4"></script>
     <script src="modules/resttimer.js?v=1"></script>
     <script src="modules/gymbag.js?v=1"></script>
     <script src="modules/notes.js?v=2"></script>
     <script src="modules/academy.js"></script>
     <script src="modules/library.js"></script>
     <script src="modules/calendar.js?v=2"></script>
-    <script src="modules/weekly.js?v=2"></script>
+    <script src="modules/weekly.js?v=3"></script>
     <script src="modules/reminders.js"></script>
     <script src="modules/backup.js?v=7"></script>
     <script src="modules/pwa.js?v=3"></script>

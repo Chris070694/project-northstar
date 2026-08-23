@@ -458,25 +458,43 @@ function renderDailyTasks() {
 }
 
 function renderFocus() {
+  /* Die Fokus-Karte sass auf dem alten Dashboard. Seit Dashboard und Heute
+     zusammengelegt sind, uebernimmt die Anker-Karte diese Rolle und die beiden
+     Elemente fehlen — deshalb schreibt setFocusText nur, wenn es sie gibt.
+     renderDailyTasks() unten muss trotzdem laufen. */
+  const setFocusText = (selector, text) => {
+    const element = $(selector);
+    if (element) element.textContent = text;
+  };
   const priorityTask = dailyTasks.find(task => task.is_priority && !task.is_completed);
   const openCount = dailyTasks.filter(task => !task.is_completed).length;
   if (priorityTask) {
-    $('#mainFocus').textContent = priorityTask.title;
-    $('#nextFocus').textContent = priorityTask.is_completed
-      ? 'Top-Priorität erledigt ✓'
-      : `★ Top-Priorität · ${priorityTask.category || 'Allgemein'}`;
+    setFocusText('#mainFocus', priorityTask.title);
+    setFocusText(
+      '#nextFocus',
+      priorityTask.is_completed
+        ? 'Top-Priorität erledigt ✓'
+        : `★ Top-Priorität · ${priorityTask.category || 'Allgemein'}`,
+    );
   } else if (openCount) {
-    $('#mainFocus').textContent = 'Wähle deine Top-Priorität.';
-    $('#nextFocus').textContent = taskPriorityReady
-      ? `${openCount} offene Aufgabe${openCount === 1 ? '' : 'n'} · Tippe auf ☆`
-      : 'Prioritätsfunktion noch einrichten';
+    setFocusText('#mainFocus', 'Wähle deine Top-Priorität.');
+    setFocusText(
+      '#nextFocus',
+      taskPriorityReady
+        ? `${openCount} offene Aufgabe${openCount === 1 ? '' : 'n'} · Tippe auf ☆`
+        : 'Prioritätsfunktion noch einrichten',
+    );
   } else {
-    $('#mainFocus').textContent = dailyTasks.length
-      ? 'Alles erledigt für heute ✓'
-      : 'Plane deinen Tag mit einer Aufgabe.';
-    $('#nextFocus').textContent = dailyTasks.length
-      ? 'Deine offenen Aufgaben sind geschafft.'
-      : 'Noch keine Aufgaben angelegt.';
+    setFocusText(
+      '#mainFocus',
+      dailyTasks.length ? 'Alles erledigt für heute ✓' : 'Plane deinen Tag mit einer Aufgabe.',
+    );
+    setFocusText(
+      '#nextFocus',
+      dailyTasks.length
+        ? 'Deine offenen Aufgaben sind geschafft.'
+        : 'Noch keine Aufgaben angelegt.',
+    );
   }
   renderDailyTasks();
 }

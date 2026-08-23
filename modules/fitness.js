@@ -564,29 +564,36 @@ function renderSetSummary(sets) {
   return `${labels.slice(0, 3).join(' · ')}${labels.length > 3 ? ` · +${labels.length - 3}` : ''}`;
 }
 
+/* Die Fitness-Kachel sass auf dem alten Dashboard. Seit Dashboard und Heute
+   zusammengelegt sind, zeigt die Jetzt-Karte auf "Heute" das laufende Training —
+   die Elemente hier koennen also fehlen. Die Funktion bleibt, damit ein Aufruf
+   aus renderFitness() nicht bricht. */
 function renderHomeFitness() {
+  const planElement = $('#homeFitnessPlan');
+  const statusElement = $('#homeFitnessStatus');
+  if (!planElement || !statusElement) return;
+
   const plan = fitnessPlans.find(item => item.id === selectedFitnessPlanId) || fitnessPlans[0];
   if (!fitnessReady) {
-    $('#homeFitnessPlan').textContent = 'Fitness-Datenbank einrichten';
-    $('#homeFitnessStatus').textContent =
-      'Die neue Fitness-Version wartet auf die Supabase-Migration.';
+    planElement.textContent = 'Fitness-Datenbank einrichten';
+    statusElement.textContent = 'Die neue Fitness-Version wartet auf die Supabase-Migration.';
     return;
   }
   if (activeFitnessSession) {
     const activeSets = setLogsForSession(activeFitnessSession.id);
     const completed = activeSets.filter(set => set.is_completed).length;
-    $('#homeFitnessPlan').textContent = activeFitnessSession.plan_name_snapshot + ' läuft';
-    $('#homeFitnessStatus').textContent = `${completed}/${activeSets.length} Sätze erledigt`;
+    planElement.textContent = activeFitnessSession.plan_name_snapshot + ' läuft';
+    statusElement.textContent = `${completed}/${activeSets.length} Sätze erledigt`;
     return;
   }
   if (!plan) {
-    $('#homeFitnessPlan').textContent = '2er-Split einrichten';
-    $('#homeFitnessStatus').textContent = 'Training A und B warten auf dich.';
+    planElement.textContent = '2er-Split einrichten';
+    statusElement.textContent = 'Training A und B warten auf dich.';
     return;
   }
   const count = fitnessPlanExercises.filter(exercise => exercise.plan_id === plan.id).length;
-  $('#homeFitnessPlan').textContent = plan.name;
-  $('#homeFitnessStatus').textContent = `${count} Übungen · bereit für dein nächstes Training`;
+  planElement.textContent = plan.name;
+  statusElement.textContent = `${count} Übungen · bereit für dein nächstes Training`;
 }
 
 function renderActiveFitnessWorkout() {

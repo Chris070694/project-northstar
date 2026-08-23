@@ -243,7 +243,8 @@ function renderWeeklyReview() {
   $('#weeklyScoreValue').textContent = `${metrics.score}%`;
   $('#weeklyScoreTitle').textContent = scoreTitle;
   $('#weeklyScoreCopy').textContent = scoreCopy;
-  $('#homeWeeklyPrompt').textContent = `${metrics.score}% System Score · Review öffnen`;
+  const weeklyPrompt = $('#homeWeeklyPrompt');
+  if (weeklyPrompt) weeklyPrompt.textContent = `${metrics.score}% System Score · Review öffnen`;
 
   $('#weeklyPnl').textContent = money(metrics.pnl);
   $('#weeklyPnl').className = 'weekly-metric ' + (metrics.pnl >= 0 ? 'pos' : 'neg');
