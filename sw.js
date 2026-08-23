@@ -1,8 +1,8 @@
-const CACHE = 'cprb-v04-v1';
+const CACHE = 'cprb-habits-v1';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=7',
+  './styles.css?v=8',
   './styles-funded.css?v=1',
   './styles-psychology.css?v=1',
   './app.js',
@@ -23,6 +23,7 @@ const APP_SHELL = [
   './modules/fitness.js?v=4',
   './modules/resttimer.js?v=1',
   './modules/gymbag.js?v=1',
+  './modules/habits.js?v=1',
   './modules/notes.js?v=2',
   './modules/academy.js',
   './modules/library.js',

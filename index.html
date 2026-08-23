@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=8" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
@@ -75,6 +75,28 @@
                   ><b id="homeTaskProgress">0/0 erledigt</b>
                 </div>
                 <div id="homeTaskList" class="home-task-list"></div>
+              </section>
+              <section id="habitCard" class="card habit-card">
+                <div class="habit-head">
+                  <div>
+                    <div class="eyebrow">Gewohnheiten</div>
+                    <h2>Jeden Tag</h2>
+                  </div>
+                  <span id="habitStatus" class="habit-status">–</span>
+                </div>
+                <div id="habitSetupNotice" class="task-setup-notice hide">
+                  Gewohnheiten warten noch auf ihre Supabase-Migration.
+                </div>
+                <div id="habitList" class="habit-list"></div>
+                <form id="habitForm" class="habit-form" onsubmit="event.preventDefault();addHabit()">
+                  <input
+                    id="habitInput"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Neue Gewohnheit, z. B. 📖 Lesen"
+                  />
+                  <button class="btn" type="submit">Hinzufügen</button>
+                </form>
               </section>
               <div id="todayNextSection" class="today-next-section">
                 <div class="today-section-label">Termine heute</div>
@@ -2116,6 +2138,7 @@
     <script src="modules/fitness.js?v=4"></script>
     <script src="modules/resttimer.js?v=1"></script>
     <script src="modules/gymbag.js?v=1"></script>
+    <script src="modules/habits.js?v=1"></script>
     <script src="modules/notes.js?v=2"></script>
     <script src="modules/academy.js"></script>
     <script src="modules/library.js"></script>
