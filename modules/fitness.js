@@ -447,6 +447,15 @@ async function toggleFitnessSet(id, isCompleted) {
   set.is_completed = isCompleted;
   set.completed_at = completedAt;
 
+  // Jeder abgehakte Satz startet die Pause. Abhaken rueckgaengig machen stoppt sie.
+  if (typeof startRestTimerForSet === 'function') {
+    const sessionExercise = fitnessSessionExercises.find(
+      item => item.id === set.session_exercise_id,
+    );
+    if (isCompleted) startRestTimerForSet(set, sessionExercise);
+    else stopRestTimer();
+  }
+
   const exerciseSets = fitnessSetLogs.filter(
     item => item.session_exercise_id === set.session_exercise_id,
   );
@@ -510,6 +519,7 @@ async function finishFitnessWorkout() {
     })
     .eq('id', activeFitnessSession.id);
   if (error) return alert(error.message);
+  if (typeof stopRestTimer === 'function') stopRestTimer();
   await refreshFitness();
 }
 
@@ -517,6 +527,7 @@ async function cancelFitnessWorkout() {
   if (!activeFitnessSession || !confirm('Laufendes Training wirklich verwerfen?')) return;
   const { error } = await sb.from('fitness_sessions').delete().eq('id', activeFitnessSession.id);
   if (error) return alert(error.message);
+  if (typeof stopRestTimer === 'function') stopRestTimer();
   await refreshFitness();
 }
 
@@ -601,8 +612,12 @@ function renderActiveFitnessWorkout() {
         .map(exercise => {
           const sets = activeSets.filter(set => set.session_exercise_id === exercise.id);
           const done = sets.length > 0 && sets.every(set => set.is_completed);
+          const restSeconds =
+            typeof restSecondsForExercise === 'function'
+              ? restSecondsForExercise(exercise.plan_exercise_id)
+              : 90;
           return `<article class="workout-exercise ${done ? 'done' : ''}">
-          <div class="workout-exercise-head"><div class="workout-exercise-copy"><b>${escapeHtml(exercise.exercise_name)}</b><span>${escapeHtml(exercise.muscle_group || 'Allgemein')} · ${exercise.target_sets} Sätze</span></div><button class="mini-btn history-btn" onclick="openFitnessProgress('${exercise.plan_exercise_id}')">Verlauf</button></div>
+          <div class="workout-exercise-head"><div class="workout-exercise-copy"><b>${escapeHtml(exercise.exercise_name)}</b><span>${escapeHtml(exercise.muscle_group || 'Allgemein')} · ${exercise.target_sets} Sätze</span></div><label class="workout-rest-field" title="Pause zwischen den Sätzen"><span>Pause</span><input type="number" min="10" max="900" step="5" value="${restSeconds}" onchange="rememberRestSeconds('${exercise.plan_exercise_id}',this.value)"><small>s</small></label><button class="mini-btn history-btn" onclick="openFitnessProgress('${exercise.plan_exercise_id}')">Verlauf</button></div>
           <div class="workout-set-list">
             ${sets
               .map(

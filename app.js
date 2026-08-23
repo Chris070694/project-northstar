@@ -23,11 +23,13 @@ async function loadAll() {
       loadReminderSettings(),
       loadLibrary(),
       loadHydration(),
+      loadGymBag(),
     ]);
     renderFocus();
     renderTrading();
     await renderGoals();
     renderFitness();
+    renderGymBag();
     renderNotes();
     await renderAcademy();
     await renderLibrary();

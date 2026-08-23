@@ -20,8 +20,8 @@ assert.match(source,/openFitnessProgress/);
 assert.match(source,/Vergleich nur mit dem letzten/);
 
 assert.match(backup,/\{\s*name:\s*'fitness_set_logs'\s*\}/);
-assert.match(backup,/fitness:\s*\[\s*'fitness_plans',\s*'fitness_plan_exercises',\s*'fitness_sessions',\s*'fitness_session_exercises',\s*'fitness_set_logs',?\s*\]/);
-assert.match(index,/modules\/fitness\.js\?v=2/);
+assert.match(backup,/fitness:\s*\[\s*'fitness_plans',\s*'fitness_plan_exercises',\s*'fitness_sessions',\s*'fitness_session_exercises',\s*'fitness_set_logs',/);
+assert.match(index,/modules\/fitness\.js\?v=\d+/);
 assert.match(index,/id="fitnessProgressModal"/);
 
 console.log('fitness v2 set logs, strict A/B history, progress UI and backup coverage: OK');

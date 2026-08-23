@@ -16,6 +16,7 @@ const CPRB_BACKUP_TABLES = [
   { name: 'fitness_sessions' },
   { name: 'fitness_session_exercises' },
   { name: 'fitness_set_logs' },
+  { name: 'gym_bag_items' },
   { name: 'notes' },
   { name: 'academy_notes' },
   { name: 'calendar_events' },
@@ -38,6 +39,7 @@ const CPRB_RESTORE_ORDER = [
   'fitness_sessions',
   'fitness_session_exercises',
   'fitness_set_logs',
+  'gym_bag_items',
   'notes',
   'academy_notes',
   'calendar_events',
@@ -53,6 +55,7 @@ const CPRB_EXPORT_MODULES = {
     'fitness_sessions',
     'fitness_session_exercises',
     'fitness_set_logs',
+    'gym_bag_items',
   ],
   focus: [
     'daily_focus',

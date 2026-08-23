@@ -52,6 +52,7 @@ function showPage(id) {
     $$('.page').forEach(page => page.classList.remove('active'));
     target.classList.add('active');
     if (id === 'today') renderToday();
+    if (id === 'fitness' && typeof onFitnessPageOpen === 'function') onFitnessPageOpen();
     if (typeof motionAfterPage === 'function') motionAfterPage();
   };
   if (typeof motionSwapPage === 'function') motionSwapPage(previous, id, swap);
