@@ -6086,3 +6086,177 @@ tbody tr:hover td {
     min-height: 160px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Gewohnheiten
+   --------------------------------------------------------------------------- */
+.habit-card {
+  margin-top: 14px;
+  padding: 14px 16px 16px;
+}
+.habit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.habit-head h2 {
+  margin: 4px 0 0;
+}
+.habit-status {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(84, 239, 177, 0.07);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.habit-list {
+  display: grid;
+  gap: 7px;
+}
+.habit-item {
+  display: grid;
+  /* 44px, weil die Touch-Regel auf schmalen Schirmen jedem Knopf min-height: 44px
+     gibt — bei 42 wäre der Knopf dort 42x44 und damit schief. */
+  grid-template-columns: 44px minmax(0, 1fr) auto auto;
+  gap: 11px;
+  align-items: center;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.022);
+  transition: 0.2s ease;
+}
+.habit-item:hover {
+  border-color: rgba(112, 229, 255, 0.24);
+}
+.habit-item.done {
+  border-color: rgba(84, 239, 177, 0.32);
+  background: rgba(84, 239, 177, 0.06);
+}
+
+/* Der Knopf ist die Hauptsache — gross genug zum Treffen, mit klarem Zustand. */
+.habit-check {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+.habit-check:hover {
+  border-color: var(--cyan);
+  background: rgba(112, 229, 255, 0.08);
+}
+.habit-item.done .habit-check {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  color: #031014;
+}
+.habit-copy {
+  min-width: 0;
+}
+.habit-title {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 750;
+}
+.habit-title:hover {
+  border-color: var(--line);
+}
+.habit-title:focus {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  outline: none;
+}
+.habit-copy small {
+  display: block;
+  margin-top: 1px;
+  padding-left: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* Vierzehn Tage als Band — dieselbe Sprache wie das Momentum darüber. */
+.habit-band {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.habit-band i {
+  width: 7px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.habit-band i.on {
+  background: linear-gradient(180deg, var(--cyan), var(--green));
+}
+.habit-actions {
+  display: flex;
+  gap: 5px;
+}
+.habit-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.habit-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+}
+.habit-form input:focus {
+  border-color: var(--line-strong);
+  outline: none;
+}
+.habit-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .habit-card {
+    padding: 13px 13px 14px;
+  }
+  /* Auf dem Handy ist die Zeile zu eng für alles nebeneinander: das Band
+     rutscht unter den Text, die Knöpfe bleiben rechts. */
+  .habit-item {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    row-gap: 7px;
+  }
+  .habit-band {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+  .habit-actions {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
+    align-items: center;
+  }
+  .habit-band i {
+    width: 6px;
+    height: 14px;
+  }
+}

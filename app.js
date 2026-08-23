@@ -27,6 +27,7 @@ async function loadAll() {
       loadLibrary(),
       loadHydration(),
       loadGymBag(),
+      loadHabits(),
     ]);
     renderFocus();
     renderTrading();
@@ -35,6 +36,7 @@ async function loadAll() {
     await renderGoals();
     renderFitness();
     renderGymBag();
+    renderHabits();
     renderNotes();
     await renderAcademy();
     await renderLibrary();
