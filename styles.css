@@ -5740,3 +5740,279 @@ tbody tr:hover td {
     transform: scaleX(1);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Fitness v0.5 — Trainingstasche
+   --------------------------------------------------------------------------- */
+.gym-bag-card {
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.gym-bag-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.gym-bag-head h2 {
+  margin: 4px 0 0;
+}
+.gym-bag-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gym-bag-status {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(112, 229, 255, 0.07);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.gym-bag-list {
+  display: grid;
+  gap: 6px;
+}
+.gym-bag-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.022);
+  transition: 0.2s ease;
+}
+.gym-bag-item:hover {
+  border-color: rgba(112, 229, 255, 0.24);
+}
+.gym-bag-item.done {
+  border-color: rgba(84, 239, 177, 0.3);
+  background: rgba(84, 239, 177, 0.06);
+}
+.gym-bag-item .fit-check {
+  width: 20px;
+  height: 20px;
+  align-self: center;
+  flex: none;
+}
+.gym-bag-label {
+  min-width: 0;
+  padding: 4px 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 750;
+}
+.gym-bag-label:hover {
+  border-color: var(--line);
+}
+.gym-bag-label:focus {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  outline: none;
+}
+.gym-bag-item.done .gym-bag-label {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.gym-bag-actions {
+  display: flex;
+  gap: 5px;
+}
+.gym-bag-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.gym-bag-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+}
+.gym-bag-form input:focus {
+  border-color: var(--line-strong);
+  outline: none;
+}
+.gym-bag-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.gym-bag-hint {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   Fitness v0.5 — Pausentimer
+   --------------------------------------------------------------------------- */
+.workout-rest-field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  margin-right: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.workout-rest-field input {
+  width: 58px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+.workout-rest-field input:focus {
+  border-color: var(--line-strong);
+  outline: none;
+}
+
+.rest-timer {
+  position: fixed;
+  z-index: 320;
+  right: 20px;
+  bottom: 20px;
+  left: auto;
+  width: min(500px, calc(100vw - 40px));
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: rgba(9, 13, 21, 0.94);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(24px);
+}
+.rest-timer.hide {
+  display: none;
+}
+.rest-timer-track {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.rest-timer-track > div {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  transition: width 0.25s linear;
+}
+.rest-timer.done .rest-timer-track > div {
+  background: linear-gradient(90deg, var(--green), var(--yellow));
+}
+.rest-timer-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  flex-wrap: nowrap;
+}
+.rest-timer-copy {
+  min-width: 96px;
+}
+.rest-timer-copy b {
+  display: block;
+  margin-top: 1px;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.rest-timer-copy small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  max-width: 240px;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rest-timer.done .rest-timer-copy b {
+  color: var(--green);
+}
+.rest-timer-presets {
+  display: flex;
+  gap: 5px;
+}
+.rest-preset {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+.rest-preset:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.rest-preset.active {
+  border-color: transparent;
+  background: linear-gradient(100deg, var(--cyan), var(--green));
+  color: #041016;
+}
+.rest-timer-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.rest-timer-actions .btn {
+  padding: 7px 13px;
+}
+
+@media (max-width: 900px) {
+  .rest-timer {
+    right: 8px;
+    left: 8px;
+    bottom: calc(84px + env(safe-area-inset-bottom));
+    width: auto;
+  }
+  .rest-timer-body {
+    gap: 10px;
+    padding: 11px 12px;
+    flex-wrap: wrap;
+  }
+  .rest-timer-copy {
+    min-width: 78px;
+  }
+  .rest-timer-copy b {
+    font-size: 22px;
+  }
+  .rest-timer-copy small {
+    max-width: 120px;
+  }
+  .rest-timer-presets {
+    order: 3;
+    width: 100%;
+  }
+  .rest-preset {
+    flex: 1;
+  }
+  .workout-rest-field {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-timer-track > div {
+    transition: none;
+  }
+}

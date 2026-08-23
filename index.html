@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=6" />
   </head>
   <body>
     <section id="auth" class="auth">
@@ -613,6 +613,40 @@
                 </button>
               </div>
               <section id="activeWorkout" class="card active-workout hide"></section>
+              <section id="gymBagCard" class="card gym-bag-card">
+                <div class="gym-bag-head">
+                  <div>
+                    <div class="eyebrow">Trainingstasche</div>
+                    <h2>Alles dabei?</h2>
+                  </div>
+                  <div class="gym-bag-head-right">
+                    <span id="gymBagStatus" class="gym-bag-status">–</span>
+                    <button class="mini-btn" onclick="uncheckAllGymBagItems()" title="Alle Haken entfernen">
+                      ↺
+                    </button>
+                  </div>
+                </div>
+                <div id="gymBagSetupNotice" class="task-setup-notice hide">
+                  Die Trainingstasche wartet noch auf ihre Supabase-Migration.
+                </div>
+                <div id="gymBagList" class="gym-bag-list"></div>
+                <form
+                  id="gymBagForm"
+                  class="gym-bag-form"
+                  onsubmit="event.preventDefault();addGymBagItem()"
+                >
+                  <input
+                    id="gymBagInput"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Noch etwas einpacken …"
+                  />
+                  <button class="btn" type="submit">Hinzufügen</button>
+                </form>
+                <small class="gym-bag-hint"
+                  >Die Haken setzen sich jeden Tag automatisch zurück.</small
+                >
+              </section>
               <div id="fitnessWorkspace" class="fitness-workspace hide">
                 <section class="card fitness-plan-card">
                   <div class="fitness-plan-toolbar">
@@ -2092,21 +2126,41 @@
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script src="modules/core.js?v=3"></script>
+    <div id="restTimer" class="rest-timer hide">
+      <div class="rest-timer-track"><div id="restTimerProgress"></div></div>
+      <div class="rest-timer-body">
+        <div class="rest-timer-copy">
+          <span class="eyebrow">Pause</span>
+          <b id="restTimerValue">0:00</b>
+          <small id="restTimerLabel">–</small>
+        </div>
+        <div id="restTimerPresets" class="rest-timer-presets"></div>
+        <div class="rest-timer-actions">
+          <button class="mini-btn" onclick="adjustRestTimer(-15)" title="15 Sekunden weniger">
+            −15
+          </button>
+          <button class="mini-btn" onclick="adjustRestTimer(30)" title="30 Sekunden mehr">+30</button>
+          <button class="btn" onclick="stopRestTimer()">Weiter</button>
+        </div>
+      </div>
+    </div>
+    <script src="modules/core.js?v=4"></script>
     <script src="modules/today.js?v=1"></script>
     <script src="modules/focus.js?v=3"></script>
     <script src="modules/goals.js"></script>
     <script src="modules/trading.js?v=2"></script>
     <script src="modules/stats.js?v=2"></script>
     <script src="modules/motion.js?v=1"></script>
-    <script src="modules/fitness.js?v=2"></script>
+    <script src="modules/fitness.js?v=3"></script>
+    <script src="modules/resttimer.js?v=1"></script>
+    <script src="modules/gymbag.js?v=1"></script>
     <script src="modules/notes.js?v=2"></script>
     <script src="modules/academy.js"></script>
     <script src="modules/library.js"></script>
     <script src="modules/calendar.js?v=2"></script>
     <script src="modules/weekly.js?v=2"></script>
     <script src="modules/reminders.js"></script>
-    <script src="modules/backup.js?v=6"></script>
+    <script src="modules/backup.js?v=7"></script>
     <script src="modules/pwa.js?v=3"></script>
     <script src="app.js"></script>
   </body>
