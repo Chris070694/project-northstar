@@ -21,8 +21,16 @@ function isMissingHydrationSchema(error) {
 
 function ensureHydrationCard() {
   if (document.getElementById('hydrationCard')) return;
-  const fitness = document.getElementById('homeFitnessOverview');
-  if (!fitness) return;
+  /* Die Karte hing frueher an #homeFitnessOverview, der Fitness-Kachel des
+     Dashboards. Seit Dashboard und Heute zusammengelegt sind, gibt es die nicht
+     mehr -- und weil die Funktion damals still ausstieg, verschwand die Karte
+     kommentarlos. Jetzt ein eigener, benannter Platz, und eine Meldung, falls
+     er fehlt. */
+  const slot = document.getElementById('hydrationSlot');
+  if (!slot) {
+    console.warn('Hydration: #hydrationSlot fehlt im Dokument — die Trinkkarte entfällt.');
+    return;
+  }
   const card = document.createElement('section');
   card.id = 'hydrationCard';
   card.className = 'card hydration-card';
@@ -39,7 +47,7 @@ function ensureHydrationCard() {
       <button class="btn hydration-undo" type="button" onclick="addHydration(-250)">− 250 ml</button>
     </div>
     <div id="hydrationSetupNotice" class="task-setup-notice hide">Hydration muss noch in Supabase eingerichtet werden.</div>`;
-  fitness.parentNode.insertBefore(card, fitness);
+  slot.appendChild(card);
 }
 
 function ensureHydrationStyles() {

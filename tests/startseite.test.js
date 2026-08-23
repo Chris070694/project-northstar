@@ -67,6 +67,45 @@ for (const weg of ['dashboard-action', 'homeWeeklyPrompt', 'homeFitnessOverview'
 }
 
 // ---------------------------------------------------------------------------
+// Jeder Anker, den ein Modul im Dokument sucht, muss es auch geben
+// ---------------------------------------------------------------------------
+/* Diese Pruefung fehlte beim Zusammenlegen und hat einen echten Fehler
+   durchgelassen: hydration.js haengte seine Trinkkarte an #homeFitnessOverview,
+   die Fitness-Kachel des alten Dashboards. Ohne sie stieg die Funktion still aus
+   und die Karte verschwand -- die Push-Erinnerungen kamen weiter, nur eintragen
+   ging nicht mehr. Gesucht wurde damals nur nach $('#id'), nicht nach
+   document.getElementById. */
+const fs2 = require('fs');
+const modulNamen = fs2.readdirSync('modules').filter(name => name.endsWith('.js'));
+const alleQuellen = modulNamen.map(name => fs2.readFileSync(`modules/${name}`, 'utf8'));
+
+/* Ein Anker ist in Ordnung, wenn er im HTML steht oder von einem Modul selbst
+   erzeugt wird -- entweder ueber element.id = 'x' oder als id="x" in einer
+   Vorlage, die das Modul in den Baum haengt. */
+const kenntId = id =>
+  index.includes(`id="${id}"`) ||
+  alleQuellen.some(
+    quelle =>
+      new RegExp(`\\.id\\s*=\\s*'${id}'`).test(quelle) || quelle.includes(`id="${id}"`),
+  );
+
+const fehlendeAnker = [];
+modulNamen.forEach((name, i) => {
+  const treffer = alleQuellen[i].matchAll(/document\.getElementById\('([A-Za-z0-9_-]+)'\)/g);
+  for (const [, id] of treffer) if (!kenntId(id)) fehlendeAnker.push(`${name} → #${id}`);
+});
+assert.deepStrictEqual(
+  fehlendeAnker,
+  [],
+  `Module suchen Elemente, die es nicht gibt:\n  ${fehlendeAnker.join('\n  ')}`,
+);
+
+// Die Trinkkarte hat jetzt einen eigenen, benannten Platz.
+assert.match(index, /id="hydrationSlot"/, 'Platz fuer die Trinkkarte auf der Startseite');
+const hydration = fs2.readFileSync('modules/hydration.js', 'utf8');
+assert.match(hydration, /getElementById\('hydrationSlot'\)/);
+
+// ---------------------------------------------------------------------------
 // Kein Modul schreibt hart auf ein entferntes Element
 // ---------------------------------------------------------------------------
 const entfernt = [
