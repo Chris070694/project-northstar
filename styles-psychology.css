@@ -1,0 +1,293 @@
+/* Psychologie-Auswertung. Ergänzt styles.css und benutzt ausschließlich deren
+   Farbtokens — keine neuen Farbwerte. Alle Regeln hängen unter .trading-psychology,
+   damit nichts in andere Karten ausläuft. */
+
+.trading-psychology {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.trading-psychology .psy-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.trading-psychology .psy-head h2 {
+  margin: 2px 0 0;
+}
+.trading-psychology .psy-basis {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+.trading-psychology .psy-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.022);
+}
+.trading-psychology .psy-block h3 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: -0.3px;
+}
+.trading-psychology .psy-block h4 {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.trading-psychology .psy-sub {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Gruppenkacheln: die Zahl trägt ihr Intervall und ihre Trade-Zahl im selben Block. */
+.trading-psychology .psy-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.trading-psychology .psy-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.028);
+}
+.trading-psychology .psy-group small {
+  color: var(--muted);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.trading-psychology .psy-group strong {
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: -0.4px;
+}
+.trading-psychology .psy-group span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Ein Satz mit getrennten Intervallen darf auffallen, ein offener Befund nicht. */
+.trading-psychology .psy-say {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+.trading-psychology .psy-say.klar {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.trading-psychology .psy-say.offen {
+  color: var(--muted);
+}
+.trading-psychology .psy-warn {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--yellow);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+/* Der Preis des Abweichens ist eine Rechnung unter einer Annahme —
+   die Annahme steht darum immer direkt darunter und wird nicht kleiner gesetzt als nötig. */
+.trading-psychology .psy-preis {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.trading-psychology .psy-preis strong {
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
+  color: var(--red);
+}
+.trading-psychology .psy-preis span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.trading-psychology .psy-preis em {
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--yellow);
+}
+
+.trading-psychology .psy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trading-psychology .psy-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.trading-psychology .psy-list li span {
+  color: var(--muted);
+}
+.trading-psychology .psy-list li b {
+  text-align: right;
+}
+
+/* Breite Tabellen scrollen in sich, damit die Seite nicht seitlich wandert. */
+.trading-psychology .psy-scroll {
+  overflow-x: auto;
+}
+.trading-psychology .psy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 520px;
+}
+.trading-psychology .psy-table th,
+.trading-psychology .psy-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.trading-psychology .psy-table th {
+  color: var(--muted);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+.trading-psychology .psy-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.trading-psychology .psy-contra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.trading-psychology .psy-contra > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 13px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.trading-psychology .psy-contra strong {
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.6px;
+  color: var(--violet);
+}
+.trading-psychology .psy-contra span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.trading-psychology .psy-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.trading-psychology .psy-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  padding: 5px 11px;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.trading-psychology .psy-chip:hover {
+  border-color: var(--line-strong);
+  color: var(--cyan);
+}
+
+.trading-psychology .psy-progress {
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.trading-psychology .psy-progress i {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+}
+
+.trading-psychology .psy-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trading-psychology .psy-notes li {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.trading-psychology .psy-notes small {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+.trading-psychology .psy-notes p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.trading-psychology .psy-notes p:empty {
+  display: none;
+}
+
+.trading-psychology .psy-foot {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 620px) {
+  .trading-psychology .psy-block {
+    padding: 13px;
+  }
+  .trading-psychology .psy-groups,
+  .trading-psychology .psy-contra {
+    grid-template-columns: 1fr;
+  }
+}

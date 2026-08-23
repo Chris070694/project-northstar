@@ -13,6 +13,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles-funded.css?v=1" />
+    <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
   <body>
     <section id="auth" class="auth">
@@ -256,7 +258,9 @@
                   <div id="tcount" class="value">0</div>
                 </div>
               </div>
+              <section id="fundedCard" class="card funded-card"></section>
               <section id="tradingStats" class="card trading-stats"></section>
+              <section id="tradingPsychology" class="card trading-psychology"></section>
               <div class="card trading-table-card">
                 <div class="table-wrap">
                   <table>
@@ -1294,6 +1298,9 @@
         <div class="grid form-grid trade-basic-fields">
           <div><label>Datum</label><input id="tDate" type="date" required /></div>
           <div>
+            <label>Konto</label><select id="tFundedPhase"></select>
+          </div>
+          <div>
             <label>Markt</label><input id="tMarket" required maxlength="20" placeholder="XAUUSD" />
           </div>
           <div>
@@ -2100,6 +2107,8 @@
     <script src="modules/goals.js"></script>
     <script src="modules/trading.js?v=2"></script>
     <script src="modules/stats.js?v=2"></script>
+    <script src="modules/funded.js?v=1"></script>
+    <script src="modules/psychology.js?v=1"></script>
     <script src="modules/motion.js?v=1"></script>
     <script src="modules/fitness.js?v=4"></script>
     <script src="modules/resttimer.js?v=1"></script>

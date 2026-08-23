@@ -11,6 +11,10 @@ const DEFAULT_TRADING_SETTINGS = {
   max_trades_per_day: 2,
 };
 
+/* Mindestzahl an Vorkommen, bevor die Cockpit-Kachel einen "haeufigsten
+   Regelbruch" ausruft. Darunter waere es Rauschen mit Ueberschrift. */
+const COCKPIT_MIN_TOP_BREAK = 5;
+
 const TRADE_CHECKS = [
   { key: 'scenario', label: 'Long- oder Short-Szenario vorab definiert' },
   { key: 'liquidity', label: 'Ziel-Liquidität klar markiert' },
@@ -274,6 +278,8 @@ async function openTrade(id = null) {
   form.reset();
   editingTradeId = id;
   $('#tDate').value = tradeDateKey();
+  if ($('#tFundedPhase') && typeof fundedTradeOptionsHtml === 'function')
+    $('#tFundedPhase').innerHTML = fundedTradeOptionsHtml();
   $('#tradeModalTitle').textContent = id ? 'Trade bearbeiten' : 'Trade planen';
   resetTradePreview('Before');
   resetTradePreview('After');
@@ -289,6 +295,8 @@ async function openTrade(id = null) {
     const trade = trades.find(item => item.id === id);
     if (!trade) return alert('Trade nicht gefunden.');
     $('#tDate').value = trade.trade_date || tradeDateKey();
+    if ($('#tFundedPhase') && typeof fundedTradeOptionsHtml === 'function')
+      $('#tFundedPhase').innerHTML = fundedTradeOptionsHtml(trade.funded_phase_id);
     $('#tMarket').value = trade.market || '';
     $('#tDirection').value = trade.direction || 'Long';
     $('#tSession').value = trade.session || 'London';
@@ -434,6 +442,7 @@ $('#tradeForm').onsubmit = async event => {
       learning: $('#tLearning').value.trim(),
       before_image_path: beforePath,
       after_image_path: afterPath,
+      ...(typeof fundedTradePayload === 'function' ? fundedTradePayload() : {}),
       updated_at: new Date().toISOString(),
     };
     if ($('#tEntry').value !== '') payload.entry_price = $('#tEntry').value;
@@ -584,13 +593,21 @@ function renderTradingAnalytics() {
     }),
   );
   const topBreak = Object.entries(breakCounts).sort((a, b) => b[1] - a[1])[0];
+  /* Ein Sieger erst ab genug Vorkommen. Bei einem einzigen Cockpit-Trade waere
+     jeder Regelbruch "der haeufigste" -- und die Psychologie-Karte direkt
+     darunter, die eine Mindestmenge verlangt, saehe es anders. */
+  const topBreakZaehlt = topBreak && topBreak[1] >= COCKPIT_MIN_TOP_BREAK;
   $('#cockpitAverageScore').textContent = checklistTrades.length ? `${avgScore.toFixed(0)}%` : '–';
   $('#cockpitPlanRate').textContent = reviewedTrades.length ? `${planRate.toFixed(0)}%` : '–';
-  $('#cockpitErrorCost').textContent = `${errorCost.toFixed(2)}R`;
-  $('#cockpitTopBreak').textContent = topBreak ? topBreak[0] : 'Noch keine Daten';
-  $('#cockpitTopBreakMeta').textContent = topBreak
+  /* Ohne einen einzigen bewerteten Trade ist "0.00R" keine Messung, sondern
+     Abwesenheit von Daten -- wie bei den drei Nachbarkacheln also ein Strich. */
+  $('#cockpitErrorCost').textContent = reviewedTrades.length ? `${errorCost.toFixed(2)}R` : '–';
+  $('#cockpitTopBreak').textContent = topBreakZaehlt ? topBreak[0] : 'Noch keine Daten';
+  $('#cockpitTopBreakMeta').textContent = topBreakZaehlt
     ? `${topBreak[1]}x nicht erfüllt`
-    : 'Beginnt mit deinem ersten Cockpit-Trade';
+    : topBreak
+      ? `Ab ${COCKPIT_MIN_TOP_BREAK} Vorkommen — bisher höchstens ${topBreak[1]}x`
+      : 'Beginnt mit deinem ersten Cockpit-Trade';
 }
 
 function renderTrading() {
