@@ -45,6 +45,9 @@ function updateNavigation(id) {
 }
 function showPage(id) {
   if (id === 'focus') id = 'tasks';
+  /* Dashboard ist in "Heute" aufgegangen. Alte Links und gespeicherte
+     ?page=home-Adressen sollen trotzdem irgendwo landen. */
+  if (id === 'home') id = 'today';
   const target = $('#' + id);
   if (!target?.classList.contains('page')) return;
   const previous = $('.page.active')?.id;

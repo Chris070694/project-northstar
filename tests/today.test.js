@@ -6,8 +6,25 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const elements = new Map();
 function element(selector) {
-  if (!elements.has(selector))
-    elements.set(selector, { textContent: '', innerHTML: '', className: '' });
+  if (!elements.has(selector)) {
+    const node = { textContent: '', innerHTML: '', className: '' };
+    /* Kleines classList, das className wirklich mitfuehrt — damit laesst sich
+       pruefen, ob ein Abschnitt aus- oder eingeblendet wird. */
+    node.classList = {
+      toggle(name, force) {
+        const classes = new Set(String(node.className).split(/\s+/).filter(Boolean));
+        const on = force === undefined ? !classes.has(name) : Boolean(force);
+        if (on) classes.add(name);
+        else classes.delete(name);
+        node.className = [...classes].join(' ');
+        return on;
+      },
+      contains(name) {
+        return String(node.className).split(/\s+/).includes(name);
+      },
+    };
+    elements.set(selector, node);
+  }
   return elements.get(selector);
 }
 
@@ -136,8 +153,15 @@ dailyTasks=[];
 renderTodayNext();`);
 assert.match(element('#todayNext').innerHTML, /Steuerberater/);
 assert.doesNotMatch(element('#todayNext').innerHTML, /Alter Termin/);
+assert.ok(
+  !element('#todayNextSection').classList.contains('hide'),
+  'mit Terminen ist der Abschnitt sichtbar',
+);
 
-// --- Was in der Jetzt-Karte steht, erscheint nicht nochmal unter "Heute noch"
+// --- Aufgaben stehen NICHT mehr in diesem Abschnitt
+/* Seit Dashboard und Heute zusammengelegt sind, sitzt die abhakbare
+   Aufgabenliste direkt darueber. Der Abschnitt hier zeigt nur noch Termine,
+   sonst stuende jede Aufgabe doppelt auf der Startseite. */
 run(`fitnessPlans=[]; calendarEvents=[]; activeFitnessSession=null;
      getTodayTradingState=()=>({maxTrades:2,lossLimit:2,tradeLimitReached:false,lossLimitReached:false});
      dailyTasks=[
@@ -147,14 +171,22 @@ run(`fitnessPlans=[]; calendarEvents=[]; activeFitnessSession=null;
      ];`);
 run("motionTestState = todayNowState(new Date('2026-08-21T06:00:00'))");
 assert.equal(run('todayNowCard(motionTestState).title'), 'Erste offene Aufgabe');
-/* Zustand fest vorgeben — sonst h\u00e4ngt der Test an der Uhrzeit des Testlaufs. */
 run('renderTodayNext(motionTestState)');
 assert.doesNotMatch(
   element('#todayNext').innerHTML,
   /Erste offene Aufgabe/,
-  'die Aufgabe aus der Jetzt-Karte steht nicht doppelt in der Liste',
+  'Aufgaben gehoeren in die abhakbare Liste, nicht hierhin',
 );
-assert.match(element('#todayNext').innerHTML, /Zweite offene Aufgabe/);
+assert.doesNotMatch(
+  element('#todayNext').innerHTML,
+  /Zweite offene Aufgabe/,
+  'auch weitere Aufgaben stehen hier nicht mehr',
+);
+assert.equal(element('#todayNext').innerHTML, '', 'ohne Termine bleibt der Abschnitt leer');
+assert.ok(
+  element('#todayNextSection').classList.contains('hide'),
+  'ohne Termine verschwindet der Abschnitt samt Ueberschrift',
+);
 
 // --- Nutzereingaben werden maskiert
 run(`dailyTasks=[{id:'x',title:'<img src=x onerror=alert(1)>',category:'',is_completed:false,is_priority:true}];

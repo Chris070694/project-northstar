@@ -216,34 +216,24 @@ function renderTodayNow(state = todayNowState()) {
     <button class="btn today-now-action" type="button" onclick="${card.onclick}">${card.action}</button>`;
 }
 
-function renderTodayNext(state = todayNowState()) {
+/* Frueher standen hier offene Aufgaben UND Termine. Seit die abhakbare
+   Aufgabenliste direkt darueber sitzt, waeren die Aufgaben doppelt — dieser
+   Abschnitt zeigt deshalb nur noch die Termine des Tages. Ohne Termine
+   verschwindet er ganz, statt eine leere Ueberschrift stehen zu lassen.
+   Der Parameter bleibt erhalten, damit vorhandene Aufrufe nicht brechen. */
+function renderTodayNext(_state = null) {
   const box = $('#todayNext');
   if (!box) return;
-  const rows = [];
-  /* Was schon in der Jetzt-Karte steht, taucht hier nicht nochmal auf. */
-  const shownTaskId = state.kind === 'task' ? state.task.id : null;
 
-  todayOpenTasks()
-    .filter(task => task.id !== shownTaskId)
-    .slice(0, 4)
-    .forEach(task => {
-      rows.push(
-        `<button class="today-row" type="button" onclick="showPage('tasks')"><span class="today-row-mark"></span><b>${escapeHtml(task.title || '')}</b><small>${escapeHtml(task.category || '')}</small></button>`,
-      );
-    });
-
-  todayEvents()
-    .slice(0, 3)
-    .forEach(event => {
+  const rows = todayEvents()
+    .slice(0, 5)
+    .map(event => {
       const time = String(event.start_time || '').slice(0, 5);
-      rows.push(
-        `<button class="today-row" type="button" onclick="showPage('calendar')"><span class="today-row-mark cal"></span><b>${escapeHtml(event.title || '')}</b><small>${escapeHtml(time)}</small></button>`,
-      );
+      return `<button class="today-row" type="button" onclick="showPage('calendar')"><span class="today-row-mark cal"></span><b>${escapeHtml(event.title || '')}</b><small>${escapeHtml(time)}</small></button>`;
     });
 
-  box.innerHTML = rows.length
-    ? rows.join('')
-    : '<div class="today-empty">Nichts mehr offen für heute.</div>';
+  box.innerHTML = rows.join('');
+  $('#todayNextSection')?.classList.toggle('hide', rows.length === 0);
 }
 
 function todayMomentumRow(label, activeDays, color) {
