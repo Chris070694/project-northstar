@@ -1,8 +1,10 @@
-const CACHE = 'cprb-start-v1';
+const CACHE = 'cprb-v04-v1';
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css?v=7',
+  './styles-funded.css?v=1',
+  './styles-psychology.css?v=1',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',
@@ -13,6 +15,8 @@ const APP_SHELL = [
   './modules/today.js?v=2',
   './modules/trading.js?v=2',
   './modules/stats.js?v=2',
+  './modules/funded.js?v=1',
+  './modules/psychology.js?v=1',
   './modules/motion.js?v=1',
   './modules/focus.js?v=4',
   './modules/goals.js',

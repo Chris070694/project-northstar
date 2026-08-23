@@ -1,0 +1,236 @@
+/* Funded-Tracking. Eigene Datei, damit styles.css unangetastet bleibt.
+   Farben kommen ausschließlich aus den vorhandenen Tokens; getönte Flächen werden per
+   color-mix daraus abgeleitet, mit neutraler Rückfallebene für ältere Browser. */
+
+.funded-card {
+  padding: 22px;
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.funded-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.funded-head h2 {
+  margin: 4px 0 4px;
+}
+.funded-head p {
+  margin: 0;
+}
+
+.funded-badge {
+  align-self: flex-start;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.funded-badge.state-target_reached,
+.funded-badge.state-passed {
+  color: var(--green);
+  border-color: var(--line-strong);
+}
+.funded-badge.state-daily_close,
+.funded-badge.state-target_days_missing {
+  color: var(--yellow);
+}
+.funded-badge.state-breach_daily,
+.funded-badge.state-breach_max,
+.funded-badge.state-failed {
+  color: var(--red);
+}
+
+/* Mehrere Konten: eine Chip-Reihe statt eines Dropdowns — sichtbar bleibt, was es gibt. */
+.funded-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.funded-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 780;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+.funded-chip:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.funded-chip.active {
+  color: var(--text);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.09);
+  background: color-mix(in srgb, var(--cyan) 14%, transparent);
+}
+
+/* Ein Zustand, ein Satz. Der Ton liegt im Rahmen, nicht in einer Warnfläche. */
+.funded-note {
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+.funded-note.good {
+  border-left-color: var(--green);
+  background: color-mix(in srgb, var(--green) 8%, transparent);
+}
+.funded-note.warn {
+  border-left-color: var(--yellow);
+  background: color-mix(in srgb, var(--yellow) 8%, transparent);
+}
+.funded-note.soft {
+  border-left-color: var(--cyan);
+  background: color-mix(in srgb, var(--cyan) 7%, transparent);
+}
+/* Gerissen heißt deutlich, nicht laut: eine Kante in Rot, kein rotes Feld. */
+.funded-note.breach {
+  border-left-color: var(--red);
+  background: color-mix(in srgb, var(--red) 8%, transparent);
+}
+.funded-stale {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.funded-progress {
+  display: grid;
+  gap: 8px;
+}
+.funded-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.funded-progress-head b {
+  color: var(--text);
+  font-size: 14px;
+}
+.funded-progress small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.funded-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.funded-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  transition: width 0.3s ease;
+}
+
+.funded-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.funded-tile {
+  display: grid;
+  gap: 3px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.028);
+}
+.funded-tile small {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 750;
+}
+.funded-tile strong {
+  font-size: 19px;
+  letter-spacing: -0.5px;
+}
+.funded-tile span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Was heute noch geht — die Zeile, für die die ganze Karte da ist. */
+.funded-today {
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  font-weight: 780;
+  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--cyan) 9%, transparent);
+}
+.funded-today.closed {
+  border-color: var(--line);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.funded-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.funded-footnote {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.funded-form {
+  display: grid;
+  gap: 0;
+}
+.funded-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.funded-form-save {
+  margin-top: 18px;
+  justify-self: start;
+}
+
+@media (max-width: 720px) {
+  .funded-card {
+    padding: 18px;
+  }
+  .funded-head {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .funded-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .funded-actions .btn {
+    flex: 1 1 46%;
+  }
+  .funded-form-save {
+    justify-self: stretch;
+  }
+}

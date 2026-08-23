@@ -3,6 +3,9 @@ const CPRB_BACKUP_MAGIC = 'CPRB01';
 const CPRB_BACKUP_ITERATIONS = 250000;
 const CPRB_BACKUP_TABLES = [
   { name: 'trades' },
+  { name: 'funded_accounts' },
+  { name: 'funded_phases' },
+  { name: 'funded_payouts' },
   { name: 'trading_settings', conflict: 'user_id' },
   { name: 'daily_focus' },
   { name: 'vision_goals' },
@@ -25,6 +28,9 @@ const CPRB_BACKUP_TABLES = [
 ];
 
 const CPRB_RESTORE_ORDER = [
+  'funded_accounts',
+  'funded_phases',
+  'funded_payouts',
   'trades',
   'trading_settings',
   'daily_focus',
@@ -48,7 +54,13 @@ const CPRB_RESTORE_ORDER = [
 ];
 
 const CPRB_EXPORT_MODULES = {
-  trading: ['trades', 'trading_settings'],
+  trading: [
+    'trades',
+    'trading_settings',
+    'funded_accounts',
+    'funded_phases',
+    'funded_payouts',
+  ],
   fitness: [
     'fitness_plans',
     'fitness_plan_exercises',

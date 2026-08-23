@@ -14,6 +14,7 @@ async function loadAll() {
     await loadFocus();
     await Promise.all([
       loadTrades(),
+      loadFunded(),
       loadGoals(),
       loadFitness(),
       loadNotes(),
@@ -27,6 +28,8 @@ async function loadAll() {
     ]);
     renderFocus();
     renderTrading();
+    renderFunded();
+    if (typeof renderTradingPsychology === 'function') renderTradingPsychology();
     await renderGoals();
     renderFitness();
     renderGymBag();
