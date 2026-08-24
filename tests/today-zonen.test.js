@@ -1,6 +1,10 @@
-/* Die Heute-Seite ist in drei Zonen geteilt: Jetzt, Heute, Überblick.
+/* Die Heute-Seite ist in vier Zonen geteilt: Jetzt, Heute, Überblick, Priorität.
    Was hier geprüft wird, ist die Ordnung — sie ist der ganze Zweck des Umbaus
-   und geht beim nächsten Einfügen einer Karte als Erstes verloren. */
+   und geht beim nächsten Einfügen einer Karte als Erstes verloren.
+
+   Die Reihenfolge ist keine Geschmacksfrage, sondern Christians Ansage: oben
+   steht, was ihn morgens angeht (Wirtschaftskalender, ein Satz zum Tag), dann
+   das zum Abhaken, dann der Rückblick, ganz unten Anker und Jetzt-Karte. */
 
 const fs = require('fs');
 const assert = require('assert');
@@ -21,15 +25,15 @@ const wo = suche => {
 };
 
 // ---------------------------------------------------------------------------
-// Zone 1 — Jetzt
+// Zone 1 — Jetzt: Begrüßung, Wirtschaftskalender, Zitat des Tages
 // ---------------------------------------------------------------------------
-assert.ok(wo('id="todayGreeting"') < wo('id="todayAnchor"'));
-assert.ok(wo('id="todayAnchor"') < wo('id="todayNow"'));
+assert.ok(wo('id="todayGreeting"') < wo('id="newsCard"'));
+assert.ok(wo('id="newsCard"') < wo('id="quoteCard"'));
 
 // ---------------------------------------------------------------------------
 // Zone 2 — Heute: alles zum Abhaken, in dieser Reihenfolge
 // ---------------------------------------------------------------------------
-assert.ok(wo('id="todayNow"') < wo('>Heute</div>'), 'der Zonentitel steht nach der Jetzt-Karte');
+assert.ok(wo('id="quoteCard"') < wo('>Heute</div>'), 'der Zonentitel steht nach dem Zitat');
 
 const abhaken = ['id="homeTaskList"', 'id="habitCard"', 'id="hydrationSlot"', 'id="todayNextSection"'];
 abhaken.reduce((vorher, jetzt) => {
@@ -52,7 +56,14 @@ assert.ok(
   'der Überblick ist standardmäßig zu',
 );
 
-const ueberblick = seite.slice(seite.indexOf('id="todayOverview"'));
+/* Bis zum schliessenden </details> schneiden, nicht bis zum Seitenende: seit der
+   Priorität-Zone steht darunter noch etwas, und ein Schnitt bis ans Ende würde
+   auch dann grün bleiben, wenn eine Karte aus dem Überblick herausrutscht. */
+const ueberblick = seite.slice(
+  seite.indexOf('id="todayOverview"'),
+  seite.indexOf('</details>'),
+);
+assert.ok(ueberblick.length > 200, 'der Überblick-Ausschnitt ist gefunden');
 for (const id of ['id="todayMomentum"', 'id="heroGoal"', 'id="pnl"', 'id="homeGoals"']) {
   assert.ok(ueberblick.includes(id), `${id} gehört in den Überblick`);
 }
@@ -60,6 +71,27 @@ for (const id of ['id="todayMomentum"', 'id="heroGoal"', 'id="pnl"', 'id="homeGo
 assert.ok(
   wo('id="todayNextSection"') < wo('id="todayMomentum"'),
   'das Momentum steht unter den Terminen, nicht darüber',
+);
+
+// ---------------------------------------------------------------------------
+// Zone 4 — Priorität: Anker und Jetzt-Karte, ganz unten, aber sichtbar
+// ---------------------------------------------------------------------------
+assert.ok(wo('</details>') < wo('id="todayAnchor"'), 'der Anker steht unter dem Überblick');
+assert.ok(wo('id="todayAnchor"') < wo('id="todayNow"'), 'Anker über der Jetzt-Karte');
+assert.ok(wo('>Priorität</div>') < wo('id="todayAnchor"'), 'die Zone hat einen Titel');
+/* Sichtbar, nicht eingeklappt: über den Anker wird die Tagespriorität gesetzt.
+   Läge er im zugeklappten Überblick, würde er gar nicht mehr benutzt. */
+assert.ok(
+  !ueberblick.includes('id="todayAnchor"'),
+  'der Anker steckt nicht im eingeklappten Überblick',
+);
+/* Und nichts steht mehr unter der Jetzt-Karte — sie ist das Seitenende.
+   Hinter ihr schliessendes </div> schneiden, nicht ab ihrer id: sonst faengt
+   der Ausschnitt ihr eigenes class="card" mit ein und die Prüfung ist nie grün. */
+assert.strictEqual(
+  seite.slice(seite.indexOf('</div>', wo('id="todayNow"'))).includes('class="card'),
+  false,
+  'die Jetzt-Karte schliesst die Seite ab',
 );
 
 // ---------------------------------------------------------------------------
@@ -121,4 +153,4 @@ assert.strictEqual(
   'styles.css: Version laeuft auseinander',
 );
 
-console.log('Heute-Seite: drei Zonen, Reihenfolge, eingeklappter Überblick, gemerkter Zustand: OK');
+console.log('Heute-Seite: vier Zonen, Reihenfolge, eingeklappter Überblick, gemerkter Zustand: OK');

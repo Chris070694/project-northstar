@@ -6555,3 +6555,105 @@ tbody tr:hover td {
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Zitat des Tages
+   Bewusst ruhiger als die News-Karte darüber: violett statt gelb, kein Rahmen
+   um die Zeilen, viel Luft. Sie soll gelesen und nicht bearbeitet werden.
+   --------------------------------------------------------------------------- */
+.quote-card {
+  position: relative;
+  padding: 20px 22px 18px 26px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border-color: rgba(173, 147, 255, 0.2);
+  background:
+    linear-gradient(180deg, rgba(173, 147, 255, 0.05), transparent 70%),
+    var(--panel);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+/* Der senkrechte Strich links statt eines Anführungszeichen-Ornaments: er
+   trägt bei jeder Zitatlänge, ein großes " sitzt bei kurzen Sätzen daneben.
+
+   :after, nicht :before — .card:before ist die feine helle Linie, die auf jeder
+   Karte oben liegt. Wer sie hier überschreibt, nimmt der Zitatkarte still das
+   gemeinsame Aussehen aller anderen. Und über die volle Höhe, sonst schneidet
+   der Eckenradius zusammen mit overflow:hidden den Strich zu einem Stummel
+   in der Kartenmitte zurecht. */
+.quote-card:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    rgba(173, 147, 255, 0.25),
+    var(--violet) 30%,
+    rgba(173, 147, 255, 0.2)
+  );
+}
+.quote-card:hover,
+.quote-card:focus-visible {
+  border-color: rgba(173, 147, 255, 0.36);
+  background:
+    linear-gradient(180deg, rgba(173, 147, 255, 0.08), transparent 70%),
+    var(--panel);
+}
+.quote-card:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+.quote-text {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.55;
+  /* Kein Umbruch mitten im Wort, aber lange Fremdwörter dürfen brechen —
+     sonst schiebt ein einziges langes Wort die Karte auf dem Handy auf. */
+  overflow-wrap: anywhere;
+}
+.quote-by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+.quote-by b {
+  color: var(--violet);
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+.quote-work {
+  color: var(--muted);
+  font-size: 10px;
+}
+/* Ohne Werkangabe soll kein leerer Punkt oder Abstand übrig bleiben. */
+.quote-work:before {
+  content: '· ';
+}
+.quote-work.hide {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .quote-card {
+    padding: 17px 15px 15px 20px;
+  }
+  .quote-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+/* Wer Bewegung abgestellt hat, bekommt auch hier keine. */
+@media (prefers-reduced-motion: reduce) {
+  .quote-card {
+    transition: none;
+  }
+}
