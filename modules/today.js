@@ -261,6 +261,31 @@ function renderTodayMomentum() {
     todayMomentumRow('Training', trainingDays, 'green');
 }
 
+/* Der Ueberblick ist eingeklappt, weil man ihn nicht taeglich braucht. Der
+   Zustand ist eine reine Anzeige-Vorliebe pro Geraet -- deshalb localStorage und
+   nicht die Datenbank. Lesen und Schreiben abgesichert: in privaten Fenstern oder
+   bei blockierten Website-Daten wirft der Zugriff. */
+const TODAY_OVERVIEW_KEY = 'northstar-today-overview';
+
+function restoreTodayOverview() {
+  const overview = $('#todayOverview');
+  if (!overview) return;
+  try {
+    overview.open = localStorage.getItem(TODAY_OVERVIEW_KEY) === 'offen';
+  } catch (error) {
+    overview.open = false;
+  }
+  if (overview.dataset.merkt === '1') return;
+  overview.dataset.merkt = '1';
+  overview.addEventListener('toggle', () => {
+    try {
+      localStorage.setItem(TODAY_OVERVIEW_KEY, overview.open ? 'offen' : 'zu');
+    } catch (error) {
+      /* Ohne Speicher klappt der Ueberblick trotzdem -- er merkt es sich nur nicht. */
+    }
+  });
+}
+
 function renderToday() {
   const greeting = $('#todayGreeting');
   if (greeting) greeting.textContent = todayGreeting();
@@ -277,4 +302,5 @@ function renderToday() {
   renderTodayNow(state);
   renderTodayNext(state);
   renderTodayMomentum();
+  restoreTodayOverview();
 }
