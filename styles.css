@@ -6405,3 +6405,153 @@ tbody tr:hover td {
     margin-top: 12px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Wirtschaftskalender
+   --------------------------------------------------------------------------- */
+.news-card {
+  padding: 14px 16px 16px;
+  margin-bottom: 14px;
+  border-color: rgba(255, 211, 107, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 211, 107, 0.05), transparent 60%),
+    var(--panel);
+}
+.news-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.news-head h2 {
+  margin: 4px 0 0;
+}
+.news-head .eyebrow {
+  color: var(--yellow);
+}
+.news-status {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 211, 107, 0.08);
+  color: var(--yellow);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+/* Der Satz über der Liste: was als Nächstes kommt und wann. */
+.news-next {
+  margin-bottom: 10px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  font-size: 12px;
+}
+.news-next b {
+  color: var(--text);
+}
+.news-list {
+  display: grid;
+  gap: 4px;
+}
+.news-row {
+  display: grid;
+  grid-template-columns: 46px 8px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  transition: 0.18s ease;
+}
+.news-row:hover {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.022);
+}
+/* Vergangene Termine bleiben stehen, treten aber zurück — die Zahl ist raus,
+   die Zeile ist nur noch Rückblick. */
+.news-row.vorbei {
+  opacity: 0.45;
+}
+.news-time {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+.news-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.news-row.vorbei .news-dot {
+  background: var(--muted);
+}
+.news-copy {
+  min-width: 0;
+}
+.news-copy b {
+  display: block;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.news-copy small {
+  display: block;
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.news-cur {
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+.news-label {
+  margin: 12px 0 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.news-empty {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 12px 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.news-empty small {
+  color: var(--muted);
+  font-size: 10px;
+  opacity: 0.8;
+}
+.news-fehler {
+  color: var(--red);
+}
+
+@media (max-width: 900px) {
+  .news-card {
+    padding: 13px 13px 14px;
+  }
+  .news-row {
+    grid-template-columns: 42px 8px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+  }
+  .news-cur {
+    display: none;
+  }
+}

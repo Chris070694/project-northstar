@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=9" />
+    <link rel="stylesheet" href="styles.css?v=10" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
@@ -63,12 +63,22 @@
                 ><button id="installBtn" class="btn primary">Als App installieren</button>
               </div>
 
-              <!-- Zone 1 — JETZT: was gerade dran ist. Kein Abschnittstitel, die
-                   Begrüßung ist der Kopf der Seite. -->
               <div class="today-head">
                 <h1 id="todayGreeting">Guten Morgen</h1>
                 <div id="todayDate" class="sub"></div>
               </div>
+              <!-- Zone 1 — JETZT. Der Wirtschaftskalender steht ganz oben:
+                   morgens ist die erste Frage, was heute den Markt bewegt. -->
+              <section id="newsCard" class="card news-card">
+                <div class="news-head">
+                  <div>
+                    <div class="eyebrow">Wichtige News · USD</div>
+                    <h2>Heute am Markt</h2>
+                  </div>
+                  <span id="newsStatus" class="news-status">…</span>
+                </div>
+                <div id="newsList" class="news-list"></div>
+              </section>
               <div id="todayAnchor" class="card today-anchor"></div>
               <div id="todayNow" class="card today-now"></div>
 
@@ -2148,6 +2158,7 @@
     </div>
     <script src="modules/core.js?v=5"></script>
     <script src="modules/today.js?v=3"></script>
+    <script src="modules/news.js?v=1"></script>
     <script src="modules/focus.js?v=4"></script>
     <script src="modules/goals.js"></script>
     <script src="modules/trading.js?v=2"></script>

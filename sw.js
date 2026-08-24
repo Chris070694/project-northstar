@@ -1,8 +1,8 @@
-const CACHE = 'cprb-zonen-v1';
+const CACHE = 'cprb-news-v1';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=9',
+  './styles.css?v=10',
   './styles-funded.css?v=1',
   './styles-psychology.css?v=1',
   './app.js',
@@ -13,6 +13,7 @@ const APP_SHELL = [
   './icons/cprb-og-180.png',
   './modules/core.js?v=5',
   './modules/today.js?v=3',
+  './modules/news.js?v=1',
   './modules/trading.js?v=2',
   './modules/stats.js?v=2',
   './modules/funded.js?v=1',
