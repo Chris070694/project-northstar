@@ -6260,3 +6260,148 @@ tbody tr:hover td {
     height: 14px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Heute-Seite: drei Zonen — Jetzt, Heute, Überblick
+   --------------------------------------------------------------------------- */
+
+/* Zonentitel. Kräftiger als ein Abschnittslabel, weil er wirklich trennt. */
+.today-zone {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.today-zone:after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Einheitlicher Kartenkopf — ersetzt die freistehenden Überschriften, die
+   vorher über nackten Listen standen. */
+.today-card-head {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.today-next-card,
+.today-momentum-card,
+.today-stats-card,
+.today-goals-card {
+  padding: 14px 16px 16px;
+  margin-top: 14px;
+}
+.today-next-card.hide {
+  display: none;
+}
+/* Die Kacheln sitzen schon in einer Karte — innen kein zweiter Rahmen. */
+.today-stats-card .stat {
+  background: rgba(255, 255, 255, 0.025);
+}
+.today-momentum-card .today-momentum {
+  margin-top: 0;
+}
+.today-goals-card .grid.thirds {
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Überblick — einklappbar
+   --------------------------------------------------------------------------- */
+.today-overview {
+  margin-top: 4px;
+}
+.today-zone-toggle {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+/* Das Standard-Dreieck von <details> weg, wir zeichnen ein eigenes. */
+.today-zone-toggle::-webkit-details-marker {
+  display: none;
+}
+.today-zone-toggle::marker {
+  content: '';
+}
+.today-zone-toggle > span {
+  order: 1;
+}
+.today-zone-toggle:after {
+  order: 2;
+}
+.today-zone-toggle > i {
+  order: 3;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  transition: 0.2s ease;
+}
+.today-zone-toggle:hover > i {
+  border-color: var(--line-strong);
+  color: var(--cyan);
+}
+.today-overview[open] .today-zone-toggle > i {
+  transform: rotate(180deg);
+  border-color: var(--line-strong);
+  color: var(--cyan);
+}
+.today-overview-body {
+  display: grid;
+  gap: 0;
+  padding-bottom: 8px;
+}
+.today-overview[open] .today-overview-body {
+  animation: todayOverviewAuf 0.22s ease;
+}
+@keyframes todayOverviewAuf {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .today-overview[open] .today-overview-body {
+    animation: none;
+  }
+  .today-zone-toggle > i {
+    transition: none;
+  }
+}
+
+#today .vision-card {
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .today-zone {
+    margin: 22px 0 10px;
+  }
+  .today-next-card,
+  .today-momentum-card,
+  .today-stats-card,
+  .today-goals-card {
+    padding: 13px 13px 14px;
+    margin-top: 12px;
+  }
+}
