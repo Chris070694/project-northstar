@@ -181,7 +181,7 @@ assert.match(funktion, /Access-Control-Allow-Origin/);
 assert.doesNotMatch(funktion, /Europe\/Vienna/, 'die Funktion kennt keine Zeitzone');
 
 // ---------------------------------------------------------------------------
-// Verdrahtung: die Karte steht ganz oben, Anker und Jetzt darunter
+// Verdrahtung: die Karte steht ganz oben, direkt unter der Begrüßung
 // ---------------------------------------------------------------------------
 const seite = index.slice(
   index.indexOf('<section id="today"'),
@@ -193,9 +193,17 @@ const wo = suche => {
   return stelle;
 };
 assert.ok(wo('id="todayGreeting"') < wo('id="newsCard"'), 'die Begrüßung bleibt der Seitenkopf');
-assert.ok(wo('id="newsCard"') < wo('id="todayAnchor"'), 'News stehen über dem Anker');
-assert.ok(wo('id="todayAnchor"') < wo('id="todayNow"'), 'Anker über der Jetzt-Karte');
-assert.ok(wo('id="todayNow"') < wo('>Heute</div>'), 'beide bleiben in der Jetzt-Zone');
+/* Der Wirtschaftskalender ist das Erste nach der Begrüßung. Zwischen beide darf
+   nichts rutschen — genau das ist bei jedem Einbau die Gefahr. */
+assert.ok(wo('id="newsCard"') < wo('id="quoteCard"'), 'News stehen über dem Zitat');
+assert.ok(wo('id="quoteCard"') < wo('>Heute</div>'), 'beide stehen über der Heute-Zone');
+assert.strictEqual(
+  seite.slice(wo('id="todayGreeting"'), wo('id="newsCard"')).includes('class="card'),
+  false,
+  'zwischen Begrüßung und News steht keine weitere Karte',
+);
+/* Anker und Jetzt-Karte sind ans Seitenende gewandert. */
+assert.ok(wo('id="todayOverview"') < wo('id="todayAnchor"'), 'der Anker steht unter dem Überblick');
 
 assert.match(app, /loadNews\(\)/);
 assert.match(app, /renderNews\(\)/);

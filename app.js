@@ -39,6 +39,7 @@ async function loadAll() {
     renderGymBag();
     renderHabits();
     renderNews();
+    renderQuote();
     renderNotes();
     await renderAcademy();
     await renderLibrary();

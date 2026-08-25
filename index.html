@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
@@ -79,8 +79,23 @@
                 </div>
                 <div id="newsList" class="news-list"></div>
               </section>
-              <div id="todayAnchor" class="card today-anchor"></div>
-              <div id="todayNow" class="card today-now"></div>
+              <!-- Ein Satz zum Tag. Die Liste steht fest in quotes.js, deshalb ist
+                   die Karte auch offline da. Tippen holt das naechste Zitat;
+                   morgen steht wieder das des Tages. -->
+              <section
+                id="quoteCard"
+                class="card quote-card"
+                role="button"
+                tabindex="0"
+                title="Tippen für das nächste Zitat"
+                onclick="naechstesQuote()"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();naechstesQuote()}"
+              >
+                <blockquote id="quoteText" class="quote-text"></blockquote>
+                <div class="quote-by">
+                  <b id="quotePerson"></b><span id="quoteWork" class="quote-work"></span>
+                </div>
+              </section>
 
               <!-- Zone 2 — HEUTE: alles zum Abhaken, in einer Optik. -->
               <div class="today-zone">Heute</div>
@@ -168,6 +183,15 @@
                   </section>
                 </div>
               </details>
+
+              <!-- Zone 4 — PRIORITAET. Anker und Jetzt-Karte standen frueher ganz
+                   oben. Christian nutzt sie selten, deshalb sollen sie den Morgen
+                   nicht besetzen. Sie bleiben aber sichtbar und nicht eingeklappt:
+                   ueber den Anker wird die Tagespriorität gesetzt, und was man
+                   zuklappt, benutzt man gar nicht mehr. -->
+              <div class="today-zone">Priorität</div>
+              <div id="todayAnchor" class="card today-anchor"></div>
+              <div id="todayNow" class="card today-now"></div>
             </section>
 
             <section id="trading" class="page">
@@ -2159,6 +2183,7 @@
     <script src="modules/core.js?v=5"></script>
     <script src="modules/today.js?v=3"></script>
     <script src="modules/news.js?v=1"></script>
+    <script src="modules/quotes.js?v=1"></script>
     <script src="modules/focus.js?v=4"></script>
     <script src="modules/goals.js"></script>
     <script src="modules/trading.js?v=2"></script>
