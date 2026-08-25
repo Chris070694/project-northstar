@@ -66,6 +66,14 @@ const liste = vm.runInContext('QUOTES', context);
 assert.ok(Array.isArray(liste), 'QUOTES ist ein Array');
 assert.ok(liste.length >= 20, `genug Zitate für eine Rotation: ${liste.length}`);
 
+/* Ein zu langes Zitat schiebt die Karte auf dem Handy weit auf und draengt die
+   Aufgaben unter die Falz. Gemessen am laengsten, der bisher drin ist. */
+const laengstes = liste.reduce((a, b) => (a.t.length >= b.t.length ? a : b));
+assert.ok(
+  laengstes.t.length <= 240,
+  `zu lang (${laengstes.t.length} Zeichen): ${laengstes.p} — ${laengstes.t.slice(0, 60)}…`,
+);
+
 liste.forEach((zitat, i) => {
   assert.ok(typeof zitat.t === 'string' && zitat.t.trim().length > 15, `Zitat ${i}: Text fehlt`);
   assert.ok(typeof zitat.p === 'string' && zitat.p.trim(), `Zitat ${i}: Person fehlt`);
