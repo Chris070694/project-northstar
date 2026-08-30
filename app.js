@@ -28,6 +28,7 @@ async function loadAll() {
       loadHydration(),
       loadGymBag(),
       loadHabits(),
+      loadFitnessProgress(),
       loadNews(),
     ]);
     renderFocus();
@@ -37,6 +38,7 @@ async function loadAll() {
     await renderGoals();
     renderFitness();
     renderGymBag();
+    renderFitnessProgress();
     renderHabits();
     renderNews();
     renderQuote();

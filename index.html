@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=11" />
+    <link rel="stylesheet" href="styles.css?v=12" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
@@ -681,6 +681,21 @@
                 <small class="gym-bag-hint"
                   >Die Haken setzen sich jeden Tag automatisch zurück.</small
                 >
+              </section>
+              <!-- Fortschritt. Liest die Sicht fitness_progress_v; gezeichnet wird
+                   als eigenes SVG wie die Kapitalkurve, ohne Diagramm-Bibliothek. -->
+              <section id="fitnessProgressCard" class="card fp-card">
+                <div class="fp-head">
+                  <div>
+                    <div class="eyebrow">Fortschritt</div>
+                    <h2>Wird es schwerer?</h2>
+                  </div>
+                </div>
+                <div id="fitnessProgressNotice" class="task-setup-notice hide">
+                  Der Fortschritt wartet noch auf die Auswertungs-Sichten in Supabase.
+                </div>
+                <div id="fitnessProgressPicker" class="fp-picker"></div>
+                <div id="fitnessProgressBody" class="fp-body"></div>
               </section>
               <div id="fitnessWorkspace" class="fitness-workspace hide">
                 <section class="card fitness-plan-card">
@@ -2192,6 +2207,7 @@
     <script src="modules/psychology.js?v=1"></script>
     <script src="modules/motion.js?v=1"></script>
     <script src="modules/fitness.js?v=4"></script>
+    <script src="modules/fitness-progress.js?v=1"></script>
     <script src="modules/resttimer.js?v=1"></script>
     <script src="modules/gymbag.js?v=1"></script>
     <script src="modules/habits.js?v=1"></script>
