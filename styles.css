@@ -6657,3 +6657,256 @@ tbody tr:hover td {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Fitness-Fortschritt
+   Grün wie das Fitness-Modul, sonst dieselbe Bauweise wie die Kennzahlen-Karte
+   im Trading-Teil: Kachelreihe oben, Kurve darunter.
+   --------------------------------------------------------------------------- */
+.fp-card {
+  padding: 16px 18px 18px;
+  margin-bottom: 14px;
+  border-color: rgba(84, 239, 177, 0.2);
+  background:
+    linear-gradient(180deg, rgba(84, 239, 177, 0.05), transparent 62%),
+    var(--panel);
+}
+.fp-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.fp-head h2 {
+  margin: 4px 0 0;
+}
+.fp-head .eyebrow {
+  color: var(--green);
+}
+
+/* Übungswahl: eine Zeile, die seitlich scrollt. Bei dreizehn Übungen würde ein
+   Umbruch die halbe Karte mit Knöpfen füllen. */
+.fp-picker {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.fp-picker::-webkit-scrollbar {
+  display: none;
+}
+.fp-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+.fp-pick span {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.fp-pick:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.fp-pick.active {
+  border-color: rgba(84, 239, 177, 0.45);
+  background: rgba(84, 239, 177, 0.12);
+  color: var(--green);
+}
+.fp-pick.active span {
+  background: rgba(84, 239, 177, 0.18);
+}
+
+.fp-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.fp-metric {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.fp-ranges {
+  display: flex;
+  gap: 4px;
+}
+.fp-range {
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+.fp-range:hover {
+  color: var(--text);
+}
+.fp-range.active {
+  border-color: rgba(84, 239, 177, 0.4);
+  background: rgba(84, 239, 177, 0.1);
+  color: var(--green);
+}
+
+.fp-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.fp-tile {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.022);
+}
+.fp-tile small {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.fp-tile strong {
+  display: block;
+  overflow: hidden;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fp-tile em {
+  display: block;
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.fp-tile em.pos {
+  color: var(--green);
+  opacity: 0.8;
+}
+.fp-tile em.neg {
+  color: var(--red);
+  opacity: 0.8;
+}
+.fp-tile strong.pos {
+  color: var(--green);
+}
+.fp-tile strong.neg {
+  color: var(--red);
+}
+
+.fp-chart {
+  display: block;
+  width: 100%;
+  height: 170px;
+  overflow: visible;
+}
+.fp-line {
+  stroke: var(--green);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Zeichnet sich einmal ein, wie die Kapitalkurve. --fp-len setzt das Modul,
+     weil nur der Browser die echte Pfadlänge kennt. */
+  stroke-dasharray: var(--fp-len);
+  stroke-dashoffset: var(--fp-len);
+  animation: fpDraw 0.9s var(--spring, ease) forwards;
+}
+@keyframes fpDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* Die Trendgerade tritt zurück: sie ist eine Deutung, keine Messung. */
+.fp-trend {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+  opacity: 0.55;
+}
+.fp-pr {
+  fill: var(--yellow);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+.fp-last {
+  fill: var(--green);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+.fp-empty {
+  margin: 4px 0;
+  padding: 14px 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.fp-note {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+@media (max-width: 900px) {
+  .fp-card {
+    padding: 14px 13px 15px;
+  }
+  .fp-tiles {
+    gap: 6px;
+  }
+  .fp-tile {
+    padding: 9px 10px;
+  }
+  .fp-tile strong {
+    font-size: 13px;
+  }
+  .fp-chart {
+    height: 150px;
+  }
+}
+
+/* Wer Bewegung abgestellt hat, bekommt die Linie fertig gezeichnet. */
+@media (prefers-reduced-motion: reduce) {
+  .fp-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .fp-pick,
+  .fp-range {
+    transition: none;
+  }
+}
