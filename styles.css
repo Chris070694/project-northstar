@@ -6910,3 +6910,192 @@ tbody tr:hover td {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Stempeluhr
+   Ein großer Zustandsknopf, ein kleiner daneben. Vier gleichwertige Knöpfe
+   wären ein Fehlstempel pro Woche.
+   --------------------------------------------------------------------------- */
+.work-card {
+  padding: 16px 18px 16px;
+  margin-bottom: 14px;
+  border-color: rgba(112, 229, 255, 0.2);
+  background:
+    linear-gradient(180deg, rgba(112, 229, 255, 0.05), transparent 62%),
+    var(--panel);
+}
+.work-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.work-head h2 {
+  margin: 4px 0 0;
+}
+.work-head .eyebrow {
+  color: var(--cyan);
+}
+.work-now {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.work-clockface strong {
+  display: block;
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.work-clockface small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.work-clockface.pause strong {
+  color: var(--yellow);
+}
+.work-clockface.fertig strong {
+  color: var(--green);
+}
+.work-clockface.leer strong {
+  color: var(--muted);
+}
+.work-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Der Hauptknopf ist absichtlich groß und trägt nur eine Beschriftung: die
+   nächste sinnvolle Handlung. Was er auslöst, ergibt sich aus dem Zustand. */
+.work-main {
+  min-height: 48px;
+  padding: 13px 22px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+.work-main.start {
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  color: #04121a;
+}
+.work-main.pause {
+  border-color: rgba(255, 211, 107, 0.4);
+  background: rgba(255, 211, 107, 0.12);
+  color: var(--yellow);
+}
+.work-main.weiter {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #04121a;
+}
+.work-main:hover {
+  filter: brightness(1.07);
+}
+.work-second {
+  min-height: 48px;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+.work-second:hover {
+  border-color: rgba(255, 120, 142, 0.4);
+  color: var(--red);
+}
+.work-done {
+  padding: 12px 16px;
+  border: 1px solid rgba(84, 239, 177, 0.28);
+  border-radius: 14px;
+  background: rgba(84, 239, 177, 0.08);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+}
+.work-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.work-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.022);
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+.work-row:hover {
+  border-color: var(--line-strong);
+}
+.work-row-time {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+.work-row-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.work-row-work_start .work-row-time {
+  color: var(--cyan);
+}
+.work-row-work_end .work-row-time {
+  color: var(--green);
+}
+.work-row-break_start .work-row-time,
+.work-row-break_end .work-row-time {
+  color: var(--yellow);
+}
+.work-hint {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+@media (max-width: 900px) {
+  .work-card {
+    padding: 14px 13px;
+  }
+  .work-now {
+    gap: 10px;
+  }
+  .work-clockface strong {
+    font-size: 26px;
+  }
+  .work-main {
+    padding: 13px 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-main,
+  .work-second,
+  .work-row {
+    transition: none;
+  }
+}

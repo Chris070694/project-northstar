@@ -1,8 +1,8 @@
-const CACHE = 'cprb-fitness-fortschritt-v1';
+const CACHE = 'cprb-stempeluhr-v1';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=12',
+  './styles.css?v=13',
   './styles-funded.css?v=1',
   './styles-psychology.css?v=1',
   './app.js',
@@ -24,6 +24,7 @@ const APP_SHELL = [
   './modules/goals.js',
   './modules/fitness.js?v=4',
   './modules/fitness-progress.js?v=1',
+  './modules/worktime.js?v=1',
   './modules/resttimer.js?v=1',
   './modules/gymbag.js?v=1',
   './modules/habits.js?v=1',
