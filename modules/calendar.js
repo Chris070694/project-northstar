@@ -22,7 +22,7 @@ function calendarQuery(columns = '*') {
 
 async function loadCalendar() {
   const columns =
-    'id,user_id,created_at,title,event_date,start_time,end_time,category,description,completed,recurrence,reminder_enabled,reminder_time';
+    'id,user_id,created_at,title,event_date,start_time,end_time,category,description,completed,recurrence,reminder_enabled,reminder_time,source';
   let { data, error } = await calendarQuery(columns);
   if (error && isMissingCalendarV2Schema(error)) {
     calendarV2Ready = false;
@@ -202,6 +202,14 @@ function calendarDay(date, num, outside) {
       .join('')}${events.length > 3 ? `<div class="sub">+${events.length - 3}</div>` : ''}</div>
   </div>`;
 }
+/* Ein Arbeitstag aus der Stempeluhr ist keine Aufgabe: er ist vorbei, es gibt
+   nichts abzuhaken. Und geloescht gehoert er auch nicht hier — er wuerde beim
+   naechsten Stempel wieder auftauchen und waere bis dahin verschwunden.
+   Geaendert wird er ueber die Stempeluhr, nicht ueber den Kalender. */
+function isStampedWorkEvent(event) {
+  return event?.source === 'work_clock';
+}
+
 function renderCalendarSelectedDay() {
   const date = new Date(selectedCalendarDate + 'T12:00:00');
   $('#selectedDateTitle').textContent = new Intl.DateTimeFormat('de-DE', {
@@ -218,7 +226,7 @@ function renderCalendarSelectedDay() {
     <div class="sub">${e.start_time ? e.start_time.slice(0, 5) : 'Ganztägig'}${e.end_time ? ' – ' + e.end_time.slice(0, 5) : ''}</div>
     <div class="event-meta">${e.recurrence === 'yearly' ? '<span>↻ Jährlich</span>' : ''}${e.reminder_enabled ? `<span>🔔 ${String(e.reminder_time || '08:00').slice(0, 5)} Uhr</span>` : ''}</div>
     ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
-    <div class="actions">${e.recurrence === 'yearly' ? '' : `<button class="btn" onclick="toggleCalendarEvent('${e.id}',${e.completed})">${e.completed ? 'Wieder öffnen' : 'Erledigt'}</button>`}<button class="btn danger" onclick="deleteCalendarEvent('${e.id}')">Löschen</button></div>
+    <div class="actions">${isStampedWorkEvent(e) ? '<span class="event-source">Aus der Stempeluhr</span>' : `${e.recurrence === 'yearly' ? '' : `<button class="btn" onclick="toggleCalendarEvent('${e.id}',${e.completed})">${e.completed ? 'Wieder öffnen' : 'Erledigt'}</button>`}<button class="btn danger" onclick="deleteCalendarEvent('${e.id}')">Löschen</button>`}</div>
   </div>`,
       )
       .join('') || '<div class="empty">Keine Termine an diesem Tag.</div>';

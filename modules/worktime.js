@@ -10,6 +10,7 @@
    Arbeitgebers, sondern ist die Gegenkontrolle dazu. */
 
 let workEntries = [];
+let workTargets = {};
 let workReady = false;
 let workTicker = null;
 
@@ -54,7 +55,144 @@ async function loadWorkTime() {
   }
   workReady = true;
   workEntries = Array.isArray(data) ? data : [];
+
+  /* Sollzeiten sind Beiwerk: fehlen sie, laeuft die Stempeluhr weiter, nur ohne
+     Gleitzeitkonto. Ein Fehler hier darf die Uhr nicht mitreissen. */
+  const ziele = await sb.from('work_targets').select('*');
+  workTargets = {};
+  if (!ziele.error) {
+    for (const ziel of ziele.data || []) workTargets[Number(ziel.weekday)] = ziel;
+  }
 }
+
+/* ---------------------------------------------------------------------------
+   Gleitzeitkonto
+   --------------------------------------------------------------------------- */
+
+/* Aus dem Datumstext den Wochentag, ohne Umweg ueber new Date('2026-09-03'):
+   das waere Mitternacht UTC und westlich von Greenwich der Vortag. */
+function workWeekday(tag) {
+  const teile = String(tag || '').split('-').map(Number);
+  if (teile.length !== 3 || teile.some(Number.isNaN)) return null;
+  return new Date(teile[0], teile[1] - 1, teile[2]).getDay();
+}
+
+function workTargetFor(tag) {
+  const wochentag = workWeekday(tag);
+  const ziel = wochentag === null ? null : workTargets[wochentag];
+  return {
+    soll: Number(ziel?.net_minutes) > 0 ? Number(ziel.net_minutes) * 60 : 0,
+    beginn: ziel?.start_time || null,
+    pause: Number(ziel?.break_minutes) > 0 ? Number(ziel.break_minutes) * 60 : 0,
+  };
+}
+
+function workHasTargets() {
+  return Object.values(workTargets).some(ziel => Number(ziel?.net_minutes) > 0);
+}
+
+/* Nur abgeschlossene Tage zaehlen ins Konto. Ein Tag ohne Stempel taucht gar
+   nicht auf — er erzeugt also kein Minus. Das ist Absicht: die Uhr ist eine
+   Gegenkontrolle, kein Nachweis. Ein Urlaubstag oder ein vergessener Tag soll
+   das Konto nicht kaputtmachen. */
+function workClosedDays(rows = workEntries) {
+  const tage = new Set();
+  for (const row of rows) if (row?.kind === 'work_end' && row.work_date) tage.add(row.work_date);
+  return [...tage].sort();
+}
+
+function workDayBalance(tag, rows = workEntries) {
+  const stempel = workStamps(tag, rows);
+  if (!stempel.some(row => row.kind === 'work_end')) return null;
+  return workNetSeconds(stempel, Date.now()) - workTargetFor(tag).soll;
+}
+
+/* Saldo aller abgeschlossenen Tage vor dem angegebenen Tag. Der laufende Tag
+   bleibt bewusst draussen — er ist ja noch nicht entschieden. */
+function workBalanceBefore(tag = workDayKey(), rows = workEntries) {
+  return workClosedDays(rows)
+    .filter(eintrag => eintrag < tag)
+    .reduce((summe, eintrag) => summe + (workDayBalance(eintrag, rows) || 0), 0);
+}
+
+/* Montag als Wochenanfang. */
+function workWeekStart(tag = workDayKey()) {
+  const teile = String(tag).split('-').map(Number);
+  const datum = new Date(teile[0], teile[1] - 1, teile[2]);
+  const zurueck = (datum.getDay() + 6) % 7;
+  datum.setDate(datum.getDate() - zurueck);
+  return workDayKey(datum);
+}
+
+/* Alles, was abgeschlossen ist — das ist der Stand des Kontos. */
+function workBalanceTotal(rows = workEntries) {
+  return workClosedDays(rows).reduce(
+    (summe, eintrag) => summe + (workDayBalance(eintrag, rows) || 0),
+    0,
+  );
+}
+
+function workBalanceWeek(tag = workDayKey(), rows = workEntries) {
+  const start = workWeekStart(tag);
+  return workClosedDays(rows)
+    .filter(eintrag => eintrag >= start && eintrag <= tag)
+    .reduce((summe, eintrag) => summe + (workDayBalance(eintrag, rows) || 0), 0);
+}
+
+function formatWorkBalance(sekunden) {
+  if (!Number.isFinite(sekunden)) return '–';
+  if (Math.abs(sekunden) < 60) return '±0:00 h';
+  const zeichen = sekunden > 0 ? '+' : '−';
+  return `${zeichen}${formatWorkDuration(Math.abs(sekunden))}`;
+}
+
+/* Wann kann er heute gehen, damit das Konto auf null steht? Gerechnet wird mit
+   dem echten Beginn und der echten Pause des Tages, nicht mit der Regelzeit —
+   wer um 05:40 angefangen hat, darf frueher heim. */
+function workZeroEndTime(stempel, tag = workDayKey(), rows = workEntries) {
+  const beginn = stempel.find(row => row.kind === 'work_start');
+  if (!beginn) return null;
+  const von = workStampTime(beginn);
+  if (von === null) return null;
+  const soll = workTargetFor(tag).soll;
+  if (!soll) return null;
+  const zielNetto = soll - workBalanceBefore(tag, rows);
+  return von + (workBreakSeconds(stempel, Date.now()) + zielNetto) * 1000;
+}
+
+/* Der naechste Tag mit Sollzeit — nach dem Donnerstag also der Freitag, nach
+   dem Freitag der Montag. Sucht hoechstens zwei Wochen weit, damit eine leere
+   Zieltabelle nicht in eine Endlosschleife laeuft. */
+function workNextTargetDay(tag = workDayKey()) {
+  const teile = String(tag).split('-').map(Number);
+  const datum = new Date(teile[0], teile[1] - 1, teile[2]);
+  for (let i = 0; i < 14; i++) {
+    datum.setDate(datum.getDate() + 1);
+    const key = workDayKey(datum);
+    if (workTargetFor(key).soll > 0) return key;
+  }
+  return null;
+}
+
+/* Bis wann muss er an einem kuenftigen Tag bleiben, um auf null zu kommen?
+   Hier zaehlt die Regelzeit, denn der Tag hat noch nicht angefangen. */
+function workForecast(tag, saldo) {
+  const ziel = workTargetFor(tag);
+  if (!ziel.soll || !ziel.beginn) return null;
+  const [stunde, minute] = String(ziel.beginn).split(':').map(Number);
+  const teile = String(tag).split('-').map(Number);
+  const start = new Date(teile[0], teile[1] - 1, teile[2], stunde || 0, minute || 0, 0, 0);
+  const regulaer = new Date(start.getTime() + (ziel.soll + ziel.pause) * 1000);
+  const noetig = new Date(regulaer.getTime() - saldo * 1000);
+  return { start, regulaer, noetig, differenz: -saldo };
+}
+
+function formatWorkTimeOfDay(datum) {
+  if (!(datum instanceof Date) || Number.isNaN(datum.getTime())) return '--:--';
+  return new Intl.DateTimeFormat('de-AT', { hour: '2-digit', minute: '2-digit' }).format(datum);
+}
+
+const WORK_WEEKDAY_NAMES = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 /* ---------------------------------------------------------------------------
    Rechnen
@@ -230,6 +368,69 @@ function workRowHtml(row) {
   </button>`;
 }
 
+/* Das Gleitzeitkonto. Waehrend der Tag laeuft: bis wann muss ich heute bleiben.
+   Nach dem Feierabend: wie steht das Konto, und was heisst das fuer den
+   naechsten Arbeitstag — genau die Frage am Donnerstagabend. */
+function workBalanceHtml(stempel, zustand, tag = workDayKey()) {
+  if (!workHasTargets()) return '';
+  const ziel = workTargetFor(tag);
+  const saldoWoche = workBalanceWeek(tag);
+  const zeilen = [];
+
+  if (ziel.soll > 0 && (zustand === 'laeuft' || zustand === 'pause')) {
+    const ende = workZeroEndTime(stempel, tag);
+    const vorher = workBalanceBefore(tag);
+    if (ende) {
+      const wann = formatWorkTimeOfDay(new Date(ende));
+      /* Liegt der Zeitpunkt schon hinter uns, ist das Konto heute bereits
+         ausgeglichen — dann keine Uhrzeit nennen, die nach Rueckstand aussieht. */
+      const erreicht = ende <= Date.now();
+      zeilen.push(
+        erreicht
+          ? `<span>Soll erfüllt — jeder Stempel ab jetzt ist Plus</span>`
+          : `<span>Feierabend <b>${escapeHtml(wann)}</b> für ±0</span>`,
+      );
+      if (Math.abs(vorher) >= 60) {
+        zeilen.push(
+          `<span>davon <b>${escapeHtml(formatWorkBalance(vorher))}</b> aus den Vortagen</span>`,
+        );
+      }
+    }
+  }
+
+  if (ziel.soll > 0 && zustand !== 'fertig' && zustand !== 'leer') {
+    zeilen.push(`<span>Soll heute ${escapeHtml(formatWorkDuration(ziel.soll))}</span>`);
+  }
+
+  if (zustand === 'fertig') {
+    const heute = workDayBalance(tag);
+    if (heute !== null) {
+      zeilen.push(`<span>Heute <b>${escapeHtml(formatWorkBalance(heute))}</b></span>`);
+    }
+    zeilen.push(`<span>Woche <b>${escapeHtml(formatWorkBalance(saldoWoche))}</b></span>`);
+
+    /* Der eigentliche Punkt: was bedeutet der Saldo fuer den naechsten
+       Arbeitstag? Am Donnerstagabend also der Freitag. */
+    const naechster = workNextTargetDay(tag);
+    const gesamt = workBalanceTotal();
+    const vorschau = naechster ? workForecast(naechster, gesamt) : null;
+    if (vorschau) {
+      const name = WORK_WEEKDAY_NAMES[workWeekday(naechster)] || 'Nächster Tag';
+      const regulaer = formatWorkTimeOfDay(vorschau.regulaer);
+      const noetig = formatWorkTimeOfDay(vorschau.noetig);
+      zeilen.push(
+        Math.abs(vorschau.differenz) < 60
+          ? `<span>${escapeHtml(name)} regulär bis <b>${escapeHtml(regulaer)}</b></span>`
+          : `<span>${escapeHtml(name)} bis <b>${escapeHtml(noetig)}</b> statt ${escapeHtml(regulaer)}</span>`,
+      );
+    }
+  }
+
+  if (!zeilen.length) return '';
+  const ton = saldoWoche > 60 ? 'plus' : saldoWoche < -60 ? 'minus' : '';
+  return `<div class="work-balance ${ton}">${zeilen.join('')}</div>`;
+}
+
 function renderWorkTime() {
   const karte = $('#workCard');
   if (!karte) {
@@ -290,6 +491,7 @@ function renderWorkTime() {
       </div>
       <div class="work-actions">${knopf}${feierabend}</div>
     </div>
+    ${workBalanceHtml(stempel, zustand)}
     ${stempel.length ? `<div class="work-list">${stempel.map(workRowHtml).join('')}</div>` : ''}
     <small class="work-hint">Private Aufzeichnung als Gegenkontrolle — nicht die offizielle Zeiterfassung.</small>`;
 
