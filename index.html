@@ -12,7 +12,7 @@
     <link rel="icon" href="icons/cprb-og-192.png" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="icons/cprb-og-180.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=12" />
+    <link rel="stylesheet" href="styles.css?v=13" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
   </head>
@@ -95,6 +95,22 @@
                 <div class="quote-by">
                   <b id="quotePerson"></b><span id="quoteWork" class="quote-work"></span>
                 </div>
+              </section>
+
+              <!-- Stempeluhr. Steht in der Jetzt-Zone, weil sie zum Tagesanfang
+                   gehoert: an einem Arbeitstag ist der erste Griff der Stempel.
+                   Der fertige Tag landet ueber einen Trigger im Kalender. -->
+              <section id="workCard" class="card work-card">
+                <div class="work-head">
+                  <div>
+                    <div class="eyebrow">Arbeitszeit</div>
+                    <h2>Stempeluhr</h2>
+                  </div>
+                </div>
+                <div id="workNotice" class="task-setup-notice hide">
+                  Die Stempeluhr wartet noch auf ihre Supabase-Migration.
+                </div>
+                <div id="workBody" class="work-body"></div>
               </section>
 
               <!-- Zone 2 — HEUTE: alles zum Abhaken, in einer Optik. -->
@@ -2208,6 +2224,7 @@
     <script src="modules/motion.js?v=1"></script>
     <script src="modules/fitness.js?v=4"></script>
     <script src="modules/fitness-progress.js?v=1"></script>
+    <script src="modules/worktime.js?v=1"></script>
     <script src="modules/resttimer.js?v=1"></script>
     <script src="modules/gymbag.js?v=1"></script>
     <script src="modules/habits.js?v=1"></script>

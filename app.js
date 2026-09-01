@@ -29,6 +29,7 @@ async function loadAll() {
       loadGymBag(),
       loadHabits(),
       loadFitnessProgress(),
+      loadWorkTime(),
       loadNews(),
     ]);
     renderFocus();
@@ -39,6 +40,7 @@ async function loadAll() {
     renderFitness();
     renderGymBag();
     renderFitnessProgress();
+    renderWorkTime();
     renderHabits();
     renderNews();
     renderQuote();
