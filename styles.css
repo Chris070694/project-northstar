@@ -7099,3 +7099,48 @@ tbody tr:hover td {
     transition: none;
   }
 }
+
+/* Ein Termin aus der Stempeluhr trägt keine Knöpfe, sondern die Herkunft. */
+.event-source {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* Gleitzeitkonto: eine ruhige Zeile unter der Uhr. Die Farbe sagt nur, in
+   welche Richtung es steht — die Zahl sagt, wie weit. */
+.work-balance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.022);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.work-balance b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.work-balance.plus {
+  border-color: rgba(84, 239, 177, 0.24);
+}
+.work-balance.plus b {
+  color: var(--green);
+}
+.work-balance.minus {
+  border-color: rgba(255, 211, 107, 0.26);
+}
+.work-balance.minus b {
+  color: var(--yellow);
+}

@@ -17,6 +17,8 @@ const app = fs.readFileSync('app.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const migration = fs.readFileSync('supabase/migrations/20260901_arbeitszeit.sql', 'utf8');
+const sollMigration = fs.readFileSync('supabase/migrations/20260901_sollzeiten.sql', 'utf8');
+const kalender = fs.readFileSync('modules/calendar.js', 'utf8');
 
 const knoten = new Map();
 const machKnoten = () => {
@@ -302,6 +304,169 @@ assert.strictEqual(
   'styles.css: Version laeuft auseinander',
 );
 
+// ---------------------------------------------------------------------------
+// Gleitzeitkonto
+// ---------------------------------------------------------------------------
+/* Christians Woche: Mo–Do 8:00 netto, Fr 6:30, jeweils ab 06:00 mit 30 min
+   Pause. Macht 38:30 — genau das, was er angesagt hat. */
+const ZIELE = {
+  0: { weekday: 0, net_minutes: 0, start_time: '06:00', break_minutes: 0 },
+  1: { weekday: 1, net_minutes: 480, start_time: '06:00', break_minutes: 30 },
+  2: { weekday: 2, net_minutes: 480, start_time: '06:00', break_minutes: 30 },
+  3: { weekday: 3, net_minutes: 480, start_time: '06:00', break_minutes: 30 },
+  4: { weekday: 4, net_minutes: 480, start_time: '06:00', break_minutes: 30 },
+  5: { weekday: 5, net_minutes: 390, start_time: '06:00', break_minutes: 30 },
+  6: { weekday: 6, net_minutes: 0, start_time: '06:00', break_minutes: 0 },
+};
+const setzeZiele = (ziele = ZIELE) =>
+  vm.runInContext(`workTargets = ${JSON.stringify(ziele)};`, context);
+setzeZiele();
+
+/* 2026: der 1.9. ist ein Dienstag, der 3.9. ein Donnerstag, der 4.9. ein Freitag. */
+assert.strictEqual(wert("workWeekday('2026-09-01')"), 2, 'der 1.9.2026 ist ein Dienstag');
+assert.strictEqual(wert("workWeekday('2026-09-03')"), 4, 'der 3.9. ein Donnerstag');
+assert.strictEqual(wert("workWeekday('2026-09-04')"), 5, 'der 4.9. ein Freitag');
+assert.strictEqual(wert("workWeekday('kaputt')"), null);
+
+assert.strictEqual(wert("workTargetFor('2026-09-03').soll"), 28800, 'Donnerstag 8 Stunden');
+assert.strictEqual(wert("workTargetFor('2026-09-04').soll"), 23400, 'Freitag 6,5 Stunden');
+assert.strictEqual(wert("workTargetFor('2026-09-05').soll"), 0, 'Samstag kein Soll');
+assert.strictEqual(wert("workTargetFor('kaputt').soll"), 0);
+
+// Die Woche beginnt am Montag.
+assert.strictEqual(wert("workWeekStart('2026-09-03')"), '2026-08-31', 'Donnerstag → Montag davor');
+assert.strictEqual(wert("workWeekStart('2026-08-31')"), '2026-08-31', 'Montag bleibt Montag');
+assert.strictEqual(wert("workWeekStart('2026-09-06')"), '2026-08-31', 'Sonntag gehoert zur Woche davor');
+
+/* Ein voller Arbeitstag: Dienstag 06:00–14:30 mit 30 min Pause ist genau das
+   Soll — Saldo null, nicht "ungefaehr". */
+const arbeitstag = (tag, von, pauseVon, pauseBis, bis) => [
+  { id: `${tag}-a`, work_date: tag, kind: 'work_start', stamped_at: `${tag}T${von}:00.000Z` },
+  { id: `${tag}-b`, work_date: tag, kind: 'break_start', stamped_at: `${tag}T${pauseVon}:00.000Z` },
+  { id: `${tag}-c`, work_date: tag, kind: 'break_end', stamped_at: `${tag}T${pauseBis}:00.000Z` },
+  { id: `${tag}-d`, work_date: tag, kind: 'work_end', stamped_at: `${tag}T${bis}:00.000Z` },
+];
+
+setzeEntries(arbeitstag('2026-09-01', '06:00', '09:00', '09:30', '14:30'));
+assert.strictEqual(wert("workDayBalance('2026-09-01')"), 0, 'Regelarbeitstag ergibt Saldo null');
+
+// Eine halbe Stunde laenger → plus 30 Minuten.
+setzeEntries(arbeitstag('2026-09-01', '06:00', '09:00', '09:30', '15:00'));
+assert.strictEqual(wert("workDayBalance('2026-09-01')"), 1800);
+// Eine Stunde frueher heim → minus eine Stunde.
+setzeEntries(arbeitstag('2026-09-01', '06:00', '09:00', '09:30', '13:30'));
+assert.strictEqual(wert("workDayBalance('2026-09-01')"), -3600);
+
+/* Ein laufender Tag zaehlt nicht ins Konto — er ist noch nicht entschieden. */
+setzeEntries([{ id: 'x', work_date: '2026-09-01', kind: 'work_start', stamped_at: '2026-09-01T06:00:00.000Z' }]);
+assert.strictEqual(wert("workDayBalance('2026-09-01')"), null);
+assert.strictEqual([...wert('workClosedDays()')].length, 0);
+
+/* Ein Tag ganz ohne Stempel erzeugt kein Minus. Bei einer Gegenkontrolle darf
+   ein Urlaubstag oder ein vergessener Tag das Konto nicht kaputtmachen. */
+setzeEntries(arbeitstag('2026-09-01', '06:00', '09:00', '09:30', '14:30'));
+assert.strictEqual(wert('workBalanceTotal()'), 0, 'der uebersprungene Mittwoch zaehlt nicht mit');
+
+/* Christians eigentliche Frage: Mo–Mi je eine halbe Stunde zu kurz, am
+   Donnerstag Feierabend — wie lange muss er am Freitag bleiben? */
+setzeEntries([
+  ...arbeitstag('2026-08-31', '06:00', '09:00', '09:30', '14:00'), // Mo −30
+  ...arbeitstag('2026-09-01', '06:00', '09:00', '09:30', '14:00'), // Di −30
+  ...arbeitstag('2026-09-02', '06:00', '09:00', '09:30', '14:00'), // Mi −30
+  ...arbeitstag('2026-09-03', '06:00', '09:00', '09:30', '14:00'), // Do −30
+]);
+assert.strictEqual(wert('workBalanceTotal()'), -7200, 'vier mal minus 30 Minuten sind minus 2 Stunden');
+assert.strictEqual(wert("workBalanceWeek('2026-09-03')"), -7200);
+assert.strictEqual(wert("workNextTargetDay('2026-09-03')"), '2026-09-04', 'nach Donnerstag kommt Freitag');
+assert.strictEqual(wert("workNextTargetDay('2026-09-04')"), '2026-09-07', 'nach Freitag der Montag');
+
+const vorschau = wert("workForecast('2026-09-04', workBalanceTotal())");
+assert.strictEqual(
+  wert("formatWorkTimeOfDay(workForecast('2026-09-04', 0).regulaer)"),
+  '13:00',
+  'Freitag regulaer bis 13:00',
+);
+assert.strictEqual(
+  wert("formatWorkTimeOfDay(workForecast('2026-09-04', workBalanceTotal()).noetig)"),
+  '15:00',
+  'mit zwei Stunden Rueckstand bis 15:00',
+);
+assert.strictEqual(vorschau.differenz, 7200, 'zwei Stunden laenger');
+
+/* Umgekehrt: mit Guthaben darf er frueher gehen. */
+setzeEntries(arbeitstag('2026-09-03', '06:00', '09:00', '09:30', '15:30'));
+assert.strictEqual(wert('workBalanceTotal()'), 3600);
+assert.strictEqual(
+  wert("formatWorkTimeOfDay(workForecast('2026-09-04', workBalanceTotal()).noetig)"),
+  '12:00',
+  'eine Stunde Guthaben heisst Freitag eine Stunde frueher',
+);
+
+// Vorzeichen lesbar.
+assert.strictEqual(wert('formatWorkBalance(0)'), '±0:00 h');
+assert.strictEqual(wert('formatWorkBalance(30)'), '±0:00 h', 'unter einer Minute ist null');
+assert.strictEqual(wert('formatWorkBalance(1800)'), '+0:30 h');
+assert.strictEqual(wert('formatWorkBalance(-7200)'), '−2:00 h');
+assert.strictEqual(wert('formatWorkBalance(NaN)'), '–');
+
+// Ohne Sollzeiten bleibt die Karte eine reine Stempeluhr, ohne Konto.
+vm.runInContext('workTargets = {};', context);
+assert.strictEqual(wert('workHasTargets()'), false);
+assert.strictEqual(wert("workBalanceHtml([], 'leer')"), '', 'kein Konto ohne Sollzeiten');
+setzeZiele();
+assert.strictEqual(wert('workHasTargets()'), true);
+
+// --- in der Karte ---------------------------------------------------------
+const heuteTag = () => vm.runInContext('workDayKey()', context);
+const heuteStempel2 = (kind, minutenZurueck, id = kind) => ({
+  id,
+  work_date: heuteTag(),
+  kind,
+  stamped_at: new Date(Date.now() - minutenZurueck * 60000).toISOString(),
+});
+/* Fuer die Kartenpruefung braucht heute ein Soll — sonst zeigt die Karte je
+   nach Wochentag mal etwas und mal nichts, und die Pruefung waere zufaellig. */
+const heuteWochentag = vm.runInContext('workWeekday(workDayKey())', context);
+setzeZiele({ ...ZIELE, [heuteWochentag]: { weekday: heuteWochentag, net_minutes: 480, start_time: '06:00', break_minutes: 30 } });
+
+setzeEntries([heuteStempel2('work_start', 180)]);
+wert('renderWorkTime();');
+assert.match(zeige(), /Soll heute 8:00 h/, 'das Tagessoll steht da');
+assert.match(zeige(), /Feierabend <b>\d{2}:\d{2}<\/b> für ±0/, 'und die Uhrzeit fuer null');
+
+setzeEntries([heuteStempel2('work_start', 570), heuteStempel2('work_end', 0)]);
+wert('renderWorkTime();');
+assert.match(zeige(), /Heute <b>\+1:30 h<\/b>/, 'neuneinhalb Stunden ohne Pause sind anderthalb Plus');
+assert.match(zeige(), /Woche <b>/, 'der Wochensaldo steht dabei');
+assert.match(zeige(), /(regulär bis|bis <b>)/, 'und was das fuer den naechsten Arbeitstag heisst');
+assert.doesNotMatch(zeige(), /NaN|undefined|Infinity/);
+setzeZiele();
+
+// ---------------------------------------------------------------------------
+// Sollzeiten-Migration
+// ---------------------------------------------------------------------------
+assert.match(sollMigration, /create table if not exists public\.work_targets/);
+assert.match(sollMigration, /weekday between 0 and 6/);
+assert.match(sollMigration, /enable row level security/);
+/* Die Startwerte sind Christians Woche. Aendert er sie von Hand, darf ein
+   erneuter Lauf sie nicht ueberschreiben. */
+assert.match(sollMigration, /on conflict \(user_id, weekday\) do nothing/);
+assert.match(sollMigration, /\(5, 390,/, 'Freitag 390 Minuten netto');
+assert.match(sollMigration, /\(1, 480,/, 'Montag 480 Minuten netto');
+
+// ---------------------------------------------------------------------------
+// Kalender: ein Arbeitstag ist keine Aufgabe
+// ---------------------------------------------------------------------------
+assert.match(kalender, /function isStampedWorkEvent/);
+assert.match(kalender, /source === 'work_clock'/);
+/* Der Erledigt-Knopf darf bei einem Stempeluhr-Termin nicht erscheinen: der Tag
+   ist vorbei, es gibt nichts abzuhaken. Loeschen auch nicht — der Termin waere
+   bis zum naechsten Stempel weg und kaeme dann wieder. */
+assert.match(kalender, /isStampedWorkEvent\(e\) \? '<span class="event-source">/);
+assert.match(kalender, /reminder_time,source'/, 'die Spalte source wird mitgelesen');
+assert.match(styles, /\.event-source\b/);
+assert.match(styles, /\.work-balance\b/);
+
 console.log(
-  'Stempeluhr: Zustaende, laufende Pause, vergessenes Pausenende, Feierabend aus der Pause, Migration, Platz: OK',
+  'Stempeluhr: Zustaende, Pausen, Gleitzeitkonto, Vorschau auf den naechsten Tag, Kalender ohne Erledigt: OK',
 );
