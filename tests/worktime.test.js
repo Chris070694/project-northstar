@@ -39,6 +39,12 @@ const context = vm.createContext({
   setInterval: () => 1,
   clearInterval: () => {},
   currentUser: { id: 'test-user' },
+  /* Die Dialoge werden pro Fall gesetzt; die Vorgabe sagt Nein, damit ein
+     vergessenes Setzen nicht versehentlich stempelt. */
+  confirm: () => false,
+  prompt: () => null,
+  alert: () => {},
+  sb: { from: () => ({ insert: () => ({ select: () => Promise.resolve({ data: [], error: null }) }), delete: () => ({ eq: () => Promise.resolve({ error: null }) }) }) },
   $: selektor => {
     if (!knoten.has(selektor)) knoten.set(selektor, machKnoten());
     return knoten.get(selektor);
@@ -210,7 +216,7 @@ setzeEntries([heuteStempel('work_start', 180)]);
 wert('renderWorkTime();');
 assert.match(zeige(), /3:00 h/, 'drei Stunden gearbeitet');
 assert.match(zeige(), /work-main pause/, 'der grosse Knopf bietet die Pause an');
-assert.match(zeige(), /onclick="stampWork\('work_end'\)"/, 'der Feierabend steht klein daneben');
+assert.match(zeige(), /onclick="stampWorkEnd\(\)"/, 'der Feierabend steht klein daneben, mit Rückfrage');
 assert.match(zeige(), /Läuft/);
 /* Ohne Pause muss "ohne Pause" dastehen. "– Pause" liest sich wie ein Fehler —
    der Gedankenstrich heisst sonst "keine Zahl vorhanden". */
@@ -467,6 +473,130 @@ assert.match(kalender, /reminder_time,source'/, 'die Spalte source wird mitgeles
 assert.match(styles, /\.event-source\b/);
 assert.match(styles, /\.work-balance\b/);
 
+// ---------------------------------------------------------------------------
+// Ausweg aus einem Fehlstempel
+// ---------------------------------------------------------------------------
+/* Christians Fall: der Feierabend loeste versehentlich aus, und danach liess
+   sich die Pause nicht mehr eintragen. Beides wird hier geprueft. */
+
+/* Objekte aus dem vm-Kontext haben einen anderen Prototyp — vor dem Vergleich
+   ins Testrealm kopieren, sonst scheitert deepStrictEqual an der Herkunft. */
+const alsObjekt = ausdruck => ({ ...wert(ausdruck) });
+assert.deepStrictEqual(alsObjekt("workParseClock('06:15')"), { stunde: 6, minute: 15 });
+assert.deepStrictEqual(alsObjekt("workParseClock('6.05')"), { stunde: 6, minute: 5 });
+assert.deepStrictEqual(alsObjekt("workParseClock('0630')"), { stunde: 6, minute: 30 }, 'auch ohne Trenner');
+assert.strictEqual(wert("workParseClock('25:00')"), null, 'die Stunde gibt es nicht');
+assert.strictEqual(wert("workParseClock('12:99')"), null, 'die Minute auch nicht');
+assert.strictEqual(wert("workParseClock('quatsch')"), null);
+assert.strictEqual(wert("workParseClock('')"), null);
+
+/* Eine nachgetragene Zeit legt sich auf den Tag des Bezugsstempels, nicht auf
+   heute — sonst wandert ein Nachtrag von gestern in den heutigen Tag. */
+const bezug = { stamped_at: '2026-08-31T04:00:00.000Z' };
+const gelegt = wert(`workTimeOnDay('09:00', ${JSON.stringify(bezug)})`);
+assert.strictEqual(
+  new Date(gelegt).getDate(),
+  new Date(Date.parse(bezug.stamped_at)).getDate(),
+  'der Nachtrag bleibt an seinem Tag',
+);
+assert.strictEqual(new Date(gelegt).getHours(), 9);
+assert.strictEqual(wert(`workTimeOnDay('kaputt', ${JSON.stringify(bezug)})`), null);
+assert.strictEqual(wert("workTimeOnDay('09:00', {stamped_at:'kaputt'})"), null);
+
+/* Der Feierabend fragt nach. Sagt man Nein, passiert nichts — genau das hat
+   gefehlt, als er danebengriff. */
+setzeEntries([stempel('work_start', '05:00')]);
+vm.runInContext('confirm = () => false;', context);
+wert('stampWorkEnd("2026-09-01");');
+assert.strictEqual(
+  [...wert('workStamps("2026-09-01")')].some(row => row.kind === 'work_end'),
+  false,
+  'ohne Bestaetigung wird kein Feierabend gestempelt',
+);
+
+// Eine nachgetragene Pause muss innerhalb des Arbeitstags liegen.
+let gemeldet = [];
+vm.runInContext('alert = text => { __gemeldet.push(text); };', context);
+vm.runInContext('var __gemeldet = [];', context);
+const meldungen = () => [...vm.runInContext('__gemeldet', context)];
+const leeren = () => vm.runInContext('__gemeldet = [];', context);
+
+setzeEntries([stempel('work_start', '05:00'), stempel('work_end', '14:00')]);
+vm.runInContext("prompt = frage => (/von/i.test(frage) ? '04:00' : '04:30');", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+assert.match(meldungen().join(' '), /vor dem Arbeitsbeginn/, 'Pause vor dem Beginn wird abgelehnt');
+
+vm.runInContext("prompt = frage => (/von/i.test(frage) ? '15:00' : '15:30');", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+assert.match(meldungen().join(' '), /nach dem Feierabend/, 'Pause nach dem Feierabend wird abgelehnt');
+
+vm.runInContext("prompt = frage => (/von/i.test(frage) ? '09:30' : '09:00');", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+assert.match(meldungen().join(' '), /nach dem Pausenbeginn/, 'verdrehte Zeiten werden abgelehnt');
+
+vm.runInContext("prompt = () => 'quatsch';", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+assert.match(meldungen().join(' '), /HH:MM/, 'unlesbare Eingabe wird abgelehnt');
+
+// Ohne Arbeitsbeginn gibt es nichts nachzutragen.
+setzeEntries([]);
+vm.runInContext("prompt = () => '09:00';", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+assert.match(meldungen().join(' '), /Erst den Arbeitsbeginn/);
+
+/* Der gute Fall: eine halbe Stunde Pause in einen abgeschlossenen Tag
+   nachtragen. Genau Christians Situation. */
+setzeEntries([stempel('work_start', '05:00'), stempel('work_end', '14:00')]);
+vm.runInContext(
+  `sb = { from: () => ({ insert: zeilen => ({ select: () => { __eingefuegt = zeilen; return Promise.resolve({ data: zeilen.map((z, i) => ({ ...z, id: 'neu' + i })), error: null }); } }) }) };
+   var __eingefuegt = [];`,
+  context,
+);
+vm.runInContext("prompt = frage => (/von/i.test(frage) ? '09:00' : '09:30');", context);
+leeren();
+wert('addWorkBreak("2026-09-01");');
+const eingefuegt = [...vm.runInContext('__eingefuegt', context)];
+assert.strictEqual(eingefuegt.length, 2, 'Pausenbeginn und Pausenende zusammen');
+assert.deepStrictEqual(
+  eingefuegt.map(z => z.kind),
+  ['break_start', 'break_end'],
+);
+assert.strictEqual(meldungen().length, 0, 'keine Fehlermeldung im guten Fall');
+
+// ---------------------------------------------------------------------------
+// Die Ausweg-Knoepfe stehen auch da
+// ---------------------------------------------------------------------------
+const heuteTag2 = () => vm.runInContext('workDayKey()', context);
+const stempelHeute = (kind, minutenZurueck, id = kind) => ({
+  id,
+  work_date: heuteTag2(),
+  kind,
+  stamped_at: new Date(Date.now() - minutenZurueck * 60000).toISOString(),
+});
+
+setzeEntries([]);
+wert('renderWorkTime();');
+assert.doesNotMatch(zeige(), /Pause nachtragen/, 'vor dem ersten Stempel gibt es nichts nachzutragen');
+
+setzeEntries([stempelHeute('work_start', 180)]);
+wert('renderWorkTime();');
+assert.match(zeige(), /Pause nachtragen/, 'im laufenden Tag laesst sich eine Pause nachtragen');
+assert.doesNotMatch(zeige(), /zurücknehmen/, 'aber es gibt keinen Feierabend zum Zuruecknehmen');
+/* Der Feierabend geht ueber die Rueckfrage, nicht mehr direkt. */
+assert.match(zeige(), /onclick="stampWorkEnd\(\)"/);
+assert.doesNotMatch(zeige(), /onclick="stampWork\('work_end'\)"/);
+
+setzeEntries([stempelHeute('work_start', 570), stempelHeute('work_end', 0)]);
+wert('renderWorkTime();');
+assert.match(zeige(), /Pause nachtragen/, 'auch im abgeschlossenen Tag — das war die Sackgasse');
+assert.match(zeige(), /Feierabend zurücknehmen/, 'und der Feierabend laesst sich zuruecknehmen');
+assert.match(styles, /\.work-fix-btn\b/);
+
 console.log(
-  'Stempeluhr: Zustaende, Pausen, Gleitzeitkonto, Vorschau auf den naechsten Tag, Kalender ohne Erledigt: OK',
+  'Stempeluhr: Zustaende, Pausen, Gleitzeitkonto, Nachtrag und Zuruecknehmen, Kalender ohne Erledigt: OK',
 );

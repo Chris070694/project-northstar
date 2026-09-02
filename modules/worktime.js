@@ -321,6 +321,87 @@ function stampWorkNext() {
   if (kind) stampWork(kind);
 }
 
+function workParseClock(text) {
+  const treffer = String(text || '').trim().match(/^(\d{1,2})[:.]?(\d{2})$/);
+  if (!treffer) return null;
+  const stunde = Number(treffer[1]);
+  const minute = Number(treffer[2]);
+  if (stunde > 23 || minute > 59) return null;
+  return { stunde, minute };
+}
+
+/* Eine Uhrzeit auf den Tag eines vorhandenen Stempels legen. Nicht auf heute:
+   ein Nachtrag fuer gestern soll gestern bleiben. */
+function workTimeOnDay(text, referenz) {
+  const uhr = workParseClock(text);
+  const basis = workStampTime(referenz);
+  if (!uhr || basis === null) return null;
+  const datum = new Date(basis);
+  datum.setHours(uhr.stunde, uhr.minute, 0, 0);
+  return datum.getTime();
+}
+
+/* Der Feierabend ist der einzige Stempel, der den Tag zumacht — und er lag im
+   ersten Wurf direkt neben der Pause. Christian hat ihn prompt aus Versehen
+   ausgeloest. Deshalb eine Rueckfrage, bevor er zaehlt. */
+function stampWorkEnd(tag = workDayKey()) {
+  const stempel = workStamps(tag);
+  const netto = formatWorkDuration(workNetSeconds(stempel, Date.now()));
+  if (!confirm(`Feierabend stempeln? Der Tag wird damit abgeschlossen — ${netto} netto.`)) return;
+  stampWork('work_end', tag);
+}
+
+/* Wieder aufmachen, wenn der Feierabend zu frueh kam. Loescht nur den
+   Schlusstempel; alles andere bleibt stehen, und der Kalendereintrag
+   verschwindet ueber den Trigger von selbst. */
+async function reopenWorkDay(tag = workDayKey()) {
+  const ende = workStamps(tag).find(row => row.kind === 'work_end');
+  if (!ende) return;
+  if (!confirm('Feierabend zurücknehmen? Der Tag läuft dann weiter.')) return;
+  const { error } = await sb.from('work_entries').delete().eq('id', ende.id);
+  if (error) return alert('Zurücknehmen fehlgeschlagen: ' + error.message);
+  workEntries = workEntries.filter(row => row.id !== ende.id);
+  renderWorkTime();
+}
+
+/* Vergessene Pause nachtragen — auch an einem bereits abgeschlossenen Tag.
+   Ohne das war ein zu frueher Feierabend eine Sackgasse: die Pause liess sich
+   danach nicht mehr eintragen. */
+async function addWorkBreak(tag = workDayKey()) {
+  const stempel = workStamps(tag);
+  const beginn = stempel.find(row => row.kind === 'work_start');
+  if (!beginn) return alert('Erst den Arbeitsbeginn stempeln, dann die Pause nachtragen.');
+
+  const von = prompt('Pause von (HH:MM):', '09:00');
+  if (von === null) return;
+  const bis = prompt('Pause bis (HH:MM):', '09:30');
+  if (bis === null) return;
+
+  const vonZeit = workTimeOnDay(von, beginn);
+  const bisZeit = workTimeOnDay(bis, beginn);
+  if (vonZeit === null || bisZeit === null) return alert('Bitte beide Zeiten als HH:MM eingeben.');
+  if (bisZeit <= vonZeit) return alert('Das Pausenende muss nach dem Pausenbeginn liegen.');
+
+  /* Eine Pause vor dem Arbeitsbeginn oder nach dem Feierabend waere keine
+     Pause, sondern eine falsche Zahl im Konto. */
+  const beginnZeit = workStampTime(beginn);
+  if (vonZeit < beginnZeit) return alert('Die Pause kann nicht vor dem Arbeitsbeginn liegen.');
+  const ende = stempel.find(row => row.kind === 'work_end');
+  const endeZeit = ende ? workStampTime(ende) : null;
+  if (endeZeit !== null && bisZeit > endeZeit) {
+    return alert('Die Pause kann nicht nach dem Feierabend enden.');
+  }
+
+  const zeilen = [
+    { user_id: currentUser.id, work_date: tag, kind: 'break_start', stamped_at: new Date(vonZeit).toISOString() },
+    { user_id: currentUser.id, work_date: tag, kind: 'break_end', stamped_at: new Date(bisZeit).toISOString() },
+  ];
+  const { data, error } = await sb.from('work_entries').insert(zeilen).select();
+  if (error) return alert('Die Pause konnte nicht gespeichert werden: ' + error.message);
+  workEntries = workEntries.concat(data || []);
+  renderWorkTime();
+}
+
 async function correctWorkStamp(id) {
   const row = workEntries.find(eintrag => eintrag.id === id);
   if (!row) return;
@@ -338,16 +419,13 @@ async function correctWorkStamp(id) {
     return;
   }
 
-  const treffer = antwort.trim().match(/^(\d{1,2})[:.](\d{2})$/);
-  if (!treffer) return alert('Bitte als HH:MM eingeben, zum Beispiel 06:15.');
-  const stunde = Number(treffer[1]);
-  const minute = Number(treffer[2]);
-  if (stunde > 23 || minute > 59) return alert('Diese Uhrzeit gibt es nicht.');
+  const uhr = workParseClock(antwort);
+  if (!uhr) return alert('Bitte als HH:MM eingeben, zum Beispiel 06:15.');
 
   /* Auf dem bisherigen Zeitpunkt aufsetzen, nicht auf heute: ein Stempel von
      gestern soll beim Korrigieren nicht auf den heutigen Tag springen. */
   const bisher = new Date(workStampTime(row) ?? Date.now());
-  bisher.setHours(stunde, minute, 0, 0);
+  bisher.setHours(uhr.stunde, uhr.minute, 0, 0);
   const { error } = await sb
     .from('work_entries')
     .update({ stamped_at: bisher.toISOString() })
@@ -468,8 +546,18 @@ function renderWorkTime() {
      Fehlgriff kostet eine Korrektur. */
   const feierabend =
     zustand === 'laeuft' || zustand === 'pause'
-      ? `<button type="button" class="work-second" onclick="stampWork('work_end')">Feierabend</button>`
+      ? `<button type="button" class="work-second" onclick="stampWorkEnd()">Feierabend</button>`
       : '';
+
+  /* Nachtragen und Zuruecknehmen: der Ausweg, wenn ein Stempel danebenging.
+     Steht bewusst klein und unter der Uhr, nicht neben den Stempelknoepfen. */
+  const nachtrag =
+    zustand === 'leer'
+      ? ''
+      : `<div class="work-fix">
+          <button type="button" class="work-fix-btn" onclick="addWorkBreak()">Pause nachtragen</button>
+          ${zustand === 'fertig' ? `<button type="button" class="work-fix-btn" onclick="reopenWorkDay()">Feierabend zurücknehmen</button>` : ''}
+        </div>`;
 
   /* Ohne Pause steht "ohne Pause" da, nicht "– Pause". Der Gedankenstrich ist
      das Zeichen fuer "keine Zahl vorhanden" und liest sich hier wie ein Fehler. */
@@ -493,6 +581,7 @@ function renderWorkTime() {
     </div>
     ${workBalanceHtml(stempel, zustand)}
     ${stempel.length ? `<div class="work-list">${stempel.map(workRowHtml).join('')}</div>` : ''}
+    ${nachtrag}
     <small class="work-hint">Private Aufzeichnung als Gegenkontrolle — nicht die offizielle Zeiterfassung.</small>`;
 
   if (zustand === 'laeuft' || zustand === 'pause') startWorkTicker();
