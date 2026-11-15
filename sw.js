@@ -1,17 +1,18 @@
-const CACHE = 'cprb-stempeluhr-v1';
+const CACHE = 'cprb-orderflow-v1';
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css?v=13',
   './styles-funded.css?v=1',
   './styles-psychology.css?v=1',
+  './styles-orderflow.css?v=1',
   './app.js',
   './config.js',
   './manifest.webmanifest?v=2',
   './icons/cprb-og-192.png',
   './icons/cprb-og-512.png',
   './icons/cprb-og-180.png',
-  './modules/core.js?v=5',
+  './modules/core.js?v=6',
   './modules/today.js?v=3',
   './modules/news.js?v=1',
   './modules/quotes.js?v=1',
@@ -30,11 +31,13 @@ const APP_SHELL = [
   './modules/habits.js?v=1',
   './modules/notes.js?v=2',
   './modules/academy.js',
+  './modules/orderflow-data.js?v=1',
+  './modules/orderflow.js?v=1',
   './modules/library.js',
   './modules/calendar.js?v=2',
   './modules/weekly.js?v=3',
   './modules/reminders.js',
-  './modules/backup.js?v=7',
+  './modules/backup.js?v=8',
   './modules/pwa.js?v=3',
 ];
 

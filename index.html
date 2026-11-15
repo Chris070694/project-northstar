@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="styles.css?v=13" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
+    <link rel="stylesheet" href="styles-orderflow.css?v=1" />
   </head>
   <body>
     <section id="auth" class="auth">
@@ -50,6 +51,7 @@
         ><button class="nav" data-page="notes">📝 Notizen</button
         ><button class="nav" data-page="library">📖 Bibliothek</button
         ><button class="nav" data-page="academy">📚 Academy</button
+        ><button class="nav" data-page="orderflow">📈 Orderflow</button
         ><button class="nav" data-page="calendar">📅 Kalender</button
         ><button class="nav" data-page="account">⚙ Konto</button>
       </aside>
@@ -762,6 +764,7 @@
                 </div>
                 <button class="btn primary" onclick="openAcademyNote()">+ Lernnotiz</button>
               </div>
+              <div id="orderflowTeaser"></div>
               <div class="card academy-toolbar">
                 <input
                   id="academySearch"
@@ -780,6 +783,19 @@
                 </select>
               </div>
               <div id="academyGrid" class="academy-grid" style="margin-top: 15px"></div>
+            </section>
+
+            <section id="orderflow" class="page orderflow-page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">Kurs · Deutsch</div>
+                  <h1>Orderflow-Bootcamp</h1>
+                  <div class="sub">
+                    Auktion, Volumenprofil, Footprint und Setups — Lektion für Lektion, mit Quiz.
+                  </div>
+                </div>
+              </div>
+              <div id="orderflowRoot" class="of-root"></div>
             </section>
 
             <section id="library" class="page">
@@ -1262,6 +1278,10 @@
               <div class="icon">📚</div>
               <b>Academy</b><span>MSS, FVG, SMT und mehr</span>
             </div>
+            <div class="module-card" onclick="showPage('orderflow')">
+              <div class="icon">📈</div>
+              <b>Orderflow</b><span>Bootcamp lesen und üben</span>
+            </div>
             <div class="module-card" onclick="showPage('calendar')">
               <div class="icon">📅</div>
               <b>Kalender</b><span>Termine und Routinen</span>
@@ -1314,7 +1334,9 @@
             ><button data-page="notes">
               <span>📝</span><b>Notizen</b><small>Gedanken sammeln</small></button
             ><button data-page="academy">
-              <span>📚</span><b>Academy</b><small>Trading lernen</small>
+              <span>📚</span><b>Academy</b><small>Trading lernen</small></button
+            ><button data-page="orderflow">
+              <span>📈</span><b>Orderflow</b><small>Bootcamp lernen</small>
             </button>
           </div>
         </section>
@@ -2211,7 +2233,8 @@
         </div>
       </div>
     </div>
-    <script src="modules/core.js?v=5"></script>
+    <div id="orderflowZoom" onclick="closeOrderflowImage()"><img alt="Chart vergrößert" /></div>
+    <script src="modules/core.js?v=6"></script>
     <script src="modules/today.js?v=3"></script>
     <script src="modules/news.js?v=1"></script>
     <script src="modules/quotes.js?v=1"></script>
@@ -2230,11 +2253,13 @@
     <script src="modules/habits.js?v=1"></script>
     <script src="modules/notes.js?v=2"></script>
     <script src="modules/academy.js"></script>
+    <script src="modules/orderflow-data.js?v=1"></script>
+    <script src="modules/orderflow.js?v=1"></script>
     <script src="modules/library.js"></script>
     <script src="modules/calendar.js?v=2"></script>
     <script src="modules/weekly.js?v=3"></script>
     <script src="modules/reminders.js"></script>
-    <script src="modules/backup.js?v=7"></script>
+    <script src="modules/backup.js?v=8"></script>
     <script src="modules/pwa.js?v=3"></script>
     <script src="app.js"></script>
   </body>

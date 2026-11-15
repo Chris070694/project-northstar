@@ -21,6 +21,7 @@ async function loadAll() {
       loadFitness(),
       loadNotes(),
       loadAcademy(),
+      loadOrderflow(),
       loadCalendar(),
       loadWeeklyReview(),
       loadReminderSettings(),
@@ -46,6 +47,7 @@ async function loadAll() {
     renderQuote();
     renderNotes();
     await renderAcademy();
+    renderOrderflow();
     await renderLibrary();
     renderCalendar();
     renderWeeklyReview();

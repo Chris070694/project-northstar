@@ -1,0 +1,388 @@
+/* Orderflow-Bootcamp. Ergänzt styles.css und benutzt ausschließlich deren
+   Farbtokens. Alle Regeln hängen unter .orderflow-page, .of-teaser oder
+   #orderflowZoom, damit nichts in andere Seiten ausläuft. */
+
+.orderflow-page .of-root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 820px;
+}
+
+.orderflow-page .of-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.orderflow-page .of-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width 0.3s ease;
+}
+
+/* Kopfkarte mit Fortschritt */
+.orderflow-page .of-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.orderflow-page .of-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.orderflow-page .of-hero-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.orderflow-page .of-hero-stats span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.orderflow-page .of-hero-stats b {
+  font-size: 22px;
+  letter-spacing: -0.4px;
+}
+.orderflow-page .of-next-lesson {
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.orderflow-page .of-next-lesson span {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.orderflow-page .of-hint,
+.orderflow-page .of-done-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.orderflow-page .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.orderflow-page .btn[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Teile und Lektionsliste */
+.orderflow-page .of-parts {
+  display: grid;
+  gap: 12px;
+}
+.orderflow-page .of-part {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.orderflow-page .of-part-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.orderflow-page .of-part-head h3 {
+  margin: 0;
+  font-size: 15.5px;
+  letter-spacing: -0.2px;
+}
+.orderflow-page .of-part-head small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.orderflow-page .of-part-num {
+  flex: 0 0 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: var(--cyan);
+  border: 1px solid var(--line-strong);
+}
+.orderflow-page .of-part.done .of-part-num {
+  color: var(--green);
+  border-color: var(--green);
+}
+.orderflow-page .of-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.orderflow-page .of-lesson-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.orderflow-page .of-lesson-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.orderflow-page .of-lesson-link.read {
+  color: var(--muted);
+}
+.orderflow-page .of-check {
+  flex: 0 0 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--green);
+}
+.orderflow-page .of-lesson-link.read .of-check {
+  border-color: var(--green);
+}
+
+/* Lektion */
+.orderflow-page .of-crumbs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.orderflow-page .of-lesson {
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.orderflow-page .of-lesson h2 {
+  margin: 0 0 12px;
+  letter-spacing: -0.4px;
+}
+.orderflow-page .of-lesson p {
+  margin: 0 0 12px;
+}
+.orderflow-page .of-lesson ul,
+.orderflow-page .of-lesson ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+.orderflow-page .of-lesson li {
+  margin-bottom: 5px;
+}
+.orderflow-page .of-lesson code {
+  font-size: 13.5px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.orderflow-page .of-intro {
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-left: 3px solid var(--cyan);
+  border-radius: 10px;
+  background: rgba(112, 229, 255, 0.06);
+  color: var(--muted);
+}
+.orderflow-page .of-intro p:last-child {
+  margin-bottom: 0;
+}
+.orderflow-page .of-merk {
+  margin: 16px 0 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: rgba(84, 239, 177, 0.07);
+  font-weight: 600;
+}
+.orderflow-page .of-merk span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.orderflow-page .of-figure {
+  margin: 6px 0 16px;
+}
+/* Die Charts haben einen weißen Hintergrund — als helle Karte im dunklen Layout. */
+.orderflow-page .of-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  background: #fff;
+  cursor: zoom-in;
+}
+.orderflow-page .of-figure figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.orderflow-page .of-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 16px;
+}
+.orderflow-page .of-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.orderflow-page .of-table th,
+.orderflow-page .of-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.orderflow-page .of-table th {
+  color: var(--muted);
+  font-weight: 700;
+}
+.orderflow-page .of-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Quiz */
+.orderflow-page .of-quiz h3 {
+  margin: 0 0 14px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.orderflow-page .of-opts {
+  display: grid;
+  gap: 10px;
+}
+.orderflow-page .of-opt {
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+.orderflow-page .of-opt:hover:not([disabled]) {
+  border-color: var(--line-strong);
+}
+.orderflow-page .of-opt.right {
+  border-color: var(--green);
+  background: rgba(84, 239, 177, 0.12);
+}
+.orderflow-page .of-opt.wrong {
+  border-color: var(--red);
+  background: rgba(255, 120, 142, 0.12);
+}
+.orderflow-page .of-opt.dim {
+  opacity: 0.5;
+}
+.orderflow-page .of-explain {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.orderflow-page .of-explain b {
+  display: block;
+  margin-bottom: 3px;
+}
+.orderflow-page .of-explain.ok {
+  background: rgba(84, 239, 177, 0.1);
+}
+.orderflow-page .of-explain.no {
+  background: rgba(255, 120, 142, 0.1);
+}
+.orderflow-page .of-next {
+  width: 100%;
+  margin-top: 14px;
+}
+.orderflow-page .of-result {
+  text-align: center;
+  padding: 28px 18px;
+}
+.orderflow-page .of-result small {
+  color: var(--muted);
+}
+.orderflow-page .of-big {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 6px 0;
+}
+.orderflow-page .of-result .actions {
+  justify-content: center;
+}
+
+/* Teaser in der Academy */
+.of-teaser {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  border-color: var(--line-strong);
+}
+.of-teaser h3 {
+  margin: 2px 0 4px;
+}
+.of-teaser small {
+  color: var(--muted);
+}
+
+/* Vollbild für Charts */
+#orderflowZoom {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(5, 6, 10, 0.92);
+}
+#orderflowZoom.open {
+  display: flex;
+}
+#orderflowZoom img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .orderflow-page .of-hero-stats b {
+    font-size: 19px;
+  }
+  .orderflow-page .of-lesson {
+    font-size: 15px;
+  }
+  .orderflow-page .of-pager .btn,
+  .orderflow-page .of-hero .actions .btn {
+    flex: 1;
+  }
+}
