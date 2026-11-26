@@ -48,6 +48,7 @@ async function loadAll() {
     renderNotes();
     await renderAcademy();
     renderOrderflow();
+    renderFabio();
     await renderLibrary();
     renderCalendar();
     renderWeeklyReview();

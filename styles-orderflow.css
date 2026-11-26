@@ -250,6 +250,8 @@
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
+  /* styles.css setzt td global auf nowrap — Lerntext muss umbrechen. */
+  white-space: normal;
 }
 .orderflow-page .of-table th {
   color: var(--muted);

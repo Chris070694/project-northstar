@@ -8,7 +8,7 @@ let sb,
   focus = null,
   goals = [];
 const mobilePrimaryPages = new Set(['today', 'trading', 'fitness']);
-const mobileWissenPages = new Set(['library', 'notes', 'academy', 'orderflow']);
+const mobileWissenPages = new Set(['library', 'notes', 'academy', 'orderflow', 'fabio']);
 const MOBILE_SHEETS = {
   wissen: { sheet: '#mobileWissenSheet', button: '#mobileWissenButton' },
   ich: { sheet: '#mobileMoreSheet', button: '#mobileMoreButton' },
