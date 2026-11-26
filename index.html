@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="styles.css?v=13" />
     <link rel="stylesheet" href="styles-funded.css?v=1" />
     <link rel="stylesheet" href="styles-psychology.css?v=1" />
-    <link rel="stylesheet" href="styles-orderflow.css?v=1" />
+    <link rel="stylesheet" href="styles-orderflow.css?v=2" />
   </head>
   <body>
     <section id="auth" class="auth">
@@ -52,6 +52,7 @@
         ><button class="nav" data-page="library">📖 Bibliothek</button
         ><button class="nav" data-page="academy">📚 Academy</button
         ><button class="nav" data-page="orderflow">📈 Orderflow</button
+        ><button class="nav" data-page="fabio">🧠 Fabio</button
         ><button class="nav" data-page="calendar">📅 Kalender</button
         ><button class="nav" data-page="account">⚙ Konto</button>
       </aside>
@@ -765,6 +766,7 @@
                 <button class="btn primary" onclick="openAcademyNote()">+ Lernnotiz</button>
               </div>
               <div id="orderflowTeaser"></div>
+              <div id="fabioTeaser"></div>
               <div class="card academy-toolbar">
                 <input
                   id="academySearch"
@@ -796,6 +798,20 @@
                 </div>
               </div>
               <div id="orderflowRoot" class="of-root"></div>
+            </section>
+
+            <section id="fabio" class="page orderflow-page fabio-page">
+              <div class="top">
+                <div>
+                  <div class="eyebrow">Kurs · Deutsch</div>
+                  <h1>Fabio Trading</h1>
+                  <div class="sub">
+                    Prop-Modell, Ordertrack, Gamma Scalping und Risiko — dein Ordner zum Nachlesen,
+                    mit Quiz.
+                  </div>
+                </div>
+              </div>
+              <div id="fabioRoot" class="of-root"></div>
             </section>
 
             <section id="library" class="page">
@@ -1282,6 +1298,10 @@
               <div class="icon">📈</div>
               <b>Orderflow</b><span>Bootcamp lesen und üben</span>
             </div>
+            <div class="module-card" onclick="showPage('fabio')">
+              <div class="icon">🧠</div>
+              <b>Fabio</b><span>Prop-Modell und Gamma Scalping</span>
+            </div>
             <div class="module-card" onclick="showPage('calendar')">
               <div class="icon">📅</div>
               <b>Kalender</b><span>Termine und Routinen</span>
@@ -1336,7 +1356,9 @@
             ><button data-page="academy">
               <span>📚</span><b>Academy</b><small>Trading lernen</small></button
             ><button data-page="orderflow">
-              <span>📈</span><b>Orderflow</b><small>Bootcamp lernen</small>
+              <span>📈</span><b>Orderflow</b><small>Bootcamp lernen</small></button
+            ><button data-page="fabio">
+              <span>🧠</span><b>Fabio</b><small>Sein Ordner</small>
             </button>
           </div>
         </section>
@@ -2234,7 +2256,7 @@
       </div>
     </div>
     <div id="orderflowZoom" onclick="closeOrderflowImage()"><img alt="Chart vergrößert" /></div>
-    <script src="modules/core.js?v=6"></script>
+    <script src="modules/core.js?v=7"></script>
     <script src="modules/today.js?v=3"></script>
     <script src="modules/news.js?v=1"></script>
     <script src="modules/quotes.js?v=1"></script>
@@ -2255,6 +2277,8 @@
     <script src="modules/academy.js"></script>
     <script src="modules/orderflow-data.js?v=1"></script>
     <script src="modules/orderflow.js?v=1"></script>
+    <script src="modules/fabio-data.js?v=1"></script>
+    <script src="modules/fabio.js?v=1"></script>
     <script src="modules/library.js"></script>
     <script src="modules/calendar.js?v=2"></script>
     <script src="modules/weekly.js?v=3"></script>
