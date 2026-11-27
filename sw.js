@@ -1,4 +1,4 @@
-const CACHE = 'cprb-fabio-v1';
+const CACHE = 'cprb-fabio-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -33,7 +33,7 @@ const APP_SHELL = [
   './modules/academy.js',
   './modules/orderflow-data.js?v=1',
   './modules/orderflow.js?v=1',
-  './modules/fabio-data.js?v=1',
+  './modules/fabio-data.js?v=2',
   './modules/fabio.js?v=1',
   './modules/library.js',
   './modules/calendar.js?v=2',
