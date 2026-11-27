@@ -20,7 +20,7 @@ const FABIO_PARTS = [
         title: 'Was in deinem Ordner steckt',
         blocks: [
           {
-            p: 'Dieser Kurs fasst deinen Ordner **Fabio Trading** auf Deutsch zusammen: vier PDFs, ein Backtest, 9 kurze Lektionen und zwei lange Extra-Videos. Die rund 32 Live-Sessions (ca. 55 Stunden) sind noch nicht drin.',
+            p: 'Dieser Kurs fasst deinen Ordner **Fabio Trading** auf Deutsch zusammen: vier PDFs, ein Backtest, 9 kurze Lektionen und zwei lange Extra-Videos. Die 32 Live-Sessions (ca. 55 Stunden) stehen zusammengefasst in Teil 8.',
           },
           {
             table: [
@@ -640,6 +640,149 @@ const FABIO_PARTS = [
       },
     ],
   },
+  {
+    id: 8,
+    title: 'Die Live-Sessions Q2',
+    intro: [
+      {
+        p: 'Zusammengefasst aus 32 Aufzeichnungen (24 Session-Tage, 9. April bis 7. Juli 2026, ca. 55 Stunden). Jeder einzelne Tag steht ausführlich im Claude Doc „Fabio Trading – Zusammenfassung“.',
+      },
+    ],
+    lessons: [
+      {
+        id: 'f8.1',
+        title: 'April: seine Modelle und der Bias-Filter',
+        blocks: [
+          {
+            ul: [
+              '**IVB + Nasdaq Effort:** Die IVB (erste 30 Minuten) gibt die Richtung, eine Nasdaq-Effort-Zone den Einstieg. Gut ist die Zone, die den Ausbruch gemacht hat und echtes Delta hat.',
+              '**Kerzen-Profil:** Liegt der Wertbereich der neuen Kerze höher, haben die Käufer die Kontrolle. Eine Innenkerze bringt keine neue Info.',
+              '**Triple A:** stärkste Delta-Marke + VAL + Ablehnung. Einstieg über Absorption, Kerzen-Profil oder Nasdaq Effort.',
+              '**Bias-Filter:** Nur in Richtung der IVB. Absorption oben ist kein Short-Signal, wenn Bias, IVB und Profil long sind.',
+              '**Fehlausbruch:** Bricht der Preis aus der Range, aber der Wertbereich der Kerze bleibt drinnen, ist es meist ein Fake.',
+              '**Nach einem Tag mit mehr als 2 % Bewegung** handelt er auf seinem eigenen Konto am nächsten Tag nicht.',
+            ],
+          },
+          {
+            merk: 'Nie gegen den Zug stellen. Richtung von der IVB, Einstieg aus der richtigen Zone.',
+          },
+        ],
+      },
+      {
+        id: 'f8.2',
+        title: 'Mai: Heatmap, Spoofing, Regime',
+        blocks: [
+          {
+            ul: [
+              '**Heatmap:** Wo keine wartenden Aufträge liegen, rauscht der Preis durch bis zur nächsten dicken Liquidität.',
+              '**Spoofing:** Große Orders werden gestellt und wieder gelöscht. Echtes Nachladen erkennst du daran, dass die Liquidität gefüllt und nicht weggezogen wird.',
+              '**Volumenprofil verankern:** vom Startpunkt der Bewegung bis jetzt.',
+              '**Regime zuerst:** Zusammendrückung oder Ausdehnung? Trendfolge im Seitwärts-Regime kostet nur Stops.',
+              '**Earnings-Modell (Aktien):** Positive Überraschung + Lücke nach oben + grüne Kerze → Einstieg in der Akkumulation, Stop unter der Lücke. Lücke nach unten = kein Trade.',
+              '**Prop-Modell verbessert:** lineare Regression über 15 Perioden als Filter.',
+            ],
+          },
+          { merk: 'Erst das Regime bestimmen, dann den Auslöser suchen.' },
+        ],
+      },
+      {
+        id: 'f8.3',
+        title: 'Optionsfluss mit Freddy',
+        blocks: [
+          {
+            p: 'Freddy war früher Derivate-Händler in London. In drei Masterclasses erklärt er, warum Optionen den Nasdaq bewegen.',
+          },
+          {
+            ul: [
+              '**Market Maker müssen absichern:** Verkaufen sie Puts, verkaufen sie Futures, wenn der Markt fällt. Diese Pflicht-Käufe und -Verkäufe bewegen den Preis.',
+              '**Gamma vormittags, Charm nachmittags:** Ab etwa 19:30 bei uns zählt die Zeit bis zum Verfall mehr als der Preis.',
+              '**Die größten Open-Interest-Knoten** sind Wendepunkte. Stop klein (150–200 $), Ziel die nächste Gamma-Marke.',
+              '**Negatives Gamma ist wie ein Loch,** in das der Preis rollt.',
+              '**Volatilität verkaufen = Fortsetzung, kaufen = Bremse.** Wird unten groß Volatilität gekauft, kommt oft die Umkehr.',
+              '**OPEX** (dritter Freitag im Monat) und **Triple Witching** (März, Juni, September, Dezember): Der Preis „pinnt“ an großen Marken. Freddy handelt Triple Witching gar nicht.',
+            ],
+          },
+          { merk: 'Orderflow sagt dir wann, Optionen sagen dir wo.' },
+        ],
+      },
+      {
+        id: 'f8.4',
+        title: 'Juni und Juli: Orderflow + Gamma live',
+        blocks: [
+          {
+            ul: [
+              '**IVB + Null-Gamma** ist laut Fabio der beste Richtungsfilter, den er je gefunden hat.',
+              '**Gamma-Squeeze:** Bricht der Preis die große negative Gamma-Marke, gibt es keinen Test mehr. Kein 1:1 nehmen, laufen lassen.',
+              '**Negatives Gamma:** Bewegungen ohne Rücklauf, Limit-Orders werden oft nicht gefüllt. Nie mit Market-Order hinterher.',
+              '**Kreuzt der Preis die Null-Gamma-Linie,** wechselt das Regime. Dann keine Trades mehr gegen die neue Seite.',
+              '**Pinning:** Am Verfallstag klebt der Preis an der größten Options-Marke. Nichtstun ist dann der beste Trade.',
+              '**Rund 80 % der Sessions** enden laut seiner Auswertung innerhalb der Spanne, die die Optionen vorgeben.',
+            ],
+          },
+          { merk: 'Gamma gibt Richtung und Ziel, Orderflow den Einstieg.' },
+        ],
+      },
+      {
+        id: 'f8.5',
+        title: 'Sein Risiko-Management aus den Sessions',
+        blocks: [
+          {
+            table: [
+              ['Regel', 'Wie er es macht'],
+              ['Tages-Risiko', 'Höchstens der Gewinn der letzten guten Session'],
+              ['Nach Stops', 'Risiko pro Trade **kleiner** (1.000 → 800 → 500 $), nie größer'],
+              ['Stop im Gewinn', 'So früh wie möglich, damit Kommission und Schlupf gedeckt sind'],
+              ['Nachkaufen', 'Nur, wenn die erste Position schon abgesichert ist'],
+              ['Prop-Konto 50k', '125 $ pro Trade, 1:1, höchstens −4R am Tag'],
+              ['Eigenes Konto', '1:2 und mehr, Gewinner in Stufen laufen lassen'],
+            ],
+          },
+          {
+            p: 'Seine Statistik: Rund 70 % des Monatsgewinns kommen aus etwa 6 Sessions. Ziel ist **jeden Monat positiv**, nicht jeden Tag.',
+          },
+          { merk: 'Schlechte Tage klein halten, an guten Tagen voll dabei sein.' },
+        ],
+      },
+      {
+        id: 'f8.6',
+        title: 'Alle 24 Tage auf einen Blick',
+        blocks: [
+          {
+            table: [
+              ['Tag', 'Thema', 'Ergebnis'],
+              ['9.4.', 'Auftakt: seine Modelle', '+4.700 $'],
+              ['14.4.', 'Triple A, Bias-Filter', 'Gewinn, kleines Konto'],
+              ['16.4.', 'Delta-Marken, aktive Führung', 'Verlust halbiert'],
+              ['21.4.', 'Verlusttag nach Regeln', '−4.560 $'],
+              ['23.4.', 'Ruhe nach gestrecktem Tag', 'klein'],
+              ['28.4.', 'Fehlausbrüche, Risikomodell', '+2.100 $'],
+              ['30.4.', 'News-Absturz, Footprint', 'klein'],
+              ['5.5.', 'Gamma-Wand, Heatmap', '± 0'],
+              ['7.5.', 'Richtige Zone, Spoofing, Earnings', '+2.000 $'],
+              ['12.5.', 'Short-Trendtag, Regime', 'fünfstellig'],
+              ['14.5.', 'Freddy 1: Warum Optionen bewegen', '–'],
+              ['19.5.', 'Freddy 2: Open Interest, Pin', '–'],
+              ['26.5.', 'Freddy 3: Volatilität', '–'],
+              ['27.5.', 'Live mit Freddy', 'klein'],
+              ['2.6.', 'Gamma-Squeeze, Swing-Modell', 'Gewinn'],
+              ['4.6.', 'Prop-Modell live', '3 Ziele, 1 Stop'],
+              ['9.6.', 'Absturz im negativen Gamma', 'Gewinn'],
+              ['11.6.', 'Prop-Konto live', '−3R'],
+              ['16.6.', 'OPEX, Pinning', 'fast zurückgeholt'],
+              ['18.6.', 'Pin an 30.607, Earnings-Scanner', 'leicht plus'],
+              ['23.6.', 'Kampf an der 30.000', '+2,2R'],
+              ['25.6.', 'Hyperscalping im Absturz', '+4R'],
+              ['30.6.', 'Zäher Tag', '± 0'],
+              ['7.7.', 'Big Trades, Q2-Abschluss', '+3,2R'],
+            ],
+          },
+          {
+            merk: 'Auch der beste Trader hat Verlusttage. Entscheidend ist, wie klein sie bleiben.',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 /* Erste Antwort ist die richtige; angezeigt wird gemischt. */
@@ -858,6 +1001,69 @@ const FABIO_QUIZ = {
         'Erst die Kommentare lesen',
       ],
       e: 'Die Großen bewegen sich nach Geldflüssen, lange bevor die Nachricht kommt. Er liest COT und Big Trades statt Schlagzeilen.',
+    },
+  ],
+  8: [
+    {
+      id: 'f8-1',
+      q: 'Was ist laut Fabio der beste Richtungsfilter, den er je gefunden hat?',
+      o: ['IVB + Null-Gamma-Linie', 'RSI + MACD', 'Gleitender Durchschnitt', 'Fibonacci'],
+      e: 'Bricht die IVB in dieselbe Richtung, in die die Null-Gamma-Linie zeigt, ist die Richtung des Tages für ihn klar.',
+    },
+    {
+      id: 'f8-2',
+      q: 'Der Markt ist im stark negativen Gamma, deine Limit-Order wird nicht gefüllt. Was tust du?',
+      o: [
+        'Nicht hinterherlaufen, auf die nächste Chance warten',
+        'Sofort per Market-Order rein',
+        'Doppelte Größe beim nächsten Trade',
+        'Gegen die Bewegung handeln',
+      ],
+      e: 'Im negativen Gamma ist der Schlupf riesig. Eine Market-Order hinterher zerstört das Chance-Risiko.',
+    },
+    {
+      id: 'f8-3',
+      q: 'Du hattest heute schon drei Stops. Was macht Fabio mit dem Risiko pro Trade?',
+      o: [
+        'Er macht es kleiner',
+        'Er macht es größer',
+        'Er lässt es gleich und handelt weiter',
+        'Er verdoppelt es',
+      ],
+      e: 'Nach Stops geht er von 1.000 $ auf 800 $ und 500 $ runter. Größer wird er nur mit dem Gewinn des Tages.',
+    },
+    {
+      id: 'f8-4',
+      q: 'Am Verfallstag (OPEX) klebt der Preis an der größten Options-Marke. Was ist der beste Trade?',
+      o: [
+        'Nicht handeln',
+        'Jeden Ausbruch kaufen',
+        'Große Position mit weitem Stop',
+        'Ziel 1:10 setzen',
+      ],
+      e: 'Beim Pinning wird jeder Ausbruch abverkauft und jeder Einbruch zurückgekauft. Freddy und Fabio raten zum Zuschauen.',
+    },
+    {
+      id: 'f8-5',
+      q: 'Wie viel darf Fabio an einem Tag höchstens riskieren?',
+      o: [
+        'Den Gewinn der letzten guten Session',
+        'Das ganze Konto',
+        'Immer genau 5 %',
+        'So viel, bis er wieder im Plus ist',
+      ],
+      e: 'Das Tages-Risiko ist durch den Gewinn der letzten positiven Session gedeckelt. So bezahlt der Markt den Versuch.',
+    },
+    {
+      id: 'f8-6',
+      q: 'Wird unten am Markt plötzlich groß Volatilität gekauft (Puts), was erwartet Freddy?',
+      o: [
+        'Oft eine Umkehr – die Bewegung wird gebremst',
+        'Einen noch stärkeren Absturz',
+        'Gar nichts, das ist Zufall',
+        'Einen Gamma-Squeeze nach unten',
+      ],
+      e: 'Gekaufte Volatilität wirkt wie eine Bremse. Danach starten die Großen oft eine Kaufkampagne in den Futures.',
     },
   ],
 };
